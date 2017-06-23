@@ -1,0 +1,20 @@
+version: '2.1'
+
+services:
+ mongo:
+  image: mongo:3.5-windowsservercore
+
+ mssql:
+  image: mssql-sitecore
+  mem_limit: 1024m
+
+ sitecore:
+  image: sitecore
+  depends_on:
+    - mongo
+    - mssql
+
+networks:
+ default:
+  external:
+   name: "nat"
