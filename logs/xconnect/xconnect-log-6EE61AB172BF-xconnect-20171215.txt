@@ -1,0 +1,3 @@
+2017-12-15 09:39:23.903 +01:00 [Information] XConnect Test Host Application Start, Machine: "6EE61AB172BF", Site: "xconnect", AppId: "/LM/W3SVC/928776700/ROOT"
+2017-12-15 09:39:25.684 +01:00 [Information] Certificate Validation Filter Enabled, Thumbprint: 81DEF67A93249A7FC34C7D13EDA77EEA2C3D483F
+2017-12-15 09:39:25.700 +01:00 [Information] SSL Validation Filter Enabled
