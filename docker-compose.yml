@@ -7,9 +7,12 @@ services:
     dockerfile: ./mssql/Dockerfile
     args:
       DB_PREFIX: ${SQL_DB_PREFIX}
+      SITECORE_PACKAGE: ${SITECORE_PACKAGE}
+      XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
+      HOST_NAME: mssql
   environment:
     ACCEPT_EULA: "Y"      
-    SA_PASSWORD: ${SQL_SA_PASSWORD}
+    sa_password: ${SQL_SA_PASSWORD}
   mem_limit: 6048m
   networks:
     app_net:
@@ -25,6 +28,7 @@ services:
       SERVICE_NAME: ${SOLR_SERVICE_NAME}  
       XCONNECT_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
       SITECORE_CORE_PREFIX: ${SITECORE_SOLR_CORE_PREFIX}
+      CONFIG_PACKAGE: ${CONFIG_PACKAGE}      
   ports:
     - ${SOLR_PORT}
   mem_limit: 4024m
@@ -42,6 +46,8 @@ services:
       SITE_NAME: ${XCONNECT_SITE_NAME}
       SOLR_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
       SOLR_PORT: ${SOLR_PORT}
+      XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
+      CONFIG_PACKAGE: ${CONFIG_PACKAGE}      
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
   networks:
@@ -60,6 +66,8 @@ services:
       SQL_DB_PREFIX: ${SQL_DB_PREFIX}
       SITE_NAME: ${SITECORE_SITE_NAME}
       SOLR_PORT: ${SOLR_PORT}    
+      SITECORE_PACKAGE: ${SITECORE_PACKAGE}
+      CONFIG_PACKAGE: ${CONFIG_PACKAGE}      
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
   depends_on:

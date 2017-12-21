@@ -9,11 +9,11 @@ ARG SQL_DB_PREFIX
 ARG SQL_SERVER="mssql"
 ARG SITE_NAME="sitecore"
 ARG SOLR_PORT=8983
+ARG CONFIG_PACKAGE="XP0 Configuration files rev.171002.zip"
+ARG SITECORE_PACKAGE="Sitecore 9.0.0 rev. 171002 (OnPrem)_single.scwdp.zip"
 
-ADD files/install /Files
+ADD files /Files
 ADD scripts /Scripts
-ADD ./xConnect.pfx /Files
-ADD ./solr.pfx /Files
 
 ENV XCONNECT_CERT_PATH "c:\\Files\\xConnect.pfx"
 ENV SOLR_CERT_PATH "c:\\Files\\solr.pfx"
@@ -40,17 +40,17 @@ RUN /Scripts/Install-SIF.ps1
 
 RUN Remove-Website -Name 'Default Web Site'
 
-ENV SIF_CONFIG="c:/Files/sitecore-XP0.json"
+RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config 
+
+ENV SIF_CONFIG="c:/Files/Config/sitecore-XP0.json"
 
 RUN $config = Get-Content $Env:SIF_CONFIG | Where-Object { $_ -notmatch '^\s*\/\/'} | Out-String | ConvertFrom-Json; `
     $config.Tasks.InstallWDP.Params.Arguments | Add-Member -Name 'Skip' -Value @(@{'ObjectName' = 'dbDacFx'}, @{'ObjectName' = 'dbFullSql'}) -MemberType NoteProperty; `
     ConvertTo-Json $config -Depth 50 | Set-Content -Path $Env:SIF_CONFIG
 
-ENV PACKAGE_FILE="c:/Files/Sitecore 9.0.0 rev. 171002 OnPrem_single.scwdp.zip"
-
 RUN $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
     Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
-    -Package $Env:PACKAGE_FILE `
+    -Package c:/Files/$Env:SITECORE_PACKAGE `
     -LicenseFile "c:/Files/license.xml" `
     -Sitename $Env:SITE_NAME `
     -SqlDbPrefix $Env:SQL_DB_PREFIX `

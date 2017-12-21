@@ -8,6 +8,8 @@ ARG PORT=8983
 ARG SERVICE_NAME="Solr-6"
 ARG XCONNECT_CORE_PREFIX="xp0"
 ARG SITECORE_CORE_PREFIX="xp0"
+ARG CONFIG_PACKAGE="XP0 Configuration files rev.171002.zip"
+
 ENV SERVICE_NAME=${SERVICE_NAME}
 ENV JAVA_HOME /Java/jre
 
@@ -24,9 +26,8 @@ RUN Invoke-WebRequest -Method Get -Uri "http://mirrors.ukfast.co.uk/sites/ftp.ap
     Expand-Archive -Path /solr.zip -DestinationPath /solr ; `
     Remove-Item /solr.zip -Force
 
-ADD files/install /Files
+ADD files /Files
 ADD scripts /Scripts
-ADD ./solr.pfx /Files
 ADD solr/Configure-SSL.ps1 /Scripts/
 
 RUN C:\Scripts\Configure-SSL.ps1 -solrHost "$Env:HOST_NAME" -certPath c:\Files\solr.pfx
@@ -44,15 +45,17 @@ RUN Invoke-WebRequest -Method Get -Uri "https://nssm.cc/release/nssm-2.24.zip" -
 RUN /nssm/nssm-2.24/win64/nssm.exe install $Env:SERVICE_NAME "/solr/solr-6.6.2/bin/solr.cmd" "start" "-f" "-p $Env:PORT"
 RUN /nssm/nssm-2.24/win64/nssm.exe set $Env:SERVICE_NAME AppEnvironmentExtra JAVA_HOME=C:\java\jre
 
+RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config 
+
 RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
-    Install-SitecoreConfiguration -Path "C:\\Files\\xconnect-solr.json" `
+    Install-SitecoreConfiguration -Path "C:\\Files\\Config\\xconnect-solr.json" `
         -SolrUrl $solrUrl `
         -SolrRoot "c:\\solr\\solr-6.6.2" `
         -SolrService $Env:SERVICE_NAME `
         -CorePrefix $Env:XCONNECT_CORE_PREFIX
 
 RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
-    Install-SitecoreConfiguration -Path "C:\\Files\\sitecore-solr.json" `
+    Install-SitecoreConfiguration -Path "C:\\Files\\Config\\sitecore-solr.json" `
         -SolrUrl $solrUrl `
         -SolrRoot "c:\\solr\\solr-6.6.2" `
         -SolrService $Env:SERVICE_NAME `

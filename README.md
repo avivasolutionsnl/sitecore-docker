@@ -3,24 +3,35 @@ Run Sitecore using Docker and Windows containers.
 # Requirements
 - Docker for Windows: https://docs.docker.com/docker-for-windows/
 - Hyper-V enabled
+- Sitecore installation files
 
 # Build
 As Sitecore does not distribute Docker images, the first step is to build the required Sitecore Docker images.
-For this you need a Sitecore zip file and a Sitecore license file.
+For this you need the Sitecore installation files and a Sitecore license file. Download the Sitecore 9 packages for
+XP Single and unzip the file in the `files` folder in this repository. 
 
-To build:
-```
-$ ./Build.ps1 Sitecore.zip license.xml
-```
+The xp0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
+xConnect and SOLR roles. You can generate these by running the './Generate-Certificates.ps1' script. 
 
-The build results in having two Docker images:
+Next, modify the .env file and change the build parameters if needed:
+
+| Field                     | Description                                      |
+| ------------------------- | ------------------------------------------------ |
+| SQL_SA_PASSWORD           | The password to use for the SQL sa user          |
+| SQL_DB_PREFIX             | Prefix to use for all DB names                   |
+| SOLR_HOST_NAME            | Host name to use for the SOLR instance           |
+| SOLR_PORT                 | Port to use for the SOLR instance                |
+| SOLR_SERVICE_NAME         | Name of the SOLR Windows service                 |
+| XCONNECT_SITE_NAME        | Host name of the Xconnect site                   |
+| XCONNECT_SOLR_CORE_PREFIX | Prefix to use for the XConnect SOLR cores        |
+| SITECORE_SITE_NAME        | Host name of the Sitecore site                   |
+| SITECORE_SOLR_CORE_PREFIX | Prefix to use for the Sitecore SOLR cores        |
+
+The build results in the following Docker images:
 - sitecore: IIS + ASP.NET + Sitecore
-- mssql-sitecore: MS SQL + Sitecore databases
-
-Optionally, verify that by running:
-```
-$ docker images
-```
+- mssql: MS SQL + Sitecore databases
+- solr: Apache Solr 
+- xconnect: IIS + ASP.NET + XConnect
 
 # Run
 Docker compose is used to start up all required services.
@@ -30,23 +41,20 @@ To start Sitecore:
 $ docker-compose up
 ```
 
-## Port mapping
-Windows Containers use WinNAT for networking. Currently WinNAT does not support (https://blogs.technet.microsoft.com/virtualization/2016/05/25/windows-nat-winnat-capabilities-and-limitations/) accessing external endpoints running on the same host.
-To overcome this limitation a workaround is to use the internal IP address of the container. Look up the internal IP of a container using `docker inspect`, e.g:
-```
-$ docker inspect -f '{{ .NetworkSettings.IPAddress }}' docker_sitecore_1
-```
-### Traefik
-[Traefik](https://traefik.io/) enables you to access a container (that exposes port 80) by using its name and (by docker-compose) given prefix. Download the Traefik executable [here](https://github.com/containous/traefik/releases) (choose traefik_windows-amd64 for Windows).
+## DNS
+The containers have fixed IP addresses in the docker compose file. The easiest way to access the containers from the host is by adding the following to your hosts file:
 
-To run Traefik:
+``` Hosts
+172.16.238.10	solr
+172.16.238.12	xconnect
+172.16.238.13	sitecore
+172.16.238.11	mssql
 ```
-$ traefik_windows-amd64 --configFile=traefik/traefik.toml
-```
-> The provided configuration uses port 80 and 8080, so make sure that no other service (e.g. IIS) are using these ports. 
 
-To view the Traefik admin panel go to: `http://localhost:8080`
+## Log files
+Logging is set up to log on the host under the logs folder of this repository. 
 
-For Sitecore go to: `http://sitecore.docker.localhost`.
-This follows the pattern `http://<container name>.<prefix>.localhost`. Docker compose uses by default the working directory as prefix.
-
+## Known issues
+- Installation files are not removed
+- Size of images is not optimized (Multiple RUN statements)
+- Docker best practices?
