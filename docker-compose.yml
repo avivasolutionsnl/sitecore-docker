@@ -67,9 +67,10 @@ services:
       SITE_NAME: ${SITECORE_SITE_NAME}
       SOLR_PORT: ${SOLR_PORT}    
       SITECORE_PACKAGE: ${SITECORE_PACKAGE}
-      CONFIG_PACKAGE: ${CONFIG_PACKAGE}      
+      CONFIG_PACKAGE: ${CONFIG_PACKAGE}     
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
+    - .\wwwroot\sitecore:C:\Workspace
   depends_on:
     - xconnect
     - mssql
@@ -77,6 +78,29 @@ services:
   networks:
     app_net:
       ipv4_address: 172.16.238.13    
+
+ commerce:
+  build: 
+    context: ./
+    dockerfile: ./commerce/Dockerfile
+    args:
+      SQL_SA_PASSWORD: ${SQL_SA_PASSWORD}
+      SQL_DB_PREFIX: ${SQL_DB_PREFIX}
+      SOLR_PORT: ${SOLR_PORT}    
+  volumes:
+    - .\logs\commerce\CommerceAuthoring_Sc9:C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\logs
+    - .\logs\commerce\CommerceMinions_Sc9:C:\inetpub\wwwroot\CommerceMinions_Sc9\wwwroot\logs
+    - .\logs\commerce\CommerceOps_Sc9:C:\inetpub\wwwroot\CommerceOps_Sc9\wwwroot\logs
+    - .\logs\commerce\CommerceShops_Sc9:C:\inetpub\wwwroot\CommerceShops_Sc9\wwwroot\logs
+    - .\logs\commerce\SitecoreIdentityServer:C:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot\logs
+  depends_on:
+    - xconnect
+    - mssql
+    - solr
+    - sitecore
+  networks:
+    app_net:
+      ipv4_address: 172.16.238.14   
 
 networks:
   app_net:

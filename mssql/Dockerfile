@@ -7,6 +7,8 @@ ARG DB_PREFIX
 ARG HOST_NAME
 ARG SITECORE_PACKAGE="Sitecore 9.0.0 rev. 171002 (OnPrem)_single.scwdp.zip"
 ARG XCONNECT_PACKAGE="Sitecore 9.0.0 rev. 171002 (OnPrem)_xp0xconnect.scwdp.zip"
+ARG COMMERCE_SDK_PACKAGE="Sitecore.Commerce.SDK.2.0.1328.zip"
+ARG COMMERCE_SIF_PACKAGE="SIF.Sitecore.Commerce.1.0.1626.zip"
 
 ENV ACCEPT_EULA "Y"
 ENV SQL_PACKAGE_EXE='C:\Program Files (x86)\Microsoft SQL Server\*\DAC\bin\SqlPackage.exe'
@@ -45,4 +47,23 @@ RUN $DB_NAME='{0}_Xdb.Collection.ShardMapManager' -f $Env:DB_PREFIX; `
 RUN $sqlcmd = 'UPDATE [{0}_Xdb.Collection.ShardMapManager].[__ShardManagement].[ShardsGlobal] SET ServerName = ''{1}''' -f $Env:DB_PREFIX, $Env:HOST_NAME; `
     sqlcmd -Q $sqlcmd 
 
+RUN Expand-Archive -Path /Files/$Env:COMMERCE_SDK_PACKAGE -DestinationPath /Files/Commerce 
+
+# Install commerce engine databases
+RUN & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Commerce/Sitecore.Commerce.Engine.DB.dacpac' /tdn:SitecoreCommerce9_SharedEnvironments /tsn:$Env:COMPUTERNAME
+RUN & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Commerce/Sitecore.Commerce.Engine.DB.dacpac' /tdn:SitecoreCommerce9_Global /tsn:$Env:COMPUTERNAME
+
 RUN sqlcmd -Q \"EXEC sp_MSforeachdb 'IF charindex(''Sitecore'', ''?'' ) = 1 BEGIN EXEC [?]..sp_changedbowner ''sa'' END'\" 
+
+RUN Expand-Archive -Path /Files/$Env:COMMERCE_SIF_PACKAGE -DestinationPath /Files/CommerceSIF
+
+RUN Add-WindowsFeature Web-Server
+
+ADD scripts /Scripts
+RUN /Scripts/Install-SIF.ps1
+
+RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/CommerceSIF/Modules'); `
+    $connStr = 'Data Source=.;Initial Catalog={0}_Core;Integrated Security=True;' -f $Env:DB_PREFIX; `
+    Install-SitecoreConfiguration -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\CommerceEngine\\CommerceEngine.UserRoles.json" `
+    -ConnectionString $connStr
+

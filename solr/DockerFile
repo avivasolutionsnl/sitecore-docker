@@ -9,6 +9,7 @@ ARG SERVICE_NAME="Solr-6"
 ARG XCONNECT_CORE_PREFIX="xp0"
 ARG SITECORE_CORE_PREFIX="xp0"
 ARG CONFIG_PACKAGE="XP0 Configuration files rev.171002.zip"
+ARG COMMERCE_SIF_PACKAGE="SIF.Sitecore.Commerce.1.0.1626.zip"
 
 ENV SERVICE_NAME=${SERVICE_NAME}
 ENV JAVA_HOME /Java/jre
@@ -60,6 +61,16 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
         -SolrRoot "c:\\solr\\solr-6.6.2" `
         -SolrService $Env:SERVICE_NAME `
         -CorePrefix $Env:SITECORE_CORE_PREFIX
+
+RUN Expand-Archive -Path /Files/$Env:COMMERCE_SIF_PACKAGE -DestinationPath /Files/CommerceSIF 
+
+RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
+    Install-SitecoreConfiguration -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json" `
+        -SolrUrl $solrUrl `
+        -SolrRoot "c:\\solr\\solr-6.6.2" `
+        -SolrService $Env:SERVICE_NAME `
+        -CorePrefix $Env:SITECORE_CORE_PREFIX `
+        -SolrSchemas "C:\\Files\\CommerceSIF\\SolrSchemas"
 
 EXPOSE 8983
 

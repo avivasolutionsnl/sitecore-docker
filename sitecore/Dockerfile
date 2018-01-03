@@ -17,13 +17,16 @@ ADD scripts /Scripts
 
 ENV XCONNECT_CERT_PATH "c:\\Files\\xConnect.pfx"
 ENV SOLR_CERT_PATH "c:\\Files\\solr.pfx"
+ENV SITECORE_CERT_PATH "c:\\Files\\sitecore.pfx"
 
 # Trust Self signed certificates
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:SOLR_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
+RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
 
 # Import XConnect certificate
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
+RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
 # Install WebDeploy
 ENV WEBDEPLOY_MSI="webdeploy.msi"
@@ -83,8 +86,19 @@ RUN $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
 
 RUN Remove-Item -Recurse -Force -Path "c:\inetpub\wwwroot\$Env:SITE_NAME\App_Data\logs"
 
+# get the web binding of the site
+RUN $pwd = ConvertTo-SecureString -String 'secret' -Force -AsPlainText; `
+    $PFXCert = Get-PfxData -FilePath $Env:SITECORE_CERT_PATH -Password $pwd; `
+    New-WebBinding -Name $Env:SITE_NAME -IPAddress * -Port 443 -Protocol "https"; `
+    $binding = Get-WebBinding -Name $Env:SITE_NAME -Protocol "https"; `
+    $binding.AddSslCertificate($PFXCert.EndEntityCertificates.ThumbPrint, 'my')
+
+ADD config /Config
+RUN Copy-Item /Config/*.* c:\inetpub\wwwroot\$Env:SITE_NAME\App_Config\Include
+
 # Start site
 RUN Start-WebAppPool -Name $Env:SITE_NAME; `
     Start-Website -Name $Env:SITE_NAME
 
+# CMD /Scripts/Watch-Directory.ps1 -Path C:\Workspace -Destination c:\inetpub\wwwroot\$Env:SITE_NAME
 ENTRYPOINT C:\ServiceMonitor.exe w3svc
