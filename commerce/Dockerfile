@@ -8,6 +8,8 @@ ARG SQL_SERVER="mssql"
 ARG SOLR_PORT=8983
 ARG SOLR_CORE_PREFIX="xp0"
 ARG HOST_NAME="commerce"
+ARG SHOP_NAME="myshop"
+ARG ENVIRONMENT_NAME="myshopauthoring"
 
 ADD files /Files
 ADD scripts /Scripts
@@ -15,6 +17,7 @@ ADD scripts /Scripts
 ENV XCONNECT_CERT_PATH "c:\\Files\\xConnect.pfx"
 ENV SOLR_CERT_PATH "c:\\Files\\solr.pfx"
 ENV SITECORE_CERT_PATH "c:\\Files\\sitecore.pfx"
+ENV COMMERCE_CERT_PATH "c:\\Files\\commerce.pfx"
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -24,6 +27,10 @@ WORKDIR /Files
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:SOLR_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
+RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
+
+# Import certificate
+RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
 # Import XConnect certificate
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
@@ -75,6 +82,11 @@ ADD scripts /Scripts
 
 # Install SIF
 RUN /Scripts/Install-SIF.ps1
+
+# Install IIS URL Rewrite
+ENV URLREWRITE_MSI="urlrewrite.msi"
+ADD http://download.microsoft.com/download/D/D/E/DDE57C26-C62C-4C59-A1BB-31D58B36ADA2/rewrite_amd64_en-US.msi ${URLREWRITE_MSI}
+RUN Start-Process msiexec.exe -ArgumentList '/i', $Env:URLREWRITE_MSI, '/quiet', '/norestart' -NoNewWindow -Wait
 
 RUN net user /add commerceuser 'Pa$$w0rd'
 
@@ -179,3 +191,40 @@ RUN /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
 
 RUN /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
     -hostName 'sitecore'
+
+# Set the certificate details of the certificate sitecore will connect with
+RUN $CommerceServicesPathCollction = @('C:\\inetpub\\wwwroot\\CommerceAuthoring_Sc9', 'C:\\inetpub\\wwwroot\\CommerceMinions_Sc9', `
+                                       'C:\\inetpub\\wwwroot\\CommerceOps_Sc9', 'C:\\inetpub\\wwwroot\\CommerceShops_Sc9'); `
+    $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2; `
+    $cert.Import('c:\\Files\\commerce.pfx', 'secret', 'MachineKeySet'); `
+    foreach($path in $CommerceServicesPathCollction) { `
+        $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json"); `
+        $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json; `
+        $certificateNode = $originalJson.Certificates.Certificates[0]; `
+		$certificateNode.Thumbprint = $cert.Thumbprint; `
+        $certificateNode.Subject = $cert.Subject; `
+        $certificateNode.IssuerCN = $cert.Issuer; `
+		$originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson; `
+    } 
+
+# Configure the business tools
+RUN $pathToJson = $(Join-Path -Path 'C:\\inetpub\\wwwroot\\SitecoreBizFx' -ChildPath "assets\\config.json"); `
+    $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json; `
+    $originalJson.EnvironmentName = $Env:ENVIRONMENT_NAME; `
+    $originalJson.EngineUri = ('http://{0}:5000' -f $Env:HOST_NAME); `
+    $originalJson.IdentityServerUri = ('http://{0}:5050' -f $Env:HOST_NAME); `
+    $originalJson.BizFxUri = ('http://{0}:4200' -f $Env:HOST_NAME); `
+    $originalJson.ShopName = $Env:SHOP_NAME; `
+    $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson;
+
+# Configure the business tools with the correct settings in Identity server
+RUN $pathToAppSettings  = $(Join-Path -Path c:\inetpub\wwwroot\SitecoreIdentityServer -ChildPath "appsettings.json"); `
+    $json = Get-Content $pathToAppSettings -raw | ConvertFrom-Json; `
+    $json.AppSettings.Clients[0].RedirectUris[0] = ('http://{0}:4200' -f $Env:HOST_NAME); `
+    $json.AppSettings.Clients[0].RedirectUris[1] = ('http://{0}:4200/?' -f $Env:HOST_NAME); `
+    $json.AppSettings.Clients[0].PostLogoutRedirectUris[0] = ('http://{0}:4200' -f $Env:HOST_NAME); `
+    $json.AppSettings.Clients[0].PostLogoutRedirectUris[1] = ('http://{0}:4200/?' -f $Env:HOST_NAME); `
+    $json.AppSettings.Clients[0].AllowedCorsOrigins[0] = ('http://{0}:4200/' -f $Env:HOST_NAME); `
+    $json.AppSettings.Clients[0].AllowedCorsOrigins[1] = ('http://{0}:4200' -f $Env:HOST_NAME); `         
+    $json = ConvertTo-Json $json -Depth 100; `
+    Set-Content $pathToAppSettings -Value $json -Encoding UTF8;

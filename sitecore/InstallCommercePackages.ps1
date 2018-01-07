@@ -20,3 +20,28 @@ Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/C
     -MergeTool '/Files/Sitecore.Commerce.Deployment.HelperTools/CSSiteCoreWebConfigMerger.exe' `
     -InputFile c:\\inetpub\\wwwroot\\sitecore\\MergeFiles\\Sitecore.Commerce.Engine.Connectors.Merge.Config `
     -WebConfig c:\\inetpub\\wwwroot\\sitecore\\web.config
+
+# Modify the commerce engine connection
+$engineConnectIncludeDir = 'c:\\inetpub\\wwwroot\\sitecore\\App_Config\\Include\\Y.Commerce.Engine'; `
+$cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2; `
+$cert.Import('c:\\Files\\commerce.pfx', 'secret', 'MachineKeySet'); `
+$pathToConfig = $(Join-Path -Path $engineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.config"); `
+$xml = [xml](Get-Content $pathToConfig); `
+$node = $xml.configuration.sitecore.commerceEngineConfiguration; `
+$node.certificateThumbprint = $cert.Thumbprint; `
+$xml.Save($pathToConfig); `
+$pathToConfig = $(Join-Path -Path $engineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.DataProvider.config.disabled"); `
+$xml = [xml](Get-Content $pathToConfig); `
+$node = $xml.configuration.sitecore.catalogProviderEngineConfiguration; `
+$node.certificateThumbprint = $cert.Thumbprint; `
+$xml.Save($pathToConfig)
+
+$engineConnectIncludeDir = 'c:\\inetpub\\wwwroot\\sitecore\\App_Config\\Include\\Y.Commerce.Engine'; `
+$pathToConfig = $(Join-Path -Path $engineConnectIncludeDir -ChildPath "\Sitecore.Commerce.Engine.DataProvider.config.disabled"); `
+$xml = [xml](Get-Content $pathToConfig); `
+$node = $xml.configuration.sitecore.catalogProviderEngineConfiguration; `
+$node.shopsServiceUrl = 'http://commerce:5000/api/'; `
+$node.commerceOpsServiceUrl = 'http://commerce:5000/commerceops/'; `
+$node.defaultEnvironment = 'MercuryFoodAuthoring'; `
+$node.defaultShopName = 'MercuryFood'; `
+$xml.Save($pathToConfig)

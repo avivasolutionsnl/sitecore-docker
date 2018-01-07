@@ -37,7 +37,7 @@ services:
       ipv4_address: 172.16.238.10
 
  xconnect:
-  build: 
+  build:  
     context: ./
     dockerfile: ./xconnect/Dockerfile
     args:
@@ -87,6 +87,8 @@ services:
       SQL_SA_PASSWORD: ${SQL_SA_PASSWORD}
       SQL_DB_PREFIX: ${SQL_DB_PREFIX}
       SOLR_PORT: ${SOLR_PORT}    
+      SHOP_NAME: ${COMMERCE_SHOP_NAME}
+      ENVIRONMENT_NAME: ${COMMERCE_ENVIRONMENT_NAME}
   volumes:
     - .\logs\commerce\CommerceAuthoring_Sc9:C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\logs
     - .\logs\commerce\CommerceMinions_Sc9:C:\inetpub\wwwroot\CommerceMinions_Sc9\wwwroot\logs
