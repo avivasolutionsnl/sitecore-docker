@@ -83,11 +83,6 @@ ADD scripts /Scripts
 # Install SIF
 RUN /Scripts/Install-SIF.ps1
 
-# Install IIS URL Rewrite
-ENV URLREWRITE_MSI="urlrewrite.msi"
-ADD http://download.microsoft.com/download/D/D/E/DDE57C26-C62C-4C59-A1BB-31D58B36ADA2/rewrite_amd64_en-US.msi ${URLREWRITE_MSI}
-RUN Start-Process msiexec.exe -ArgumentList '/i', $Env:URLREWRITE_MSI, '/quiet', '/norestart' -NoNewWindow -Wait
-
 RUN net user /add commerceuser 'Pa$$w0rd'
 
 RUN Expand-Archive -Path './SIF.Sitecore.Commerce.1.0.1626.zip' -DestinationPath './SIF.Sitecore.Commerce.1.0.1626'; 
@@ -154,6 +149,9 @@ RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceShops
 
 RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 RUN choco install -y --params="Quiet" dotnetcore-windowshosting
+
+# Install IIS URL Rewrite
+RUN choco install -y --params="Quiet" urlrewrite
 
 RUN $pathToAppSettings  = $(Join-Path -Path c:\inetpub\wwwroot\SitecoreIdentityServer -ChildPath "appsettings.json"); `
     $json = Get-Content $pathToAppSettings -raw | ConvertFrom-Json; `

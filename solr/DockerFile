@@ -33,7 +33,7 @@ ADD solr/Configure-SSL.ps1 /Scripts/
 
 RUN C:\Scripts\Configure-SSL.ps1 -solrHost "$Env:HOST_NAME" -certPath c:\Files\solr.pfx
 
-RUN $hostFileName = 'c:\\windows\\system32\\drivers\\etc\\hosts'; '`r`n127.0.0.1`t$Env:HOST_NAME' | Add-Content $hostFileName
+RUN $hostFileName = 'c:\\windows\\system32\\drivers\\etc\\hosts'; '\"`r`n127.0.0.1`t$Env:HOST_NAME\"' | Add-Content $hostFileName
 
 RUN /Scripts/Install-SIF.ps1
 
