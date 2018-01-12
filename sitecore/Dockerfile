@@ -1,4 +1,16 @@
 # escape=`
+
+# Stage 0: prepare files
+FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
+
+ARG CONFIG_PACKAGE="XP0 Configuration files rev.171002.zip"
+
+ADD files /Files
+
+RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config 
+
+
+# Stage 1: create actual image
 FROM microsoft/aspnet:4.7.1-windowsservercore-1709
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
@@ -9,10 +21,12 @@ ARG SQL_DB_PREFIX
 ARG SQL_SERVER="mssql"
 ARG SITE_NAME="sitecore"
 ARG SOLR_PORT=8983
-ARG CONFIG_PACKAGE="XP0 Configuration files rev.171002.zip"
 ARG SITECORE_PACKAGE="Sitecore 9.0.0 rev. 171002 (OnPrem)_single.scwdp.zip"
 
-ADD files /Files
+COPY files/*.pfx /Files/
+COPY files/license.xml /Files/
+COPY files/$SITECORE_PACKAGE /Files/
+COPY --from=prepare /Files/Config /Files/Config/
 ADD scripts /Scripts
 
 ENV XCONNECT_CERT_PATH "c:\\Files\\xConnect.pfx"
@@ -45,8 +59,6 @@ RUN Start-Process msiexec.exe -ArgumentList '/i', $Env:URLREWRITE_MSI, '/quiet',
 RUN /Scripts/Install-SIF.ps1
 
 RUN Remove-Website -Name 'Default Web Site'
-
-RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config 
 
 ENV SIF_CONFIG="c:/Files/Config/sitecore-XP0.json"
 
@@ -98,6 +110,9 @@ RUN $pwd = ConvertTo-SecureString -String 'secret' -Force -AsPlainText; `
 
 ADD config /Config
 RUN Copy-Item /Config/*.* c:\inetpub\wwwroot\$Env:SITE_NAME\App_Config\Include
+
+# enable live-mode
+RUN mv C:\inetpub\wwwroot\sitecore\App_Config\Include\Examples\LiveMode.config.example C:\inetpub\wwwroot\sitecore\App_Config\Include\Examples\LiveMode.config
 
 # Start site
 RUN Start-WebAppPool -Name $Env:SITE_NAME; `

@@ -27,7 +27,9 @@ RUN Invoke-WebRequest -Method Get -Uri "http://mirrors.ukfast.co.uk/sites/ftp.ap
     Expand-Archive -Path /solr.zip -DestinationPath /solr ; `
     Remove-Item /solr.zip -Force
 
-ADD files /Files
+ADD files/$CONFIG_PACKAGE /Files/
+ADD files/$COMMERCE_SIF_PACKAGE /Files/
+ADD files/solr.pfx /Files/
 ADD scripts /Scripts
 ADD solr/Configure-SSL.ps1 /Scripts/
 

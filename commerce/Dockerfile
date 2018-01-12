@@ -1,5 +1,56 @@
 # escape=`
+
+# Stage 0: prepare files & build prerequisites
+FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+WORKDIR /Files
+
+ADD files /Files
+ADD scripts /Scripts
+
+# Expand installation files
+RUN Expand-Archive -Path '/Files/Sitecore.Commerce.SDK.2.0.1328.zip' -DestinationPath '/Files/Sitecore.Commerce.SDK.2.0.1328'; 
+RUN Expand-Archive -Path '/Files/Sitecore.IdentityServer.SDK.1.0.48.zip' -DestinationPath '/Files/Sitecore.IdentityServer.SDK.1.0.48'; 
+RUN Expand-Archive -Path '/Files/SIF.Sitecore.Commerce.1.0.1626.zip' -DestinationPath '/Files/SIF.Sitecore.Commerce.1.0.1626'; 
+RUN Expand-Archive -Path '/Files/Sitecore.BizFX.1.0.443.zip' -DestinationPath '/Files/Sitecore.BizFX'; 
+
+ENV DOTNET_SDK_DOWNLOAD_URL="https://download.microsoft.com/download/2/9/3/293BC432-348C-4D1C-B628-5AC8AB7FA162/dotnet-sdk-2.1.3-win-x64.exe"
+
+RUN Invoke-WebRequest $Env:DOTNET_SDK_DOWNLOAD_URL -OutFile dotnetsdk.exe; `
+    & ./dotnetsdk.exe -q;
+
+ENV DOTNET_DEVELOPER_PACK_URL="https://download.microsoft.com/download/E/F/D/EFD52638-B804-4865-BB57-47F4B9C80269/NDP462-DevPack-KB3151934-ENU.exe"
+
+RUN Invoke-WebRequest $Env:DOTNET_DEVELOPER_PACK_URL -OutFile dotnetdevpack.exe; `
+    & ./dotnetdevpack.exe -q;
+
+ENV DOTNET_47_DEVELOPER_PACK_URL="https://download.microsoft.com/download/A/1/D/A1D07600-6915-4CB8-A931-9A980EF47BB7/NDP47-DevPack-KB3186612-ENU.exe"
+
+RUN Invoke-WebRequest $Env:DOTNET_47_DEVELOPER_PACK_URL -OutFile dotnetdevpack47.exe; `
+    & ./dotnetdevpack47.exe -q;
+
+ENV DOTNET_HOSTING_URL="https://download.microsoft.com/download/5/C/1/5C190037-632B-443D-842D-39085F02E1E8/DotNetCore.2.0.3-WindowsHosting.exe"
+
+RUN dotnet restore './Sitecore.Commerce.SDK.2.0.1328/Customer.Sample.Solution.sln'; `
+    dotnet publish './Sitecore.Commerce.SDK.2.0.1328/Customer.Sample.Solution.sln' -o '/Publish/Customer.Sample.Solution'; `
+    New-Item C:\Deploy\Customer.Sample.Solution -type directory; `
+    Compress-Archive -Path '/Publish/Customer.Sample.Solution/*' -DestinationPath C:\Deploy\Customer.Sample.Solution\Customer.Sample.Solution.zip
+
+RUN dotnet restore './Sitecore.IdentityServer.SDK.1.0.48/Sitecore.IdentityServer.sln'; `
+    dotnet publish './Sitecore.IdentityServer.SDK.1.0.48/Sitecore.IdentityServer.sln' -o '/Publish/Sitecore.IdentityServer'; `
+    New-Item C:\Deploy\Sitecore.IdentityServer -type directory; `
+    Compress-Archive -Path '/Publish/Sitecore.IdentityServer/*' -DestinationPath C:\Deploy\Sitecore.IdentityServer\Sitecore.IdentityServer.zip
+
+
+# Stage 1: create actual image
 FROM microsoft/aspnet:4.7.1-windowsservercore-1709
+
+ARG HOST_NAME="commerce"
+ARG SITECORE_HOSTNAME="sitecore"
+ARG SHOP_NAME="myshop"
+ARG ENVIRONMENT_NAME="myshopauthoring"
 
 ARG SQL_USER="sa"
 ARG SQL_SA_PASSWORD
@@ -7,13 +58,6 @@ ARG SQL_DB_PREFIX
 ARG SQL_SERVER="mssql"
 ARG SOLR_PORT=8983
 ARG SOLR_CORE_PREFIX="xp0"
-ARG HOST_NAME="commerce"
-ARG SHOP_NAME="myshop"
-ARG ENVIRONMENT_NAME="myshopauthoring"
-
-ADD files /Files
-ADD scripts /Scripts
-
 ENV XCONNECT_CERT_PATH "c:\\Files\\xConnect.pfx"
 ENV SOLR_CERT_PATH "c:\\Files\\solr.pfx"
 ENV SITECORE_CERT_PATH "c:\\Files\\sitecore.pfx"
@@ -22,6 +66,16 @@ ENV COMMERCE_CERT_PATH "c:\\Files\\commerce.pfx"
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 WORKDIR /Files
+
+# Copy required files
+ADD scripts /Scripts
+
+COPY files/*.pfx /Files/
+COPY --from=prepare /Files/Sitecore.Commerce.SDK.2.0.1328 /Files/Sitecore.Commerce.SDK.2.0.1328/
+COPY --from=prepare /Files/SIF.Sitecore.Commerce.1.0.1626 /Files/SIF.Sitecore.Commerce.1.0.1626/
+COPY --from=prepare /Files/Sitecore.BizFX /Files/Sitecore.BizFX/
+COPY --from=prepare /Deploy/Customer.Sample.Solution /Deploy/Customer.Sample.Solution/
+COPY --from=prepare /Deploy/Sitecore.IdentityServer /Deploy/Sitecore.IdentityServer/
 
 # Trust Self signed certificates
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:SOLR_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
@@ -35,58 +89,18 @@ RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:COMMERCE_CERT_PATH -se
 # Import XConnect certificate
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
-ENV DOTNET_SDK_EXE="dotnet-sdk.exe"
-
-ENV DOTNET_SDK_DOWNLOAD_URL="https://download.microsoft.com/download/2/9/3/293BC432-348C-4D1C-B628-5AC8AB7FA162/dotnet-sdk-2.1.3-win-x64.exe"
-
-RUN Invoke-WebRequest $Env:DOTNET_SDK_DOWNLOAD_URL -OutFile dotnetsdk.exe; `
-    & ./dotnetsdk.exe -q; 
-
-ENV DOTNET_DEVELOPER_PACK_URL="https://download.microsoft.com/download/E/F/D/EFD52638-B804-4865-BB57-47F4B9C80269/NDP462-DevPack-KB3151934-ENU.exe"
-
-RUN Invoke-WebRequest $Env:DOTNET_DEVELOPER_PACK_URL -OutFile dotnetdevpack.exe; `
-    & ./dotnetdevpack.exe -q; 
-
-ENV DOTNET_47_DEVELOPER_PACK_URL="https://download.microsoft.com/download/A/1/D/A1D07600-6915-4CB8-A931-9A980EF47BB7/NDP47-DevPack-KB3186612-ENU.exe"
-
-RUN Invoke-WebRequest $Env:DOTNET_47_DEVELOPER_PACK_URL -OutFile dotnetdevpack47.exe; `
-    & ./dotnetdevpack47.exe -q; 
-
-ENV DOTNET_HOSTING_URL="https://download.microsoft.com/download/5/C/1/5C190037-632B-443D-842D-39085F02E1E8/DotNetCore.2.0.3-WindowsHosting.exe"
-
-RUN Invoke-WebRequest $Env:DOTNET_HOSTING_URL -OutFile hosting.exe; `
-    & ./dotnetsdk.exe /quiet /install; 
-
-# Expand installation files
-RUN Expand-Archive -Path './Sitecore.Commerce.SDK.2.0.1328.zip' -DestinationPath './Sitecore.Commerce.SDK.2.0.1328'; 
-
 RUN $pathToProj = './Sitecore.Commerce.SDK.2.0.1328/src/Sitecore.Commerce.Engine/Sitecore.Commerce.Engine.csproj'; `
     [xml] $xml = Get-Content $pathToProj; `
     $node = $xml.SelectSingleNode('//Project/PropertyGroup/TargetFramework'); `
     $node.InnerText = 'net47'; `
     $xml.Save($pathToProj);
 
-RUN dotnet restore './Sitecore.Commerce.SDK.2.0.1328/Customer.Sample.Solution.sln'; `
-    dotnet publish './Sitecore.Commerce.SDK.2.0.1328/Customer.Sample.Solution.sln' -o '/Publish/Customer.Sample.Solution'; `
-    New-Item C:\Deploy\Customer.Sample.Solution -type directory; `
-    Compress-Archive -Path '/Publish/Customer.Sample.Solution/*' -DestinationPath C:\Deploy\Customer.Sample.Solution\Customer.Sample.Solution.zip
-
-RUN Expand-Archive -Path './Sitecore.IdentityServer.SDK.1.0.48.zip' -DestinationPath './Sitecore.IdentityServer.SDK.1.0.48'; 
-
-RUN dotnet restore './Sitecore.IdentityServer.SDK.1.0.48/Sitecore.IdentityServer.sln'; `
-    dotnet publish './Sitecore.IdentityServer.SDK.1.0.48/Sitecore.IdentityServer.sln' -o '/Publish/Sitecore.IdentityServer'; `
-    New-Item C:\Deploy\Sitecore.IdentityServer -type directory; `
-    Compress-Archive -Path '/Publish/Sitecore.IdentityServer/*' -DestinationPath C:\Deploy\Sitecore.IdentityServer\Sitecore.IdentityServer.zip
-
-ADD scripts /Scripts
+RUN net user /add commerceuser 'Pa$$w0rd'
 
 # Install SIF
 RUN /Scripts/Install-SIF.ps1
 
-RUN net user /add commerceuser 'Pa$$w0rd'
-
-RUN Expand-Archive -Path './SIF.Sitecore.Commerce.1.0.1626.zip' -DestinationPath './SIF.Sitecore.Commerce.1.0.1626'; 
-
+# Configure
 RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce.1.0.1626/Modules'); `
     $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
     Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce.1.0.1626/Configuration/Commerce/CommerceEngine/CommerceEngine.Deploy.json' `
@@ -111,8 +125,6 @@ RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';
     -CommerceServicesSQL '/Files/sql.sql' `
     -Skip "DeployCommerceDatabase", "AddCommerceUserToCoreDatabase"
 
-RUN Expand-Archive -Path './Sitecore.BizFX.1.0.443.zip' -DestinationPath './Sitecore.BizFX'; 
-
 RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce.1.0.1626/Modules'); `
     Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce.1.0.1626/Configuration/Commerce/SitecoreBizFx/SitecoreBizFx.json' `
     -SitecoreBizFxServicesContentPath './Sitecore.BizFX' `
@@ -130,25 +142,23 @@ ADD commerce/UpdateConnectionString.ps1 /Scripts
 RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
     -userName 'sa' `
     -password $Env:SQL_SA_PASSWORD `
-    -server 'mssql'
-
-RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceMinions_Sc9 `
+    -server $Env:SQL_SERVER; `
+    /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceMinions_Sc9 `
+    -userName 'sa' `
+    -password $Env:SQL_SA_PASSWORD `
+    -server $Env:SQL_SERVER; `
+    /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
+    -userName 'sa' `
+    -password $Env:SQL_SA_PASSWORD `
+    -server $Env:SQL_SERVER; `
+    /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
     -userName 'sa' `
     -password $Env:SQL_SA_PASSWORD `
     -server $Env:SQL_SERVER
 
-RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
-    -userName 'sa' `
-    -password $Env:SQL_SA_PASSWORD `
-    -server $Env:SQL_SERVER
-
-RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
-    -userName 'sa' `
-    -password $Env:SQL_SA_PASSWORD `
-    -server $Env:SQL_SERVER
-
-RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-RUN choco install -y --params="Quiet" dotnetcore-windowshosting
+# Install hosting
+RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')); `
+    choco install -y --params="Quiet" dotnetcore-windowshosting
 
 # Install IIS URL Rewrite
 RUN choco install -y --params="Quiet" urlrewrite
@@ -165,37 +175,31 @@ RUN $hostFileName = 'c:\\windows\\system32\\drivers\\etc\\hosts'; '\"`r`n127.0.0
 ADD commerce/UpdateIdentityServerUrl.ps1 /Scripts
 
 RUN /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
-    -hostName $Env:HOST_NAME
-
-RUN /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceMinions_Sc9 `
-    -hostName $Env:HOST_NAME
-
-RUN /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
-    -hostName $Env:HOST_NAME
-
-RUN /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
-    -hostName $Env:HOST_NAME
+    -hostName $Env:HOST_NAME; `
+    /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceMinions_Sc9 `
+    -hostName $Env:HOST_NAME; `
+    /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
+    -hostName $Env:HOST_NAME; `
+    /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
+    -hostName $Env:HOST_NAME;
 
 ADD commerce/UpdateSitecoreUrl.ps1 /Scripts
 
 RUN /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
-    -hostName 'sitecore'
-
-RUN /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceMinions_Sc9 `
-    -hostName 'sitecore'
-
-RUN /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
-    -hostName 'sitecore'
-
-RUN /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
-    -hostName 'sitecore'
+    -hostName $Env:SITECORE_HOSTNAME; `
+    /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceMinions_Sc9 `
+    -hostName $Env:SITECORE_HOSTNAME; `
+    /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
+    -hostName $Env:SITECORE_HOSTNAME; `
+    /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
+    -hostName $Env:SITECORE_HOSTNAME
 
 # Set the certificate details of the certificate sitecore will connect with
-RUN $CommerceServicesPathCollction = @('C:\\inetpub\\wwwroot\\CommerceAuthoring_Sc9', 'C:\\inetpub\\wwwroot\\CommerceMinions_Sc9', `
+RUN $CommerceServicesPathCollection = @('C:\\inetpub\\wwwroot\\CommerceAuthoring_Sc9', 'C:\\inetpub\\wwwroot\\CommerceMinions_Sc9', `
                                        'C:\\inetpub\\wwwroot\\CommerceOps_Sc9', 'C:\\inetpub\\wwwroot\\CommerceShops_Sc9'); `
     $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2; `
     $cert.Import('c:\\Files\\commerce.pfx', 'secret', 'MachineKeySet'); `
-    foreach($path in $CommerceServicesPathCollction) { `
+    foreach($path in $CommerceServicesPathCollection) { `
         $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json"); `
         $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json; `
         $certificateNode = $originalJson.Certificates.Certificates[0]; `
