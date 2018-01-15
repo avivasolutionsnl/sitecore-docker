@@ -3,10 +3,10 @@
 # Stage 0: prepare files
 FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
 
-ARG SITECORE_PACKAGE="Sitecore 9.0.0 rev. 171002 (OnPrem)_single.scwdp.zip"
-ARG XCONNECT_PACKAGE="Sitecore 9.0.0 rev. 171002 (OnPrem)_xp0xconnect.scwdp.zip"
-ARG COMMERCE_SDK_PACKAGE="Sitecore.Commerce.SDK.2.0.1328.zip"
-ARG COMMERCE_SIF_PACKAGE="SIF.Sitecore.Commerce.1.0.1626.zip"
+ARG SITECORE_PACKAGE
+ARG XCONNECT_PACKAGE
+ARG COMMERCE_SDK_PACKAGE
+ARG COMMERCE_SIF_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
 

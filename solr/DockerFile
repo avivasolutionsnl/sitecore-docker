@@ -8,8 +8,8 @@ ARG PORT=8983
 ARG SERVICE_NAME="Solr-6"
 ARG XCONNECT_CORE_PREFIX="xp0"
 ARG SITECORE_CORE_PREFIX="xp0"
-ARG CONFIG_PACKAGE="XP0 Configuration files rev.171002.zip"
-ARG COMMERCE_SIF_PACKAGE="SIF.Sitecore.Commerce.1.0.1626.zip"
+ARG CONFIG_PACKAGE
+ARG COMMERCE_SIF_PACKAGE
 
 ENV SERVICE_NAME=${SERVICE_NAME}
 ENV JAVA_HOME /Java/jre
@@ -32,6 +32,7 @@ ADD files/$COMMERCE_SIF_PACKAGE /Files/
 ADD files/solr.pfx /Files/
 ADD scripts /Scripts
 ADD solr/Configure-SSL.ps1 /Scripts/
+ADD solr/WaitForSolr.ps1 /Scripts/
 
 RUN C:\Scripts\Configure-SSL.ps1 -solrHost "$Env:HOST_NAME" -certPath c:\Files\solr.pfx
 
@@ -51,6 +52,7 @@ RUN /nssm/nssm-2.24/win64/nssm.exe set $Env:SERVICE_NAME AppEnvironmentExtra JAV
 RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config 
 
 RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
+    /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
     Install-SitecoreConfiguration -Path "C:\\Files\\Config\\xconnect-solr.json" `
         -SolrUrl $solrUrl `
         -SolrRoot "c:\\solr\\solr-6.6.2" `
@@ -58,6 +60,7 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
         -CorePrefix $Env:XCONNECT_CORE_PREFIX
 
 RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
+    /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
     Install-SitecoreConfiguration -Path "C:\\Files\\Config\\sitecore-solr.json" `
         -SolrUrl $solrUrl `
         -SolrRoot "c:\\solr\\solr-6.6.2" `
@@ -67,6 +70,7 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
 RUN Expand-Archive -Path /Files/$Env:COMMERCE_SIF_PACKAGE -DestinationPath /Files/CommerceSIF 
 
 RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
+    /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
     Install-SitecoreConfiguration -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json" `
         -SolrUrl $solrUrl `
         -SolrRoot "c:\\solr\\solr-6.6.2" `
@@ -76,11 +80,6 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
 
 EXPOSE 8983
 
-HEALTHCHECK CMD powershell -command `
-    try { `
-        $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
-        $response = iwr $solrUrl -UseBasicParsing; `
-        if ($response.StatusCode -eq 200) { return 0} else {return 1}; `
-    } catch { return 1 }
+HEALTHCHECK CMD powershell -command /Scripts/WaitForSolr.ps1 $Env:HOST_NAME
 
 ENTRYPOINT C:\ServiceMonitor.exe $Env:SERVICE_NAME

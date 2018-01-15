@@ -3,7 +3,7 @@
 # Stage 0: prepare files
 FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
 
-ARG CONFIG_PACKAGE="XP0 Configuration files rev.171002.zip"
+ARG CONFIG_PACKAGE
 
 ADD files /Files
 
@@ -21,7 +21,7 @@ ARG SQL_DB_PREFIX
 ARG SQL_SERVER="mssql"
 ARG SITE_NAME="sitecore"
 ARG SOLR_PORT=8983
-ARG SITECORE_PACKAGE="Sitecore 9.0.0 rev. 171002 (OnPrem)_single.scwdp.zip"
+ARG SITECORE_PACKAGE
 
 COPY files/*.pfx /Files/
 COPY files/license.xml /Files/

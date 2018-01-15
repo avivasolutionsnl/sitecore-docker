@@ -7,16 +7,18 @@ services:
     dockerfile: ./mssql/Dockerfile
     args:
       DB_PREFIX: ${SQL_DB_PREFIX}
+      COMMERCE_SDK_PACKAGE: ${COMMERCE_SDK_PACKAGE}
+      COMMERCE_SIF_PACKAGE: ${COMMERCE_SIF_PACKAGE}
       SITECORE_PACKAGE: ${SITECORE_PACKAGE}
       XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
       HOST_NAME: mssql
   environment:
-    ACCEPT_EULA: "Y"      
+    ACCEPT_EULA: "Y"
     sa_password: ${SQL_SA_PASSWORD}
-  mem_limit: 6048m
+  mem_limit: 2048m
   networks:
     app_net:
-      ipv4_address: 172.16.238.11  
+      ipv4_address: 172.16.238.11
 
  solr:
   build:
@@ -24,20 +26,21 @@ services:
     dockerfile: ./solr/Dockerfile
     args:
       HOST_NAME: ${SOLR_HOST_NAME}
-      PORT: ${SOLR_PORT}  
-      SERVICE_NAME: ${SOLR_SERVICE_NAME}  
+      PORT: ${SOLR_PORT}
+      SERVICE_NAME: ${SOLR_SERVICE_NAME}
       XCONNECT_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
       SITECORE_CORE_PREFIX: ${SITECORE_SOLR_CORE_PREFIX}
-      CONFIG_PACKAGE: ${CONFIG_PACKAGE}      
+      CONFIG_PACKAGE: ${CONFIG_PACKAGE}
+      COMMERCE_SIF_PACKAGE: ${COMMERCE_SIF_PACKAGE}
   ports:
     - ${SOLR_PORT}
-  mem_limit: 4024m
+  mem_limit: 4096m
   networks:
     app_net:
       ipv4_address: 172.16.238.10
 
  xconnect:
-  build:  
+  build:
     context: ./
     dockerfile: ./xconnect/Dockerfile
     args:
@@ -47,7 +50,7 @@ services:
       SOLR_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
       SOLR_PORT: ${SOLR_PORT}
       XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
-      CONFIG_PACKAGE: ${CONFIG_PACKAGE}      
+      CONFIG_PACKAGE: ${CONFIG_PACKAGE}
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
   networks:
@@ -89,6 +92,10 @@ services:
       SOLR_PORT: ${SOLR_PORT}    
       SHOP_NAME: ${COMMERCE_SHOP_NAME}
       ENVIRONMENT_NAME: ${COMMERCE_ENVIRONMENT_NAME}
+      COMMERCE_SIF_PACKAGE: ${COMMERCE_SIF_PACKAGE}
+      COMMERCE_SDK_PACKAGE: ${COMMERCE_SDK_PACKAGE}
+      SITECORE_BIZFX_PACKAGE: ${SITECORE_BIZFX_PACKAGE}
+      SITECORE_IDENTITY_PACKAGE: ${SITECORE_IDENTITY_PACKAGE}
   volumes:
     - .\logs\commerce\CommerceAuthoring_Sc9:C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\logs
     - .\logs\commerce\CommerceMinions_Sc9:C:\inetpub\wwwroot\CommerceMinions_Sc9\wwwroot\logs

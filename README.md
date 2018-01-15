@@ -1,14 +1,14 @@
-Run Sitecore using Docker and Windows containers.
+Run Sitecore Commerce using Docker and Windows containers.
 
 # Requirements
-- Docker for Windows: https://docs.docker.com/docker-for-windows/
-- Hyper-V enabled
+- Windows 10 update 1709 (with Hyper-V enabled)
+- Docker for Windows (version 1712 or better): https://docs.docker.com/docker-for-windows/
+- Visual Studio 15.5.3
 - Sitecore installation files
 
 # Build
-As Sitecore does not distribute Docker images, the first step is to build the required Sitecore Docker images.
-For this you need the Sitecore installation files and a Sitecore license file. Download the Sitecore 9 packages for
-XP Single and unzip the file in the `files` folder in this repository. 
+As Sitecore does not distribute Docker images, the first step is to build the required Docker images.
+For this you need the Sitecore installation files and a Sitecore license file. What files to use are set by environment variables (interpreted by docker-compose); download all the packages that are defined by variables in the `.env.` file.
 
 The xp0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
 xConnect and SOLR roles. You can generate these by running the './Generate-Certificates.ps1' script. 
@@ -36,6 +36,19 @@ The build results in the following Docker images:
 # Run
 Docker compose is used to start up all required services.
 
+Place the Sitecore source files in the `.\wwwroot\sitecore` directory.
+
+Create the log directories which are mounted in the Docker compose file:
+```
+$ mkdir -p .\logs\sitecore
+$ mkdir -p .\logs\xconnect
+$ mdkir -p .\logs\commerce\CommerceAuthoring_Sc9
+$ mkdir -p .\logs\commerce\CommerceMinions_Sc9
+$ mkdir -p .\logs\commerce\CommerceOps_Sc9
+$ mkdir -p .\logs\commerce\CommerceShops_Sc9
+$ mkdir -p .\logs\commerce\SitecoreIdentityServer
+```
+
 To start Sitecore:
 ```
 $ docker-compose up
@@ -46,15 +59,34 @@ The containers have fixed IP addresses in the docker compose file. The easiest w
 
 ``` Hosts
 172.16.238.10	solr
+172.16.238.11	mssql
 172.16.238.12	xconnect
 172.16.238.13	sitecore
-172.16.238.11	mssql
+172.16.238.14	commerce
 ```
 
 ## Log files
 Logging is set up to log on the host under the logs folder of this repository. 
 
 ## Known issues
-- Installation files are not removed
-- Size of images is not optimized (Multiple RUN statements)
-- Docker best practices?
+Docker for Windows can to be unstable at times. Some common troubleshooting items are listed here.
+
+### Clean up network hosting
+In case it's no longer possible to create networks and docker network commands don't work give this a try: https://github.com/MicrosoftDocs/Virtualization-Documentation/tree/live/windows-server-container-tools/CleanupContainerHostNetworking
+
+### Clean Docker install
+In case nothing else helps, perform a clean Docker install using the following steps:
+- Uninstall Docker
+
+- Check that no Windows Containers are running (https://docs.microsoft.com/en-us/powershell/module/hostcomputeservice/get-computeprocess?view=win10-ps):
+```
+$ Get-ComputeProcess
+```
+and if so, stop them using `Stop-ComputeProcess`.
+
+- Remove the `C:\ProgramData\Docker` directory (and Windows Containers) using the [docker-ci-zap](https://github.com/jhowardmsft/docker-ci-zap) tool as administrator in `cmd`:
+```
+$ docker-ci-zap.exe -folder "c:\ProgramData\Docker"
+```
+
+- Install Docker

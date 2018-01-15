@@ -5,16 +5,21 @@ FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
+ARG COMMERCE_SIF_PACKAGE
+ARG COMMERCE_SDK_PACKAGE
+ARG SITECORE_BIZFX_PACKAGE
+ARG SITECORE_IDENTITY_PACKAGE
+
 WORKDIR /Files
 
 ADD files /Files
 ADD scripts /Scripts
 
 # Expand installation files
-RUN Expand-Archive -Path '/Files/Sitecore.Commerce.SDK.2.0.1328.zip' -DestinationPath '/Files/Sitecore.Commerce.SDK.2.0.1328'; 
-RUN Expand-Archive -Path '/Files/Sitecore.IdentityServer.SDK.1.0.48.zip' -DestinationPath '/Files/Sitecore.IdentityServer.SDK.1.0.48'; 
-RUN Expand-Archive -Path '/Files/SIF.Sitecore.Commerce.1.0.1626.zip' -DestinationPath '/Files/SIF.Sitecore.Commerce.1.0.1626'; 
-RUN Expand-Archive -Path '/Files/Sitecore.BizFX.1.0.443.zip' -DestinationPath '/Files/Sitecore.BizFX'; 
+RUN Expand-Archive -Path "/Files/$Env:COMMERCE_SDK_PACKAGE" -DestinationPath '/Files/Sitecore.Commerce.SDK'; 
+RUN Expand-Archive -Path "/Files/$Env:SITECORE_IDENTITY_PACKAGE" -DestinationPath '/Files/Sitecore.IdentityServer.SDK'; 
+RUN Expand-Archive -Path "/Files/$Env:COMMERCE_SIF_PACKAGE" -DestinationPath '/Files/SIF.Sitecore.Commerce'; 
+RUN Expand-Archive -Path '/Files/$Env:SITECORE_BIZFX_PACKAGE' -DestinationPath '/Files/Sitecore.BizFX'; 
 
 ENV DOTNET_SDK_DOWNLOAD_URL="https://download.microsoft.com/download/2/9/3/293BC432-348C-4D1C-B628-5AC8AB7FA162/dotnet-sdk-2.1.3-win-x64.exe"
 
@@ -33,13 +38,13 @@ RUN Invoke-WebRequest $Env:DOTNET_47_DEVELOPER_PACK_URL -OutFile dotnetdevpack47
 
 ENV DOTNET_HOSTING_URL="https://download.microsoft.com/download/5/C/1/5C190037-632B-443D-842D-39085F02E1E8/DotNetCore.2.0.3-WindowsHosting.exe"
 
-RUN dotnet restore './Sitecore.Commerce.SDK.2.0.1328/Customer.Sample.Solution.sln'; `
-    dotnet publish './Sitecore.Commerce.SDK.2.0.1328/Customer.Sample.Solution.sln' -o '/Publish/Customer.Sample.Solution'; `
+RUN dotnet restore './Sitecore.Commerce.SDK/Customer.Sample.Solution.sln'; `
+    dotnet publish './Sitecore.Commerce.SDK/Customer.Sample.Solution.sln' -o '/Publish/Customer.Sample.Solution'; `
     New-Item C:\Deploy\Customer.Sample.Solution -type directory; `
     Compress-Archive -Path '/Publish/Customer.Sample.Solution/*' -DestinationPath C:\Deploy\Customer.Sample.Solution\Customer.Sample.Solution.zip
 
-RUN dotnet restore './Sitecore.IdentityServer.SDK.1.0.48/Sitecore.IdentityServer.sln'; `
-    dotnet publish './Sitecore.IdentityServer.SDK.1.0.48/Sitecore.IdentityServer.sln' -o '/Publish/Sitecore.IdentityServer'; `
+RUN dotnet restore './Sitecore.IdentityServer.SDK/Sitecore.IdentityServer.sln'; `
+    dotnet publish './Sitecore.IdentityServer.SDK/Sitecore.IdentityServer.sln' -o '/Publish/Sitecore.IdentityServer'; `
     New-Item C:\Deploy\Sitecore.IdentityServer -type directory; `
     Compress-Archive -Path '/Publish/Sitecore.IdentityServer/*' -DestinationPath C:\Deploy\Sitecore.IdentityServer\Sitecore.IdentityServer.zip
 
@@ -71,8 +76,8 @@ WORKDIR /Files
 ADD scripts /Scripts
 
 COPY files/*.pfx /Files/
-COPY --from=prepare /Files/Sitecore.Commerce.SDK.2.0.1328 /Files/Sitecore.Commerce.SDK.2.0.1328/
-COPY --from=prepare /Files/SIF.Sitecore.Commerce.1.0.1626 /Files/SIF.Sitecore.Commerce.1.0.1626/
+COPY --from=prepare /Files/Sitecore.Commerce.SDK /Files/Sitecore.Commerce.SDK/
+COPY --from=prepare /Files/SIF.Sitecore.Commerce /Files/SIF.Sitecore.Commerce/
 COPY --from=prepare /Files/Sitecore.BizFX /Files/Sitecore.BizFX/
 COPY --from=prepare /Deploy/Customer.Sample.Solution /Deploy/Customer.Sample.Solution/
 COPY --from=prepare /Deploy/Sitecore.IdentityServer /Deploy/Sitecore.IdentityServer/
@@ -89,7 +94,7 @@ RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:COMMERCE_CERT_PATH -se
 # Import XConnect certificate
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
-RUN $pathToProj = './Sitecore.Commerce.SDK.2.0.1328/src/Sitecore.Commerce.Engine/Sitecore.Commerce.Engine.csproj'; `
+RUN $pathToProj = './Sitecore.Commerce.SDK/src/Sitecore.Commerce.Engine/Sitecore.Commerce.Engine.csproj'; `
     [xml] $xml = Get-Content $pathToProj; `
     $node = $xml.SelectSingleNode('//Project/PropertyGroup/TargetFramework'); `
     $node.InnerText = 'net47'; `
@@ -101,9 +106,9 @@ RUN net user /add commerceuser 'Pa$$w0rd'
 RUN /Scripts/Install-SIF.ps1
 
 # Configure
-RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce.1.0.1626/Modules'); `
+RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce/Modules'); `
     $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
-    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce.1.0.1626/Configuration/Commerce/CommerceEngine/CommerceEngine.Deploy.json' `
+    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/CommerceEngine/CommerceEngine.Deploy.json' `
     -CommerceServicesDbServer $Env:SQL_SERVER `
     -CommerceServicesDbName SitecoreCommerce9_SharedEnvironments `
     -CommerceServicesGlobalDbName SitecoreCommerce9_Global `
@@ -125,13 +130,13 @@ RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';
     -CommerceServicesSQL '/Files/sql.sql' `
     -Skip "DeployCommerceDatabase", "AddCommerceUserToCoreDatabase"
 
-RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce.1.0.1626/Modules'); `
-    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce.1.0.1626/Configuration/Commerce/SitecoreBizFx/SitecoreBizFx.json' `
+RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce/Modules'); `
+    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/SitecoreBizFx/SitecoreBizFx.json' `
     -SitecoreBizFxServicesContentPath './Sitecore.BizFX' `
     -UserAccount @{ Domain = $Env:COMPUTERNAME; UserName = 'commerceuser'; Password = 'Pa$$w0rd' }
 
-RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce.1.0.1626/Modules'); `
-    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce.1.0.1626/Configuration/Commerce/SitecoreIdentityServer/SitecoreIdentityServer.json' `
+RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce/Modules'); `
+    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/SitecoreIdentityServer/SitecoreIdentityServer.json' `
     -SitecoreIdentityServerContentPath /Deploy/Sitecore.IdentityServer `
     -SitecoreDbServer $Env:SQL_SERVER `
     -SitecoreCoreDbName "${$Env:SQL_DB_PREFIX}_Core" `

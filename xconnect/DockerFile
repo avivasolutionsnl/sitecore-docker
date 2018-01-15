@@ -3,13 +3,13 @@
 # Stage 0: prepare files
 FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
 
-ARG CONFIG_PACKAGE="XP0 Configuration files rev.171002.zip"
+ARG CONFIG_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
 
 ADD files/$CONFIG_PACKAGE /Files/
 
-RUN Expand-Archive -Path /Files/$CONFIG_PACKAGE -DestinationPath /Files/Config 
+RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config 
 
 
 # Stage 1: create actual image
@@ -21,7 +21,7 @@ ARG SQL_SERVER="mssql"
 ARG SITE_NAME="xconnect"
 ARG SOLR_CORE_PREFIX="xp0"
 ARG SOLR_PORT="8983"
-ARG XCONNECT_PACKAGE="Sitecore 9.0.0 rev. 171002 (OnPrem)_xp0xconnect.scwdp.zip"
+ARG XCONNECT_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"] 
 
