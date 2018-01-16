@@ -9,7 +9,6 @@ ARG SERVICE_NAME="Solr-6"
 ARG XCONNECT_CORE_PREFIX="xp0"
 ARG SITECORE_CORE_PREFIX="xp0"
 ARG CONFIG_PACKAGE
-ARG COMMERCE_SIF_PACKAGE
 
 ENV SERVICE_NAME=${SERVICE_NAME}
 ENV JAVA_HOME /Java/jre
@@ -28,7 +27,6 @@ RUN Invoke-WebRequest -Method Get -Uri "http://mirrors.ukfast.co.uk/sites/ftp.ap
     Remove-Item /solr.zip -Force
 
 ADD files/$CONFIG_PACKAGE /Files/
-ADD files/$COMMERCE_SIF_PACKAGE /Files/
 ADD files/solr.pfx /Files/
 ADD scripts /Scripts
 ADD solr/Configure-SSL.ps1 /Scripts/
@@ -49,7 +47,10 @@ RUN Invoke-WebRequest -Method Get -Uri "https://nssm.cc/release/nssm-2.24.zip" -
 RUN /nssm/nssm-2.24/win64/nssm.exe install $Env:SERVICE_NAME "/solr/solr-6.6.2/bin/solr.cmd" "start" "-f" "-p $Env:PORT"
 RUN /nssm/nssm-2.24/win64/nssm.exe set $Env:SERVICE_NAME AppEnvironmentExtra JAVA_HOME=C:\java\jre
 
-RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config 
+RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config
+
+# Overwrite configuration with longer timeout after Solr start
+ADD solr/xconnect-solr.json /Files/Config/
 
 RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
     /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
@@ -59,6 +60,9 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
         -SolrService $Env:SERVICE_NAME `
         -CorePrefix $Env:XCONNECT_CORE_PREFIX
 
+# Overwrite configuration with longer timeout after Solr start
+ADD solr/sitecore-solr.json /Files/Config/
+
 RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
     /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
     Install-SitecoreConfiguration -Path "C:\\Files\\Config\\sitecore-solr.json" `
@@ -66,17 +70,6 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
         -SolrRoot "c:\\solr\\solr-6.6.2" `
         -SolrService $Env:SERVICE_NAME `
         -CorePrefix $Env:SITECORE_CORE_PREFIX
-
-RUN Expand-Archive -Path /Files/$Env:COMMERCE_SIF_PACKAGE -DestinationPath /Files/CommerceSIF 
-
-RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
-    /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
-    Install-SitecoreConfiguration -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json" `
-        -SolrUrl $solrUrl `
-        -SolrRoot "c:\\solr\\solr-6.6.2" `
-        -SolrService $Env:SERVICE_NAME `
-        -CorePrefix $Env:SITECORE_CORE_PREFIX `
-        -SolrSchemas "C:\\Files\\CommerceSIF\\SolrSchemas"
 
 EXPOSE 8983
 

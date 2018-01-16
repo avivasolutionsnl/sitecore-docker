@@ -5,15 +5,11 @@ FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
 
 ARG SITECORE_PACKAGE
 ARG XCONNECT_PACKAGE
-ARG COMMERCE_SDK_PACKAGE
-ARG COMMERCE_SIF_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
 
 ADD files/ /Files/
 
-RUN Expand-Archive -Path /Files/$Env:COMMERCE_SDK_PACKAGE -DestinationPath /Files/Commerce
-RUN Expand-Archive -Path /Files/$Env:COMMERCE_SIF_PACKAGE -DestinationPath /Files/CommerceSIF
 RUN Expand-Archive -Path /Files/$Env:SITECORE_PACKAGE -DestinationPath /Files/Sitecore 
 RUN Expand-Archive -Path /Files/$Env:XCONNECT_PACKAGE -DestinationPath /Files/Xconnect 
 
@@ -30,8 +26,6 @@ ENV ACCEPT_EULA "Y"
 ENV SQL_PACKAGE_EXE='C:\Program Files (x86)\Microsoft SQL Server\*\DAC\bin\SqlPackage.exe'
 
 # Add files
-COPY --from=prepare /Files/Commerce /Files/Commerce/
-COPY --from=prepare /Files/CommerceSIF /Files/CommerceSIF/
 COPY --from=prepare /Files/Sitecore /Files/Sitecore/
 COPY --from=prepare /Files/Xconnect /Files/Xconnect/
 
@@ -60,20 +54,7 @@ RUN $DB_NAME='{0}_Xdb.Collection.ShardMapManager' -f $Env:DB_PREFIX; `
     /dacpac '/Files/Xconnect/Content/Website/App_data/collectiondeployment/Sitecore.Xdb.Collection.Database.Sql.dacpac'
 
 RUN $sqlcmd = 'UPDATE [{0}_Xdb.Collection.ShardMapManager].[__ShardManagement].[ShardsGlobal] SET ServerName = ''{1}''' -f $Env:DB_PREFIX, $Env:HOST_NAME; `
-    sqlcmd -Q $sqlcmd 
-
-# Install commerce engine databases
-RUN & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Commerce/Sitecore.Commerce.Engine.DB.dacpac' /tdn:SitecoreCommerce9_SharedEnvironments /tsn:$Env:COMPUTERNAME
-RUN & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Commerce/Sitecore.Commerce.Engine.DB.dacpac' /tdn:SitecoreCommerce9_Global /tsn:$Env:COMPUTERNAME
-
-RUN sqlcmd -Q \"EXEC sp_MSforeachdb 'IF charindex(''Sitecore'', ''?'' ) = 1 BEGIN EXEC [?]..sp_changedbowner ''sa'' END'\" 
+    sqlcmd -Q $sqlcmd; `
+    sqlcmd -Q \"EXEC sp_MSforeachdb 'IF charindex(''Sitecore'', ''?'' ) = 1 BEGIN EXEC [?]..sp_changedbowner ''sa'' END'\" 
 
 RUN Add-WindowsFeature Web-Server
-
-ADD scripts /Scripts
-RUN /Scripts/Install-SIF.ps1
-
-RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/CommerceSIF/Modules'); `
-    $connStr = 'Data Source=.;Initial Catalog={0}_Core;Integrated Security=True;' -f $Env:DB_PREFIX; `
-    Install-SitecoreConfiguration -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\CommerceEngine\\CommerceEngine.UserRoles.json" `
-    -ConnectionString $connStr

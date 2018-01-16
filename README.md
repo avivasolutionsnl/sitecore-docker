@@ -1,4 +1,4 @@
-Run Sitecore Commerce using Docker and Windows containers.
+Run Sitecore 9 (with XConnect) using Docker and Windows containers.
 
 # Requirements
 - Windows 10 update 1709 (with Hyper-V enabled)
@@ -42,11 +42,6 @@ Create the log directories which are mounted in the Docker compose file:
 ```
 $ mkdir -p .\logs\sitecore
 $ mkdir -p .\logs\xconnect
-$ mdkir -p .\logs\commerce\CommerceAuthoring_Sc9
-$ mkdir -p .\logs\commerce\CommerceMinions_Sc9
-$ mkdir -p .\logs\commerce\CommerceOps_Sc9
-$ mkdir -p .\logs\commerce\CommerceShops_Sc9
-$ mkdir -p .\logs\commerce\SitecoreIdentityServer
 ```
 
 To start Sitecore:
@@ -62,7 +57,6 @@ The containers have fixed IP addresses in the docker compose file. The easiest w
 172.16.238.11	mssql
 172.16.238.12	xconnect
 172.16.238.13	sitecore
-172.16.238.14	commerce
 ```
 
 ## Log files

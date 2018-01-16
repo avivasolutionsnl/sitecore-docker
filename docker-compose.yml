@@ -7,8 +7,6 @@ services:
     dockerfile: ./mssql/Dockerfile
     args:
       DB_PREFIX: ${SQL_DB_PREFIX}
-      COMMERCE_SDK_PACKAGE: ${COMMERCE_SDK_PACKAGE}
-      COMMERCE_SIF_PACKAGE: ${COMMERCE_SIF_PACKAGE}
       SITECORE_PACKAGE: ${SITECORE_PACKAGE}
       XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
       HOST_NAME: mssql
@@ -31,7 +29,6 @@ services:
       XCONNECT_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
       SITECORE_CORE_PREFIX: ${SITECORE_SOLR_CORE_PREFIX}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-      COMMERCE_SIF_PACKAGE: ${COMMERCE_SIF_PACKAGE}
   ports:
     - ${SOLR_PORT}
   mem_limit: 4096m
@@ -61,16 +58,16 @@ services:
     - solr
 
  sitecore:
-  build: 
+  build:
     context: ./
     dockerfile: ./sitecore/Dockerfile
     args:
       SQL_SA_PASSWORD: ${SQL_SA_PASSWORD}
       SQL_DB_PREFIX: ${SQL_DB_PREFIX}
       SITE_NAME: ${SITECORE_SITE_NAME}
-      SOLR_PORT: ${SOLR_PORT}    
+      SOLR_PORT: ${SOLR_PORT}
       SITECORE_PACKAGE: ${SITECORE_PACKAGE}
-      CONFIG_PACKAGE: ${CONFIG_PACKAGE}     
+      CONFIG_PACKAGE: ${CONFIG_PACKAGE}
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
@@ -81,35 +78,6 @@ services:
   networks:
     app_net:
       ipv4_address: 172.16.238.13    
-
- commerce:
-  build: 
-    context: ./
-    dockerfile: ./commerce/Dockerfile
-    args:
-      SQL_SA_PASSWORD: ${SQL_SA_PASSWORD}
-      SQL_DB_PREFIX: ${SQL_DB_PREFIX}
-      SOLR_PORT: ${SOLR_PORT}    
-      SHOP_NAME: ${COMMERCE_SHOP_NAME}
-      ENVIRONMENT_NAME: ${COMMERCE_ENVIRONMENT_NAME}
-      COMMERCE_SIF_PACKAGE: ${COMMERCE_SIF_PACKAGE}
-      COMMERCE_SDK_PACKAGE: ${COMMERCE_SDK_PACKAGE}
-      SITECORE_BIZFX_PACKAGE: ${SITECORE_BIZFX_PACKAGE}
-      SITECORE_IDENTITY_PACKAGE: ${SITECORE_IDENTITY_PACKAGE}
-  volumes:
-    - .\logs\commerce\CommerceAuthoring_Sc9:C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\logs
-    - .\logs\commerce\CommerceMinions_Sc9:C:\inetpub\wwwroot\CommerceMinions_Sc9\wwwroot\logs
-    - .\logs\commerce\CommerceOps_Sc9:C:\inetpub\wwwroot\CommerceOps_Sc9\wwwroot\logs
-    - .\logs\commerce\CommerceShops_Sc9:C:\inetpub\wwwroot\CommerceShops_Sc9\wwwroot\logs
-    - .\logs\commerce\SitecoreIdentityServer:C:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot\logs
-  depends_on:
-    - xconnect
-    - mssql
-    - solr
-    - sitecore
-  networks:
-    app_net:
-      ipv4_address: 172.16.238.14   
 
 networks:
   app_net:

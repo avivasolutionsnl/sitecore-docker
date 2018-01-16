@@ -13,7 +13,7 @@ do {
     Write-Host "Waiting for SOLR service to be available...";
 
     try {
-        $solrPing = Invoke-WebRequest "https://$Hostname:8983/solr" -UseBasicParsing -Verbose
+        $solrPing = Invoke-WebRequest "https://${Hostname}:8983/solr" -UseBasicParsing -Verbose
 
         if($solrPing.StatusCode -eq 200) {
             $available = $true;
