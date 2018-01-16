@@ -33,6 +33,8 @@ The build results in the following Docker images:
 - solr: Apache Solr 
 - xconnect: IIS + ASP.NET + XConnect
 
+As final step build all Solr indexes (populate and re-build indexes), and perform a Docker commit for the Solr image to persist the changes.
+
 # Run
 Docker compose is used to start up all required services.
 
@@ -42,6 +44,11 @@ Create the log directories which are mounted in the Docker compose file:
 ```
 $ mkdir -p .\logs\sitecore
 $ mkdir -p .\logs\xconnect
+```
+
+Create a webroot directory:
+```
+PS> mkdir -p wwwroot/sitecore
 ```
 
 To start Sitecore:

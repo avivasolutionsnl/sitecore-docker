@@ -49,8 +49,10 @@ RUN /nssm/nssm-2.24/win64/nssm.exe set $Env:SERVICE_NAME AppEnvironmentExtra JAV
 
 RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config
 
-# Overwrite configuration with longer timeout after Solr start
-ADD solr/xconnect-solr.json /Files/Config/
+# Set longer timeout after Solr start
+RUN $config = Get-Content "C:\\Files\\Config\\xconnect-solr.json" | Where-Object { $_ -notmatch '^\s*\/\/'} | Out-String | ConvertFrom-Json; `
+    $config.Tasks.StartSolr.Params.PostDelay = 30000; `
+    ConvertTo-Json $config -Depth 50 | Set-Content -Path "C:\\Files\\Config\\xconnect-solr.json"
 
 RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
     /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
@@ -60,8 +62,10 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
         -SolrService $Env:SERVICE_NAME `
         -CorePrefix $Env:XCONNECT_CORE_PREFIX
 
-# Overwrite configuration with longer timeout after Solr start
-ADD solr/sitecore-solr.json /Files/Config/
+# Set longer timeout after Solr start
+RUN $config = Get-Content "C:\\Files\\Config\\sitecore-solr.json" | Where-Object { $_ -notmatch '^\s*\/\/'} | Out-String | ConvertFrom-Json; `
+    $config.Tasks.StartSolr.Params.PostDelay = 30000; `
+    ConvertTo-Json $config -Depth 50 | Set-Content -Path "C:\\Files\\Config\\sitecore-solr.json"
 
 RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
     /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
