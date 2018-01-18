@@ -8,12 +8,12 @@ Run Sitecore 9 (with XConnect) using Docker and Windows containers.
 
 # Build
 As Sitecore does not distribute Docker images, the first step is to build the required Docker images.
-For this you need the Sitecore installation files and a Sitecore license file. What files to use are set by environment variables (interpreted by docker-compose); download all the packages that are defined by variables in the `.env.` file.
+For this you need the Sitecore installation files and a Sitecore license file. What files to use are set by environment variables (interpreted by docker-compose); download all the packages that are defined by variables in the `.env` file.
 
 The xp0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
-xConnect and SOLR roles. You can generate these by running the './Generate-Certificates.ps1' script. 
+xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script. 
 
-Next, modify the .env file and change the build parameters if needed:
+Next, modify the `.env` file and change the build parameters if needed:
 
 | Field                     | Description                                      |
 | ------------------------- | ------------------------------------------------ |
