@@ -1,5 +1,8 @@
 Run Sitecore 9 (with XConnect) using Docker and Windows containers.
 
+# Disclaimer
+This repository contains experimental code that we use in development setups. We do not consider the current code in this repository ready for production. Hopefully this will help you to get easily up and running with Sitecore and Docker. Please feel free to provide feedback by creating an issue, PR, etc.
+
 # Requirements
 - Windows 10 update 1709 (with Hyper-V enabled)
 - Docker for Windows (version 1712 or better): https://docs.docker.com/docker-for-windows/
