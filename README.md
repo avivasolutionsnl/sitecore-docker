@@ -73,16 +73,16 @@ The containers have fixed IP addresses in the docker compose file. The easiest w
 ## Log files
 Logging is set up to log on the host under the logs folder of this repository. 
 
-## Known issues
+# Known issues
 Docker for Windows can be unstable at times, some troubleshooting tips are listed below.
 
-### Containers not reachable by domain name
+## Containers not reachable by domain name
 Sometimes the internal Docker DNS is malfunctioning and containers (e.g. mssql) cannot be reached by domain name. To solve this restart the Docker daemon.
 
-### Clean up network hosting
+## Clean up network hosting
 In case it's no longer possible to create networks and docker network commands don't work give this a try: https://github.com/MicrosoftDocs/Virtualization-Documentation/tree/live/windows-server-container-tools/CleanupContainerHostNetworking
 
-### Clean Docker install
+## Clean Docker install
 In case nothing else helps, perform a clean Docker install using the following steps:
 - Uninstall Docker
 
