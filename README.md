@@ -1,7 +1,7 @@
 Run Sitecore 9 (with XConnect) using Docker and Windows containers.
 
 # Disclaimer
-This repository contains experimental code that we use in development setups. We do not consider the current code in this repository ready for production. Hopefully this will help you to get easily up and running with Sitecore and Docker. Please feel free to provide feedback by creating an issue, PR, etc.
+This repository contains experimental code that we use in development setups. We do not consider the current code in this repository ready for production. Hopefully this will help you to get up and running with Sitecore and Docker. Please feel free to provide feedback by creating an issue, PR, etc.
 
 # Requirements
 - Windows 10 update 1709 (with Hyper-V enabled)
@@ -73,7 +73,10 @@ The containers have fixed IP addresses in the docker compose file. The easiest w
 Logging is set up to log on the host under the logs folder of this repository. 
 
 ## Known issues
-Docker for Windows can to be unstable at times. Some common troubleshooting items are listed here.
+Docker for Windows can be unstable at times, some troubleshooting tips are listed below.
+
+### Containers not reachable by domain name
+Sometimes the internal Docker DNS is malfunctioning and containers (e.g. mssql) cannot be reached by domain name. To solve this restart the Docker daemon.
 
 ### Clean up network hosting
 In case it's no longer possible to create networks and docker network commands don't work give this a try: https://github.com/MicrosoftDocs/Virtualization-Documentation/tree/live/windows-server-container-tools/CleanupContainerHostNetworking
