@@ -1,4 +1,4 @@
-version: '2.1'
+version: '2.2'
 
 services:
  mssql:
@@ -14,6 +14,7 @@ services:
     ACCEPT_EULA: "Y"
     sa_password: ${SQL_SA_PASSWORD}
   mem_limit: 2048m
+  cpu_count: 4
   networks:
     app_net:
       ipv4_address: 172.16.238.11
@@ -75,6 +76,7 @@ services:
     - xconnect
     - mssql
     - solr
+  cpu_count: 6
   networks:
     app_net:
       ipv4_address: 172.16.238.13    
