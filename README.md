@@ -12,10 +12,10 @@ Hopefully this will help you to get up and running with Sitecore and Docker. By 
 
 # Build
 As Sitecore does not distribute Docker images, the first step is to build the required Docker images.
-For this you need the Sitecore installation files and a Sitecore license file. What files to use are set by environment variables (interpreted by docker-compose); download all the packages that are defined by variables in the `.env` file.
+For this you need the Sitecore installation files and a Sitecore license file. What files to use are set by environment variables (interpreted by docker-compose); download all the packages that are defined by variables in the `.env` file and place them in the `files` directory.
 
 The xp0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
-xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script. 
+xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script (note that this requires an Administrator elevated powershell environment and you may need to set the correct execution policy, e.g. `PS> powershell.exe -ExecutionPolicy Unrestricted`).
 
 Next, modify the `.env` file and change the build parameters if needed:
 
@@ -31,13 +31,18 @@ Next, modify the `.env` file and change the build parameters if needed:
 | SITECORE_SITE_NAME        | Host name of the Sitecore site                   |
 | SITECORE_SOLR_CORE_PREFIX | Prefix to use for the Sitecore SOLR cores        |
 
+Now perform the Docker build step:
+```
+PS> docker-compose build
+``` 
+
 The build results in the following Docker images:
 - sitecore: IIS + ASP.NET + Sitecore
 - mssql: MS SQL + Sitecore databases
 - solr: Apache Solr 
 - xconnect: IIS + ASP.NET + XConnect
 
-As final step build all Solr indexes (populate and re-build indexes), and perform a Docker commit for the Solr image to persist the changes.
+As final step build all Solr indexes (populate and re-build indexes) from Sitecore (reachable at https://sitecore/sitecore), and perform a Docker commit for the Solr image to persist the changes (otherwise you will have to redo this step each time).
 
 # Run
 Docker compose is used to start up all required services.
@@ -46,8 +51,8 @@ Place the Sitecore source files in the `.\wwwroot\sitecore` directory.
 
 Create the log directories which are mounted in the Docker compose file:
 ```
-$ mkdir -p .\logs\sitecore
-$ mkdir -p .\logs\xconnect
+PS> mkdir -p logs/sitecore
+PS> mkdir -p logs/xconnect
 ```
 
 Create a webroot directory:
@@ -57,17 +62,17 @@ PS> mkdir -p wwwroot/sitecore
 
 To start Sitecore:
 ```
-$ docker-compose up
+PS> docker-compose up
 ```
 
 ## DNS
 The containers have fixed IP addresses in the docker compose file. The easiest way to access the containers from the host is by adding the following to your hosts file:
 
 ``` Hosts
-172.16.238.10	solr
-172.16.238.11	mssql
-172.16.238.12	xconnect
-172.16.238.13	sitecore
+172.16.1.2	mssql
+172.16.1.3	solr
+172.16.1.4	xconnect
+172.16.1.5	sitecore
 ```
 
 ## Log files
@@ -88,13 +93,19 @@ In case nothing else helps, perform a clean Docker install using the following s
 
 - Check that no Windows Containers are running (https://docs.microsoft.com/en-us/powershell/module/hostcomputeservice/get-computeprocess?view=win10-ps):
 ```
-$ Get-ComputeProcess
+PS> Get-ComputeProcess
 ```
 and if so, stop them using `Stop-ComputeProcess`.
 
 - Remove the `C:\ProgramData\Docker` directory (and Windows Containers) using the [docker-ci-zap](https://github.com/jhowardmsft/docker-ci-zap) tool as administrator in `cmd`:
 ```
-$ docker-ci-zap.exe -folder "c:\ProgramData\Docker"
+PS> docker-ci-zap.exe -folder "c:\ProgramData\Docker"
 ```
 
 - Install Docker
+
+## Docker build fails
+Docker for Windows build can be flaky from time to time. Error messages like below can be solved by trying harder (i.e. more often) and making sure no other programs (e.g. file explorer) have the applicable directory open. 
+```
+ERROR: Service 'solr' failed to build: failed to register layer: re-exec error: exit status 1: output: remove \\?\C:\ProgramData\Docker\windowsfilter\6d12d77235757f9e1cdd58216d104f0e51bc56e6021cf206a2dd6d97b0d3520f\UtilityVM\Files\Windows\WinSxS\amd64_microsoft-windows-a..ence-inventory-core_31bf3856ad364e35_10.0.16299.15_none_81bfff856a844456\aepic.dll: Access is denied.
+```
