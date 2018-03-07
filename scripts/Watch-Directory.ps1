@@ -1,85 +1,92 @@
 [CmdletBinding()]
 param(
     # Path to watch for changes
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_ -PathType 'Container'})] 
+    [Parameter(Mandatory = $true)]
+    [ValidateScript( {Test-Path $_ -PathType 'Container'})] 
     $Path,
     # Destination path to keep updated
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_ -PathType 'Container'})] 
-    $Destination,
-    # Array of filename patterns (-like operator) to ignore
-    [Parameter(Mandatory=$false)]
-    [array]$Ignore = @("*\obj\*", "*.cs", "*.csproj", "*.user")
+    [Parameter(Mandatory = $true)]
+    [ValidateScript( {Test-Path $_ -PathType 'Container'})] 
+    $Destination
 )
 
-function Sync 
+function Sync
 {
-    Get-ChildItem -Path $Path -Recurse -File | % {
-        $sourcePath = $_.FullName
-        $targetPath = ("{0}\{1}" -f $Destination, $_.FullName.Replace("$Path\", ""))  
-        $ignored = $false
-        
-        if($Ignore -ne $null -and $Ignore.Length -gt 0) {
-            :filter foreach($filter in $Ignore) {
-                if($sourcePath -like $filter)
-                {                    
-                    $ignored = $true
-                    break :filter
-                }
-            }                
-        }
+    param(
+        [Parameter(Mandatory = $true)]
+        $Path,
+        [Parameter(Mandatory = $true)]
+        $Destination
+    )
 
-        if($ignored -eq $false)
+    $dirty = $false
+    $raw = (robocopy $Path $Destination /E /XX /MT:1 /NJH /NJS /FP /NDL /NP /NS /R:5 /W:1 /XD obj /XF *.user /XF *ncrunch* /XF *.cs)
+    $raw | ForEach-Object {
+        $line = $_.Trim().Replace("`r`n", "").Replace("`t", " ")
+        $dirty = ![string]::IsNullOrEmpty($line)
+
+        if ($dirty)
         {
-            $triggerReason = $null
-
-            if(Test-Path -Path $targetPath -PathType Leaf) 
-            {
-                Compare-Object (Get-Item $sourcePath) (Get-Item $targetPath) -Property Name, Length, LastWriteTime | % {
-                    $triggerReason = "Different"
-                }
-            }
-            else
-            {
-                $triggerReason = "Missing"
-            }
-
-            if($triggerReason -ne $null)
-            {
-                New-Item -Path (Split-Path $targetPath) -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
-               
-                Copy-Item -Path $sourcePath -Destination $targetPath -Force
-               
-                Write-Output ("{0}: {1, -9} -> {2, -9}" -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $triggerReason, ($sourcePath.Replace("$Path\", "")))
-            }
+            Write-Host ("{0}: {1}" -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $line) -ForegroundColor DarkGray            
         }
-    }   
+    }
+
+    if ($dirty)
+    {
+        Write-Host ("{0}: Done syncing..." -f [DateTime]::Now.ToString("HH:mm:ss:fff")) -ForegroundColor Green
+    }
 }
 
-$Destination = $Destination.TrimEnd("\")
+Write-Host ("{0}: Watching '{1}' for changes, will copy to '{2}'..." -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $Path, $Destination)
 
-Write-Host ("{0}: Warming up..." -f [DateTime]::Now.ToString("HH:mm:ss:fff"))
+# Cleanup old event if present in current session
+Get-EventSubscriber -SourceIdentifier "FileDeleted" -ErrorAction "SilentlyContinue" | Unregister-Event
 
-# Initial sync
-Sync | Out-Null
+# Setup
+$watcher = New-Object System.IO.FileSystemWatcher
+$watcher.Path = $Path
+$watcher.IncludeSubdirectories = $true
+$watcher.EnableRaisingEvents = $true
 
-# Warm up
-try 
+Register-ObjectEvent $watcher Deleted -SourceIdentifier "FileDeleted" -MessageData $Destination {
+    $destinationPath = Join-Path $event.MessageData $eventArgs.Name
+    $delete = !(Test-Path $eventArgs.FullPath) -and (Test-Path $destinationPath)
+
+    if ($delete)
+    {
+        try
+        {
+            Remove-Item -Path $destinationPath -Force -Recurse -ErrorAction "SilentlyContinue"
+
+            Write-Host ("{0}: Deleted '{1}'..." -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $destinationPath) -ForegroundColor Green
+        }
+        catch
+        {
+            Write-Host ("{0}: Could not delete '{1}'..." -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $destinationPath) -ForegroundColor Red
+        }
+    }
+} | Out-Null
+
+try
 {
-    Invoke-WebRequest -Uri "http://localhost:80" -UseBasicParsing -TimeoutSec 20 -ErrorAction "SilentlyContinue" | Out-Null
+    # Main loop
+    while ($true)
+    {
+        Sync -Path $Path -Destination $Destination
+
+        Start-Sleep -Milliseconds 200
+    }
 }
-catch 
+finally 
 {
-    # OK    
-}
+    # Cleanup
+    Get-EventSubscriber -SourceIdentifier "FileDeleted" | Unregister-Event
 
-Write-Host ("{0}: Watching '{1}' for changes, will copy to '{2}' while ignoring '{3}'." -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $Path, $Destination, ($Ignore -join ", "))
+    if ($watcher -ne $null)
+    {
+        $watcher.Dispose()
+        $watcher = $null
+    }
 
-# Start            
-while($true)
-{   
-    Sync | Write-Host
-
-    Sleep -Milliseconds 500
+    Write-Host ("{0}: Stopped." -f [DateTime]::Now.ToString("HH:mm:ss:fff")) -ForegroundColor Red
 }
