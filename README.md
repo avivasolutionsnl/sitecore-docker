@@ -51,8 +51,7 @@ Place the Sitecore source files in the `.\wwwroot\sitecore` directory.
 
 Create the log directories which are mounted in the Docker compose file:
 ```
-PS> mkdir -p logs/sitecore
-PS> mkdir -p logs/xconnect
+PS> ./CreateLogDirs.ps1
 ```
 
 Create a webroot directory:
@@ -70,9 +69,9 @@ The containers have fixed IP addresses in the docker compose file. The easiest w
 
 ``` Hosts
 172.16.1.2	mssql
-172.16.1.3	solr
-172.16.1.4	xconnect
-172.16.1.5	sitecore
+172.16.1.3	sitecore
+172.16.1.4	solr
+172.16.1.5	xconnect
 ```
 
 ## Log files
