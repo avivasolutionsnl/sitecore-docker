@@ -42,7 +42,10 @@ The build results in the following Docker images:
 - solr: Apache Solr 
 - xconnect: IIS + ASP.NET + XConnect
 
-As final step build all Solr indexes (populate and re-build indexes) from Sitecore (reachable at https://sitecore/sitecore), and perform a Docker commit for the Solr image to persist the changes (otherwise you will have to redo this step each time).
+As final step build all Solr indexes (populate and re-build indexes) from Sitecore (reachable at https://sitecore/sitecore), and perform a Docker commit for the Solr image to persist the changes (otherwise you will have to redo this step each time):
+```
+PS> docker commit sitecoredocker_solr_1 sitecoredocker_solr:latest
+```
 
 # Run
 Docker compose is used to start up all required services.
