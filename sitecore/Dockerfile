@@ -52,6 +52,11 @@ ENV URLREWRITE_MSI="urlrewrite.msi"
 ADD http://download.microsoft.com/download/D/D/E/DDE57C26-C62C-4C59-A1BB-31D58B36ADA2/rewrite_amd64_en-US.msi ${URLREWRITE_MSI}
 RUN Start-Process msiexec.exe -ArgumentList '/i', $Env:URLREWRITE_MSI, '/quiet', '/norestart' -NoNewWindow -Wait
 
+# Install chocolatey
+RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+RUN choco install -y --params="Quiet" vcredist2015
+
 # Install SIF
 RUN /Scripts/Install-SIF.ps1
 
