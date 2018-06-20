@@ -91,11 +91,6 @@ RUN Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs
 RUN Start-WebAppPool -Name $Env:SITE_NAME 
 RUN Start-Website -Name $Env:SITE_NAME
 
-# Fix models conflict for SC9 update 1: https://blog.ryanbailey.co.nz/2018/03/sitecore-experience-commerce-one-or.html
-COPY xconnect/Sitecore.Commerce.Connect.XConnect.Models.json /Files/
-RUN cp /Files/Sitecore.Commerce.Connect.XConnect.Models.json C:\inetpub\wwwroot\xconnect\App_data\jobs\continuous\IndexWorker\App_data\Models\; `
-    cp /Files/Sitecore.Commerce.Connect.XConnect.Models.json C:\inetpub\wwwroot\xconnect\App_data\Models\
-
 EXPOSE 443
 
 ENTRYPOINT C:\ServiceMonitor.exe w3svc
