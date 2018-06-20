@@ -111,3 +111,16 @@ Docker for Windows build can be flaky from time to time. Error messages like bel
 ```
 ERROR: Service 'solr' failed to build: failed to register layer: re-exec error: exit status 1: output: remove \\?\C:\ProgramData\Docker\windowsfilter\6d12d77235757f9e1cdd58216d104f0e51bc56e6021cf206a2dd6d97b0d3520f\UtilityVM\Files\Windows\WinSxS\amd64_microsoft-windows-a..ence-inventory-core_31bf3856ad364e35_10.0.16299.15_none_81bfff856a844456\aepic.dll: Access is denied.
 ```
+
+## Certificate issues with XConnect
+There is an excellent describtion of how XConnect uses certificates here: https://kamsar.net/index.php/2017/10/All-about-xConnect-Security/
+
+An issue we encountered lately was the `Could not create SSL/TLS secure channel.` one (mentioned in above describtion).
+To grant permissions in a Docker container you can use (Carbon|http://get-carbon.org/documentation.html), e.g.
+```
+PS> Get-Permission -Identity sitecore -Path 'cert:\localmachine\my\9CC4483261B92D7C5B32239115283933FC5014C'
+```
+If none are returned for the `xConnect.client` certificate, you probably need to give permissions to the sitecore user. For example:
+```
+PS>  Grant-Permission -Identity sitecore -Permission GenericRead -Path 'cert:\localmachine\my\9CC4483261B92D7C5B32239115283933FC5014C4'
+```
