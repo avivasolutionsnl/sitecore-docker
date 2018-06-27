@@ -77,6 +77,4 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
 
 EXPOSE 8983
 
-HEALTHCHECK CMD powershell -command /Scripts/WaitForSolr.ps1 $Env:HOST_NAME
-
 ENTRYPOINT C:\ServiceMonitor.exe $Env:SERVICE_NAME
