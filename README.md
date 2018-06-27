@@ -116,7 +116,7 @@ ERROR: Service 'solr' failed to build: failed to register layer: re-exec error: 
 There is an excellent describtion of how XConnect uses certificates here: https://kamsar.net/index.php/2017/10/All-about-xConnect-Security/
 
 An issue we encountered lately was the `Could not create SSL/TLS secure channel.` one (mentioned in above describtion).
-To grant permissions in a Docker container you can use (Carbon|http://get-carbon.org/documentation.html), e.g.
+To grant permissions in a Docker container you can use [Carbon](http://get-carbon.org/documentation.html), e.g.
 ```
 PS> Get-Permission -Identity sitecore -Path 'cert:\localmachine\my\9CC4483261B92D7C5B32239115283933FC5014C'
 ```
