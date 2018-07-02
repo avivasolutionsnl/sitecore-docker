@@ -38,7 +38,8 @@ RUN $name = '{0}_MarketingAutomation' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE 
     $name = '{0}_Web' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Web.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
     $name = '{0}_Reporting' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Reporting.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
     $name = '{0}_Processing.Tasks' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Processing.tasks.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `       
-    $name = '{0}_ExperienceForms' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.ExperienceForms.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME 
+    $name = '{0}_ExperienceForms' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.ExperienceForms.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
+    $name = '{0}_Messaging' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Messaging.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME
 
 RUN $DB_NAME='{0}_Xdb.Collection.ShardMapManager' -f $Env:DB_PREFIX; `
     $SHARD_NAME_PREFIX='{0}_Xdb.Collection.Shard' -f $Env:DB_PREFIX; `
