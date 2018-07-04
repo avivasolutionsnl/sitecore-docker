@@ -80,15 +80,17 @@ RUN $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SqlProcessingPoolsPassword $Env:SQL_SA_PASSWORD `
     -SqlReferenceDataUser "sa" `
     -SqlReferenceDataPassword $Env:SQL_SA_PASSWORD `
+	-SqlMessagingUser "sa" `
+    -SqlMessagingPassword $Env:SQL_SA_PASSWORD `
     -SqlMarketingAutomationUser "sa" `
     -SqlMarketingAutomationPassword $Env:SQL_SA_PASSWORD `    
-    -SqlMessagingUser "sa" `
-    -SqlMessagingPassword $Env:SQL_SA_PASSWORD `    
     -SolrCorePrefix $Env:SOLR_CORE_PREFIX `
     -SolrURL $solrUrl `
     -Skip "CleanShards", "CreateShards", "CreateShardApplicationDatabaseServerLoginSqlCmd", "CreateShardManagerApplicationDatabaseUserSqlCmd", "CreateShard0ApplicationDatabaseUserSqlCmd", "CreateShard1ApplicationDatabaseUserSqlCmd", "ConfigureSolrSchemas"
 
 RUN Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs
+# Add Host	
+RUN /Scripts/Add-Hosts.ps1
 
 RUN Start-WebAppPool -Name $Env:SITE_NAME 
 RUN Start-Website -Name $Env:SITE_NAME
