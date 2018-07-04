@@ -27,6 +27,7 @@ COPY files/*.pfx /Files/
 COPY files/license.xml /Files/
 COPY files/$SITECORE_PACKAGE /Files/
 COPY --from=prepare /Files/Config /Files/Config/
+COPY files/docker-entrypoint.ps1 /temp/
 ADD scripts /Scripts
 
 ENV XCONNECT_CERT_PATH "c:\\Files\\xConnect.pfx"
@@ -89,7 +90,11 @@ RUN $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SqlProcessingTasksUser $Env:SQL_USER `
     -SqlProcessingTasksPassword $Env:SQL_SA_PASSWORD `
     -SqlReferenceDataUser $Env:SQL_USER `
-    -SqlReferenceDataPassword $Env:SQL_SA_PASSWORD `       
+    -SqlReferenceDataPassword $Env:SQL_SA_PASSWORD ` 
+	-SqlExmMasterUser "sa" `
+    -SqlExmMasterPassword $Env:SQL_SA_PASSWORD `
+	-SqlMessagingUser "sa" `
+    -SqlMessagingPassword $Env:SQL_SA_PASSWORD `	
     -SqlProcessingPoolsUser $Env:SQL_USER `
     -SqlProcessingPoolsPassword $Env:SQL_SA_PASSWORD `
     -SqlReportingUser $Env:SQL_USER `
@@ -116,8 +121,11 @@ RUN Copy-Item /Config/*.* c:\inetpub\wwwroot\$Env:SITE_NAME\App_Config\Include
 # enable live-mode
 RUN mv C:\inetpub\wwwroot\sitecore\App_Config\Include\Examples\LiveMode.config.example C:\inetpub\wwwroot\sitecore\App_Config\Include\Examples\LiveMode.config
 
+# Add Host	
+RUN /Scripts/Add-Hosts.ps1
+
 # Start site
 RUN Start-WebAppPool -Name $Env:SITE_NAME; `
     Start-Website -Name $Env:SITE_NAME
 
-ENTRYPOINT C:\ServiceMonitor.exe w3svc
+ENTRYPOINT ["powershell.exe","C:/temp/docker-entrypoint.ps1"]
