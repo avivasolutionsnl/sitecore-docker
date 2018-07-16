@@ -15,9 +15,6 @@ services:
     sa_password: ${SQL_SA_PASSWORD}
   mem_limit: 2048m
   cpu_count: 4
-  networks:
-    app_net:
-      ipv4_address: 172.16.1.2
 
  sitecore:
   build:
@@ -30,6 +27,8 @@ services:
       SOLR_PORT: ${SOLR_PORT}
       SITECORE_PACKAGE: ${SITECORE_PACKAGE}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
+  labels:
+    - traefik.frontend.rule=Host:sitecore
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
@@ -38,9 +37,6 @@ services:
     - mssql
     - solr
   cpu_count: 6
-  networks:
-    app_net:
-      ipv4_address: 172.16.1.3    
 
  solr:
   build:
@@ -53,12 +49,12 @@ services:
       XCONNECT_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
       SITECORE_CORE_PREFIX: ${SITECORE_SOLR_CORE_PREFIX}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
+  labels:
+    - traefik.frontend.rule=Host:solr
+    - traefik.port=8983
   ports:
     - ${SOLR_PORT}
   mem_limit: 4096m
-  networks:
-    app_net:
-      ipv4_address: 172.16.1.4
 
  xconnect:
   build:
@@ -72,20 +68,11 @@ services:
       SOLR_PORT: ${SOLR_PORT}
       XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
+  labels:
+    - traefik.frontend.rule=Host:xconnect
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
-  networks:
-    app_net:
-      ipv4_address: 172.16.1.5    
   depends_on:
     - mssql
     - solr
 
-networks:
-  app_net:
-    ipam:
-      driver: default
-      config:
-        -
-          subnet: 172.16.1.0/24
-          gateway: 172.16.1.1

@@ -68,14 +68,8 @@ PS> docker-compose up
 ```
 
 ## DNS
-The containers have fixed IP addresses in the docker compose file. The easiest way to access the containers from the host is by adding the following to your hosts file:
-
-``` Hosts
-172.16.1.2	mssql
-172.16.1.3	sitecore
-172.16.1.4	solr
-172.16.1.5	xconnect
-```
+To set the Docker container service names as DNS names on your host edit your `hosts` file. 
+A convenient tool to automatically do this is [whales-names](https://github.com/gregolsky/whales-names).
 
 ## Log files
 Logging is set up to log on the host under the logs folder of this repository. 
