@@ -72,7 +72,7 @@ try
     # Main loop
     while ($true)
     {
-        Sync -Path $Path -Destination $Destination
+        Sync -Path $Path -Destination $Destination | Write-Host
 
         Start-Sleep -Milliseconds 200
     }

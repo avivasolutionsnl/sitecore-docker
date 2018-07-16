@@ -89,7 +89,11 @@ RUN $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SqlProcessingTasksUser $Env:SQL_USER `
     -SqlProcessingTasksPassword $Env:SQL_SA_PASSWORD `
     -SqlReferenceDataUser $Env:SQL_USER `
-    -SqlReferenceDataPassword $Env:SQL_SA_PASSWORD `       
+    -SqlReferenceDataPassword $Env:SQL_SA_PASSWORD ` 
+    -SqlExmMasterUser "sa" `
+    -SqlExmMasterPassword $Env:SQL_SA_PASSWORD `
+    -SqlMessagingUser "sa" `
+    -SqlMessagingPassword $Env:SQL_SA_PASSWORD `	
     -SqlProcessingPoolsUser $Env:SQL_USER `
     -SqlProcessingPoolsPassword $Env:SQL_SA_PASSWORD `
     -SqlReportingUser $Env:SQL_USER `
@@ -120,4 +124,4 @@ RUN mv C:\inetpub\wwwroot\sitecore\App_Config\Include\Examples\LiveMode.config.e
 RUN Start-WebAppPool -Name $Env:SITE_NAME; `
     Start-Website -Name $Env:SITE_NAME
 
-ENTRYPOINT C:\ServiceMonitor.exe w3svc
+ENTRYPOINT /Scripts/Watch-Directory.ps1 -Path C:\Workspace -Destination c:\inetpub\wwwroot\sitecore

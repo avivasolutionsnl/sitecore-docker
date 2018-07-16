@@ -15,9 +15,6 @@ services:
     sa_password: ${SQL_SA_PASSWORD}
   mem_limit: 2048m
   cpu_count: 4
-  networks:
-    app_net:
-      ipv4_address: 172.16.1.2
 
  sitecore:
   build:
@@ -38,9 +35,6 @@ services:
     - mssql
     - solr
   cpu_count: 6
-  networks:
-    app_net:
-      ipv4_address: 172.16.1.3    
 
  solr:
   build:
@@ -56,9 +50,6 @@ services:
   ports:
     - ${SOLR_PORT}
   mem_limit: 4096m
-  networks:
-    app_net:
-      ipv4_address: 172.16.1.4
 
  xconnect:
   build:
@@ -74,18 +65,7 @@ services:
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
-  networks:
-    app_net:
-      ipv4_address: 172.16.1.5    
   depends_on:
     - mssql
     - solr
 
-networks:
-  app_net:
-    ipam:
-      driver: default
-      config:
-        -
-          subnet: 172.16.1.0/24
-          gateway: 172.16.1.1
