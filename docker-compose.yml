@@ -27,8 +27,6 @@ services:
       SOLR_PORT: ${SOLR_PORT}
       SITECORE_PACKAGE: ${SITECORE_PACKAGE}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-  labels:
-    - traefik.frontend.rule=Host:sitecore
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
@@ -49,9 +47,6 @@ services:
       XCONNECT_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
       SITECORE_CORE_PREFIX: ${SITECORE_SOLR_CORE_PREFIX}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-  labels:
-    - traefik.frontend.rule=Host:solr
-    - traefik.port=8983
   ports:
     - ${SOLR_PORT}
   mem_limit: 4096m
@@ -68,8 +63,6 @@ services:
       SOLR_PORT: ${SOLR_PORT}
       XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-  labels:
-    - traefik.frontend.rule=Host:xconnect
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
   depends_on:
