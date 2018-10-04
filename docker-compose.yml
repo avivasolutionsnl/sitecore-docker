@@ -1,4 +1,4 @@
-version: '2.2'
+version: '2.4'
 
 services:
  mssql:
@@ -34,6 +34,7 @@ services:
     - xconnect
     - mssql
     - solr
+  mem_limit: 8192m
   cpu_count: 6
 
  solr:
@@ -50,6 +51,7 @@ services:
   ports:
     - ${SOLR_PORT}
   mem_limit: 4096m
+  cpu_count: 4
 
  xconnect:
   build:
@@ -68,4 +70,6 @@ services:
   depends_on:
     - mssql
     - solr
+  mem_limit: 2048m
+  cpu_count: 4
 
