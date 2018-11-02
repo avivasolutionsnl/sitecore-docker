@@ -40,7 +40,8 @@ RUN /Scripts/Install-SIF.ps1
 
 WORKDIR "/solr/solr-6.6.2"
 
-RUN Invoke-WebRequest -Method Get -Uri "https://nssm.cc/release/nssm-2.24.zip" -OutFile /nssm.zip ; `
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
+    Invoke-WebRequest -Method Get -Uri "https://nssm.cc/release/nssm-2.24.zip" -OutFile /nssm.zip ; `
     Expand-Archive -Path /nssm.zip -DestinationPath /nssm ; `
     Remove-Item /nssm.zip -Force
 
