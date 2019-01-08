@@ -1,0 +1,15 @@
+# Overlay file for Aviva Solutions specific Docker image names
+version: '2.4'
+
+services:
+  mssql:
+    image: avivasolutionsnl.azurecr.io/sitecore-mssql:9.0.2
+
+  sitecore:
+    image: avivasolutionsnl.azurecr.io/sitecore-sitecore:9.0.2
+
+  solr:
+    image: avivasolutionsnl.azurecr.io/sitecore-solr:9.0.2
+
+  xconnect:
+    image: avivasolutionsnl.azurecr.io/sitecore-xconnect:9.0.2

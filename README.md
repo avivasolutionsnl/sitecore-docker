@@ -12,6 +12,8 @@ Hopefully this will help you to get up and running with Sitecore and Docker. By 
 
 # Build
 As Sitecore does not distribute Docker images, the first step is to build the required Docker images.
+
+## Pre-build steps
 For this you need the Sitecore installation files and a Sitecore license file. What files to use are set by environment variables (interpreted by docker-compose); download all the packages that are defined by variables in the `.env` file and place them in the `files` directory.
 
 The xp0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
@@ -31,10 +33,13 @@ Next, modify the `.env` file and change the build parameters if needed:
 | SITECORE_SITE_NAME        | Host name of the Sitecore site                   |
 | SITECORE_SOLR_CORE_PREFIX | Prefix to use for the Sitecore SOLR cores        |
 
+## Build step
 Now perform the Docker build step:
 ```
 PS> docker-compose build
-``` 
+```
+
+> Optionally use an overlay `docker-compose.yml` file to give the images custom tags, e.g. `docker-compose -f docker-compose.yml -f docker-compose.aviva.yml build`
 
 The build results in the following Docker images:
 - sitecore: IIS + ASP.NET + Sitecore
@@ -42,20 +47,53 @@ The build results in the following Docker images:
 - solr: Apache Solr 
 - xconnect: IIS + ASP.NET + XConnect
 
-As final step build all Solr indexes (populate and re-build indexes) from Sitecore (reachable at https://sitecore/sitecore), and perform a Docker commit for the Solr image to persist the changes (otherwise you will have to redo this step each time):
+## Post-build steps
+Post-build steps require a running system. 
+To run the system create the log directories which are mounted in the Docker compose file:
 ```
-PS> docker commit sitecoredocker_solr_1 sitecoredocker_solr:latest
+PS> ./CreateLogDirs.ps1
+```
+
+### (Optionally) Install Sitecore SXA packages
+Copy the `PSE_PACKAGE` and `SXA_PACKAGE` (defined in the `.env` file) into the files directory.
+
+Extract the `Commerce SIF` package to the `files` directory, this is used for installing the packages.
+
+Install SXA using: `docker-compose -f docker-compose.yml -f docker-compose.install-sxa.yml run --entrypoint powershell sitecore C:\sxa\InstallSXA.ps1`
+
+Store the changes, e.g:
+```
+PS> docker commit --change="ENTRYPOINT /Scripts/Watch-Directory.ps1 -Path C:\Workspace -Destination c:\inetpub\wwwroot\sitecore" sitecore-docker_sitecore_1 sitecore-docker_sitecore-sxa:latest
+PS> docker commit sitecore-docker_mssql_1 sitecore-docker_mssql-sxa:latest
+```
+
+Optionally correctly tag the stored images, e.g:
+```
+PS> docker tag sitecore-docker_sitecore-sxa:9.0.2 avivasolutionsnl.azurecr.io/sitecore-sitecore-sxa:9.0.2
+PS> docker tag sitecore-docker_mssql-sxa:9.0.2 avivasolutionsnl.azurecr.io/sitecore-mssql-sxa:9.0.2
+```
+
+### (Optionally) Build Solr indexes
+As final step build (after starting the system using `docker-compose up`) all Solr indexes (populate and re-build indexes) from Sitecore (reachable at https://sitecore/sitecore), and perform a Docker commit for the Solr image to persist the changes (otherwise you will have to redo this step each time):
+```
+PS> docker commit sitecore-docker_solr_1 sitecore-docker_solr:latest
+```
+
+### (Optionally) Obtain database files from images
+Obtain mountable files from the stopped containers:
+- Copy SQL databases to `databases`: `PS> ./CopyDatabases.ps1`
+- Copy Solr cores to `cores`: `PS> ./CopyCores.ps1`
+
+### Push images
+Push the Docker images to your repository, e.g:
+```
+PS> docker-compose -f docker-compose.yml -f docker-compose.aviva.yml push
 ```
 
 # Run
 Docker compose is used to start up all required services.
 
 Place the Sitecore source files in the `.\wwwroot\sitecore` directory.
-
-Create the log directories which are mounted in the Docker compose file:
-```
-PS> ./CreateLogDirs.ps1
-```
 
 Create a webroot directory:
 ```
