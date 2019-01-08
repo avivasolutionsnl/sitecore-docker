@@ -10,7 +10,7 @@ services:
       SITECORE_PACKAGE: ${SITECORE_PACKAGE}
       XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
       HOST_NAME: mssql
-  image: sitecore-docker_mssql:9.0.2
+  image: "sitecore-docker_mssql:${TAG}"
   environment:
     ACCEPT_EULA: "Y"
     sa_password: ${SQL_SA_PASSWORD}
@@ -28,7 +28,7 @@ services:
       SOLR_PORT: ${SOLR_PORT}
       SITECORE_PACKAGE: ${SITECORE_PACKAGE}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-  image: sitecore-docker_sitecore:9.0.2
+  image: "sitecore-docker_sitecore:${TAG}"
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
@@ -50,7 +50,7 @@ services:
       XCONNECT_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
       SITECORE_CORE_PREFIX: ${SITECORE_SOLR_CORE_PREFIX}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-  image: sitecore-docker_solr:9.0.2
+  image: "sitecore-docker_solr:${TAG}"
   ports:
     - ${SOLR_PORT}
   mem_limit: 4096m
@@ -68,7 +68,7 @@ services:
       SOLR_PORT: ${SOLR_PORT}
       XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
       CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-  image: sitecore-docker_xconnect:9.0.2
+  image: "sitecore-docker_xconnect:${TAG}"
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
   depends_on:
@@ -76,4 +76,3 @@ services:
     - solr
   mem_limit: 2048m
   cpu_count: 4
-

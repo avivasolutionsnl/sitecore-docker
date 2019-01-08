@@ -3,13 +3,13 @@ version: '2.4'
 
 services:
   mssql:
-    image: avivasolutionsnl.azurecr.io/sitecore-mssql:9.0.2
+    image: "avivasolutionsnl.azurecr.io/sitecore-mssql:${TAG}"
 
   sitecore:
-    image: avivasolutionsnl.azurecr.io/sitecore-sitecore:9.0.2
+    image: "avivasolutionsnl.azurecr.io/sitecore-sitecore:${TAG}"
 
   solr:
-    image: avivasolutionsnl.azurecr.io/sitecore-solr:9.0.2
+    image: "avivasolutionsnl.azurecr.io/sitecore-solr:${TAG}"
 
   xconnect:
-    image: avivasolutionsnl.azurecr.io/sitecore-xconnect:9.0.2
+    image: "avivasolutionsnl.azurecr.io/sitecore-xconnect:${TAG}"

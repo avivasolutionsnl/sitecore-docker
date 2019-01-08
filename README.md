@@ -32,6 +32,7 @@ Next, modify the `.env` file and change the build parameters if needed:
 | XCONNECT_SOLR_CORE_PREFIX | Prefix to use for the XConnect SOLR cores        |
 | SITECORE_SITE_NAME        | Host name of the Sitecore site                   |
 | SITECORE_SOLR_CORE_PREFIX | Prefix to use for the Sitecore SOLR cores        |
+| TAG                       | The version to tag the Docker images with        |
 
 ## Build step
 Now perform the Docker build step:
