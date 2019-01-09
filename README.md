@@ -49,7 +49,7 @@ The build results in the following Docker images:
 - xconnect: IIS + ASP.NET + XConnect
 
 ## Post-build steps
-Post-build steps require a running system. 
+Post-build steps require a running system.
 To run the system create the log directories which are mounted in the Docker compose file:
 ```
 PS> ./CreateLogDirs.ps1
@@ -66,6 +66,11 @@ Store the changes, e.g:
 ```
 PS> docker commit --change="ENTRYPOINT /Scripts/Watch-Directory.ps1 -Path C:\Workspace -Destination c:\inetpub\wwwroot\sitecore" sitecore-docker_sitecore_1 sitecore-docker_sitecore-sxa:latest
 PS> docker commit sitecore-docker_mssql_1 sitecore-docker_mssql-sxa:latest
+```
+
+Install SXA Solr cores:
+```
+PS> docker-compose -f docker-compose.install-sxa.yml build solr
 ```
 
 Optionally correctly tag the stored images, e.g:

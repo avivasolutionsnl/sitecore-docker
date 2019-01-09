@@ -9,7 +9,7 @@ services:
     image: "avivasolutionsnl.azurecr.io/sitecore-sitecore-sxa:${TAG}"
 
   solr:
-    image: "avivasolutionsnl.azurecr.io/sitecore-solr:${TAG}"
+    image: "avivasolutionsnl.azurecr.io/sitecore-solr-sxa:${TAG}"
 
   xconnect:
     image: "avivasolutionsnl.azurecr.io/sitecore-xconnect:${TAG}"
