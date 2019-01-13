@@ -1,5 +1,6 @@
 # escape=`
-FROM sitecore-docker_solr:9.0.2
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
 

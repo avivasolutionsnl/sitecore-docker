@@ -4,43 +4,30 @@ Run Sitecore 9 (with XConnect) using Docker and Windows containers.
 This repository contains experimental code that we use in development setups. We do not consider the current code in this repository ready for production.
 Hopefully this will help you to get up and running with Sitecore and Docker. By no means we consider ourselves Docker experts and thus expect these images to still contain a lot of bugs. Great help for creating this setup was provided by the [sitecoreops](https://github.com/sitecoreops/sitecore-images) and [sitecore-nine-docker](https://github.com/pbering/sitecore-nine-docker) repos. Please feel free to provide feedback by creating an issue, PR, etc. 
 
+
 # Requirements
 - Windows 10 update 1709 (with Hyper-V enabled)
 - Docker for Windows (version 1712 or better): https://docs.docker.com/docker-for-windows/
 - Visual Studio 15.5.3
 - Sitecore installation files
+- [Nuke.build](https://nuke.build)
+
 
 # Build
 As Sitecore does not distribute Docker images, the first step is to build the required Docker images.
 
 ## Pre-build steps
-For this you need the Sitecore installation files and a Sitecore license file. What files to use are set by environment variables (interpreted by docker-compose); download all the packages that are defined by variables in the `.env` file and place them in the `files` directory.
+For this you need the Sitecore installation files and a Sitecore license file. 
+What files to use are set in the [build configuration](./build/Build.cs).
 
 The xp0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
 xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script (note that this requires an Administrator elevated powershell environment and you may need to set the correct execution policy, e.g. `PS> powershell.exe -ExecutionPolicy Unrestricted`).
 
-Next, modify the `.env` file and change the build parameters if needed:
-
-| Field                     | Description                                      |
-| ------------------------- | ------------------------------------------------ |
-| SQL_SA_PASSWORD           | The password to use for the SQL sa user          |
-| SQL_DB_PREFIX             | Prefix to use for all DB names                   |
-| SOLR_HOST_NAME            | Host name to use for the SOLR instance           |
-| SOLR_PORT                 | Port to use for the SOLR instance                |
-| SOLR_SERVICE_NAME         | Name of the SOLR Windows service                 |
-| XCONNECT_SITE_NAME        | Host name of the Xconnect site                   |
-| XCONNECT_SOLR_CORE_PREFIX | Prefix to use for the XConnect SOLR cores        |
-| SITECORE_SITE_NAME        | Host name of the Sitecore site                   |
-| SITECORE_SOLR_CORE_PREFIX | Prefix to use for the Sitecore SOLR cores        |
-| TAG                       | The version to tag the Docker images with        |
-
-## Build step
-Now perform the Docker build step:
+## Build
+Build all images using:
 ```
-PS> docker-compose build
+PS> nuke 
 ```
-
-> Optionally use an overlay `docker-compose.yml` file to give the images custom tags, e.g. `docker-compose -f docker-compose.yml -f docker-compose.aviva.yml build`
 
 The build results in the following Docker images:
 - sitecore: IIS + ASP.NET + Sitecore
@@ -48,53 +35,16 @@ The build results in the following Docker images:
 - solr: Apache Solr 
 - xconnect: IIS + ASP.NET + XConnect
 
-## Post-build steps
-Post-build steps require a running system.
-To run the system create the log directories which are mounted in the Docker compose file:
-```
-PS> ./CreateLogDirs.ps1
-```
-
-### (Optionally) Install Sitecore SXA packages
-Copy the `PSE_PACKAGE` and `SXA_PACKAGE` (defined in the `.env` file) into the files directory.
-
-Extract the `Commerce SIF` package to the `files` directory, this is used for installing the packages.
-
-Install SXA using: `docker-compose -f docker-compose.yml -f docker-compose.install-sxa.yml run --entrypoint powershell sitecore C:\sxa\InstallSXA.ps1`
-
-Store the changes, e.g:
-```
-PS> docker commit --change="ENTRYPOINT /Scripts/Watch-Directory.ps1 -Path C:\Workspace -Destination c:\inetpub\wwwroot\sitecore" sitecore-docker_sitecore_1 sitecore-docker_sitecore-sxa:latest
-PS> docker commit sitecore-docker_mssql_1 sitecore-docker_mssql-sxa:latest
-```
-
-Install SXA Solr cores:
-```
-PS> docker-compose -f docker-compose.install-sxa.yml build solr
-```
-
-Optionally correctly tag the stored images, e.g:
-```
-PS> docker tag sitecore-docker_sitecore-sxa:9.0.2 avivasolutionsnl.azurecr.io/sitecore-sitecore-sxa:9.0.2
-PS> docker tag sitecore-docker_mssql-sxa:9.0.2 avivasolutionsnl.azurecr.io/sitecore-mssql-sxa:9.0.2
-```
-
-### (Optionally) Build Solr indexes
-As final step build (after starting the system using `docker-compose up`) all Solr indexes (populate and re-build indexes) from Sitecore (reachable at https://sitecore/sitecore), and perform a Docker commit for the Solr image to persist the changes (otherwise you will have to redo this step each time):
-```
-PS> docker commit sitecore-docker_solr_1 sitecore-docker_solr:latest
-```
-
-### (Optionally) Obtain database files from images
-Obtain mountable files from the stopped containers:
-- Copy SQL databases to `databases`: `PS> ./CopyDatabases.ps1`
-- Copy Solr cores to `cores`: `PS> ./CopyCores.ps1`
+and two SXA images:
+- sitecore-sxa
+- mssql-sxa
 
 ### Push images
 Push the Docker images to your repository, e.g:
 ```
-PS> docker-compose -f docker-compose.yml -f docker-compose.aviva.yml push
+PS> nuke push
 ```
+
 
 # Run
 Docker compose is used to start up all required services.
@@ -106,17 +56,47 @@ Create a webroot directory:
 PS> mkdir -p wwwroot/sitecore
 ```
 
-To start Sitecore:
+Create the log directories which are mounted in the Docker compose file:
+```
+PS> ./CreateLogDirs.ps1
+```
+
+To start Sitecore;
 ```
 PS> docker-compose up
 ```
+
+or to start Sitecore with SXA:
+```
+PS> docker-compose -f docker-compose.yml -f docker-compose.sxa.yml up
+```
+
+Run-time parameters can be modified using the `.env` file:
+
+| Field                     | Description                                      |
+| ------------------------- | ------------------------------------------------ |
+| SQL_SA_PASSWORD           | The password to use for the SQL sa user          |
+| SITECORE_SITE_NAME        | Host name of the Sitecore site                   |
+| IMAGE_PREFIX              | The Docker image prefix to use                   |
+| TAG                       | The version to tag the Docker images with        |
+
 
 ## DNS
 To set the Docker container service names as DNS names on your host edit your `hosts` file. 
 A convenient tool to automatically do this is [whales-names](https://github.com/gregolsky/whales-names).
 
-## Log files
-Logging is set up to log on the host under the logs folder of this repository. 
+## (Optionally) Obtain Solr cores
+Stop the `solr` container and copy the cores to your the `cores` directory:
+```
+PS> ./CopyCores.ps1
+```
+
+## (Optionally) Obtain database files from images
+Stop the `mssql` container and copy the databases to the `databases` directory:
+```
+PS> ./CopyDatabases.ps1
+```
+
 
 # Known issues
 Docker for Windows can be unstable at times, some troubleshooting tips are listed below.

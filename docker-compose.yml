@@ -2,15 +2,7 @@ version: '2.4'
 
 services:
  mssql:
-  build:
-    context: ./
-    dockerfile: ./mssql/Dockerfile
-    args:
-      DB_PREFIX: ${SQL_DB_PREFIX}
-      SITECORE_PACKAGE: ${SITECORE_PACKAGE}
-      XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
-      HOST_NAME: mssql
-  image: "sitecore-docker_mssql:${TAG}"
+  image: "${IMAGE_PREFIX}mssql:${TAG}"
   environment:
     ACCEPT_EULA: "Y"
     sa_password: ${SQL_SA_PASSWORD}
@@ -18,17 +10,7 @@ services:
   cpu_count: 4
 
  sitecore:
-  build:
-    context: ./
-    dockerfile: ./sitecore/Dockerfile
-    args:
-      SQL_SA_PASSWORD: ${SQL_SA_PASSWORD}
-      SQL_DB_PREFIX: ${SQL_DB_PREFIX}
-      SITE_NAME: ${SITECORE_SITE_NAME}
-      SOLR_PORT: ${SOLR_PORT}
-      SITECORE_PACKAGE: ${SITECORE_PACKAGE}
-      CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-  image: "sitecore-docker_sitecore:${TAG}"
+  image: "${IMAGE_PREFIX}sitecore:${TAG}"
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
@@ -40,35 +22,12 @@ services:
   cpu_count: 6
 
  solr:
-  build:
-    context: ./
-    dockerfile: ./solr/Dockerfile
-    args:
-      HOST_NAME: ${SOLR_HOST_NAME}
-      PORT: ${SOLR_PORT}
-      SERVICE_NAME: ${SOLR_SERVICE_NAME}
-      XCONNECT_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
-      SITECORE_CORE_PREFIX: ${SITECORE_SOLR_CORE_PREFIX}
-      CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-  image: "sitecore-docker_solr:${TAG}"
-  ports:
-    - ${SOLR_PORT}
+  image: "${IMAGE_PREFIX}solr:${TAG}"
   mem_limit: 4096m
   cpu_count: 4
 
  xconnect:
-  build:
-    context: ./
-    dockerfile: ./xconnect/Dockerfile
-    args:
-      SQL_SA_PASSWORD: ${SQL_SA_PASSWORD}
-      SQL_DB_PREFIX: ${SQL_DB_PREFIX}
-      SITE_NAME: ${XCONNECT_SITE_NAME}
-      SOLR_CORE_PREFIX: ${XCONNECT_SOLR_CORE_PREFIX}
-      SOLR_PORT: ${SOLR_PORT}
-      XCONNECT_PACKAGE: ${XCONNECT_PACKAGE}
-      CONFIG_PACKAGE: ${CONFIG_PACKAGE}
-  image: "sitecore-docker_xconnect:${TAG}"
+  image: "${IMAGE_PREFIX}xconnect:${TAG}"
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
   depends_on:
