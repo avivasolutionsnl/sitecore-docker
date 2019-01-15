@@ -57,7 +57,7 @@ class Build : NukeBuild
     [Parameter("Sitecore Solr core prefix")]
     readonly string SITECORE_SOLR_CORE_PREFIX = "Sitecore";
     
-    private string FullImageName(string name) => $"{ImagePrefix}mssql:{Version}";
+    private string FullImageName(string name) => $"{ImagePrefix}{name}:{Version}";
 
     Target Mssql => _ => _
         .Executes(() =>
@@ -174,11 +174,13 @@ class Build : NukeBuild
     Target SolrSxa => _ => _
         .DependsOn(Solr)
         .Executes(() => {
+            var baseImage = FullImageName("solr");
+
             DockerBuild(x => x
                 .SetPath("solr/sxa")
                 .SetTag(FullImageName("solr-sxa"))
                 .SetBuildArg(new string[] {
-                    $"BASE_IMAGE={ImagePrefix}solr:{Version}"
+                    $"BASE_IMAGE={baseImage}"
                 })
             );
         });
