@@ -35,8 +35,9 @@ The build results in the following Docker images:
 - solr: Apache Solr 
 - xconnect: IIS + ASP.NET + XConnect
 
-and two SXA images:
+and three SXA images:
 - sitecore-sxa
+- solr-sxa
 - mssql-sxa
 
 ### Push images

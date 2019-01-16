@@ -114,7 +114,7 @@ RUN $pwd = ConvertTo-SecureString -String 'secret' -Force -AsPlainText; `
     $binding = Get-WebBinding -Name $Env:SITE_NAME -Protocol "https"; `
     $binding.AddSslCertificate($PFXCert.EndEntityCertificates.ThumbPrint, 'my')
 
-ADD config /Config
+ADD xp/sitecore/config /Config
 RUN Copy-Item /Config/*.* c:\inetpub\wwwroot\$Env:SITE_NAME\App_Config\Include
 
 # enable live-mode
