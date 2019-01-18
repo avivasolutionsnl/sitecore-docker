@@ -1,0 +1,16 @@
+version: '2.4'
+
+services:
+  sitecore:
+    volumes:
+      - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
+      - .\wwwroot\sitecore:C:\Workspace
+      - .\sitecore\sxa:C:\sxa
+      - ..\files:C:\files-mount
+    environment:
+      PSE_PACKAGE: ${PSE_PACKAGE}
+      SXA_PACKAGE: ${SXA_PACKAGE}
+      SCXA_PACKAGE: ${SCXA_PACKAGE}
+
+  solr:
+    image: "${IMAGE_PREFIX}solr-sxa:${TAG}"

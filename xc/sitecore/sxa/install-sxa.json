@@ -1,0 +1,68 @@
+{
+  "Parameters": {
+    "PowershellExtensionPackageFullPath": {
+      "Type": "string",
+      "Description": "The path to the Sitecore Powershell Extensions zip.",
+      "DefaultValue": "/files-mount/pse-package.zip"
+    },
+    "SXAPackageFullPath": {
+      "Type": "string",
+      "Description": "The path to the SXA zip.",
+      "DefaultValue": "/files-mount/sxa-package.zip"
+    },
+    "SCXAPackageFullPath": {
+      "Type": "string",
+      "Description": "The path to the SCXA zip.",
+      "DefaultValue": "/files-mount/scxa-package.zip"
+    },
+    "PackagesDirDst": {
+      "Type": "string",
+      "Description": "The path to packages directory.",
+      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\sitecore\\admin\\Packages\\"
+    },
+    "BaseUrl": {
+      "Type": "string",
+      "Description": "The utility pages base url.",
+      "DefaultValue": "http://sitecore/SiteUtilityPages"
+    }
+  },
+  "Modules": [ "SitecoreUtilityTasks" ],
+  "Tasks": {
+    "CheckPaths": {
+      "Type": "EnsurePath",
+      "Params": {
+        "Exists": [
+          "[parameter('PowershellExtensionPackageFullPath')]",
+          "[parameter('SXAPackageFullPath')]",
+          "[parameter('SCXAPackageFullPath')]",
+          "[parameter('PackagesDirDst')]"
+        ]
+      }
+    },
+    "InstallPSEPackage": {
+      "Type": "InstallPackage",
+      "Params": {
+        "PackageFullPath": "[parameter('PowershellExtensionPackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    },
+    "InstallSXAPackage": {
+      "Type": "InstallPackage",
+      "Params": {
+        "PackageFullPath": "[parameter('SXAPackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    },
+    "InstallSCXAPackage": {
+      "Type": "InstallPackage",
+      "Params": {
+        "PackageFullPath": "[parameter('SCXAPackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    }
+  }
+}
+  

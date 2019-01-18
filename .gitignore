@@ -6,3 +6,4 @@ files
 logs
 tmp
 .tmp
+.log

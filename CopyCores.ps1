@@ -3,7 +3,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$false)]
-    [string]$Container = 'sitecore-docker_solr_1',
+    [string]$Container = 'sitecore-xp_solr_1',
     [Parameter(Mandatory=$false)]
     [string]$FromCoresFilePath = 'C:\solr\solr-6.6.2\server\solr',
     [Parameter(Mandatory=$false)]
@@ -12,21 +12,10 @@ param(
 
 mkdir -Force -Path ${ToCoresFilePath}
 
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_fxm_master_index ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_fxm_web_index ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_marketingdefinitions_master ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_marketingdefinitions_web ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_marketing_asset_index_web ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_marketing_asset_index_master ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_suggested_test_index ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_testing_index ${ToCoresFilePath}
+docker cp ${Container}:${FromCoresFilePath} ${ToCoresFilePath}
 
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_core_index ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_master_index ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\Sitecore_web_index ${ToCoresFilePath}
-
-docker cp ${Container}:${FromCoresFilePath}\xp0_xdb ${ToCoresFilePath}
-docker cp ${Container}:${FromCoresFilePath}\xp0_xdb_rebuild ${ToCoresFilePath}
+mv -Force ${ToCoresFilePath}/solr/* ${ToCoresFilePath}
+rm -Recurse ${ToCoresFilePath}/solr
 
 # LCOW mount binds do not yet support locking
 # Replace native locking by simple locking
