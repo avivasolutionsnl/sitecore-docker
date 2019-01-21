@@ -17,7 +17,7 @@ partial class Build : NukeBuild
     [Parameter("Docker image version tag for Sitecore XP")]
     readonly string XpVersion = "9.0.2";
 
-    private string XpFullImageName(string name) => $"{XpImagePrefix}{name}:{XpVersion}";
+    private string XpFullImageName(string name) => $"{RepoImagePrefix}{XpImagePrefix}{name}:{XpVersion}";
 
     // Packages
     [Parameter("Sitecore XPO configuration package")]
@@ -61,6 +61,7 @@ partial class Build : NukeBuild
                 .SetPath(".")
                 .SetFile("xp/mssql/Dockerfile")
                 .SetTag(XpFullImageName("mssql"))
+                .SetMemory(4000000000) // 4GB, SQL needs some more memory
                 .SetBuildArg(new string[] {
                     $"DB_PREFIX={SQL_DB_PREFIX}",
                     $"SITECORE_PACKAGE={SITECORE_PACKAGE}",
@@ -140,34 +141,12 @@ partial class Build : NukeBuild
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XpImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XpVersion}", EnvironmentVariableTarget.Process);
 
-            DockerCompose(@"-f docker-compose.yml -f docker-compose.build-sxa.yml up -d");
-
-            var sitecoreContainerName = GetContainerName("sitecore");
-
-            // Install SXA package
-            DockerExec(x => x
-                .SetContainer(sitecoreContainerName)
-                .SetCommand("powershell")
-                .SetArgs(@"C:\sxa\InstallSXA.ps1")
-                .SetInteractive(true)
-                .SetTty(true)
+            InstallSitecorePackage(
+                @"C:\sxa\InstallSXA.ps1",
+                XpFullImageName("sitecore-sxa"),
+                XpFullImageName("mssql-sxa"),
+                "-f docker-compose.yml -f docker-compose.build-sxa.yml"
             );
-
-            DockerCompose("stop");
-
-            // Commit changes
-            DockerCommit(x => x
-                .SetContainer(GetContainerName("mssql"))
-                .SetRepository(XpFullImageName("mssql-sxa"))
-            );
-
-            DockerCommit(x => x
-                .SetContainer(sitecoreContainerName)
-                .SetRepository(XpFullImageName("sitecore-sxa"))
-            );
-
-            // Remove build artefacts
-            DockerCompose("down");
         });
 
     Target XpSolrSxa => _ => _

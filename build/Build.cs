@@ -18,10 +18,43 @@ partial class Build : NukeBuild
 
     [PathExecutable] readonly Tool Powershell;
 
+    // Docker options
+    [Parameter("Docker image repository prefix, e.g. my.docker-image.repo/")]
+    readonly string RepoImagePrefix = "";
+
     // Get the container created by docker-compose
     private string GetContainerName(string serviceName) {
         var dirName = new System.IO.DirectoryInfo(System.IO.Directory.GetCurrentDirectory()).Name;
         return $"{dirName}_{serviceName}_1";
+    }
+
+    // Install a Sitecore package using the given script file and the docker-compose.yml file in the current directory
+    private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "") {
+        DockerCompose($"{dockerComposeOptions} up -d");
+
+        // Install Commerce Connect package
+        var sitecoreContainerName = GetContainerName("sitecore");
+        DockerExec(x => x
+            .SetContainer(sitecoreContainerName)
+            .SetCommand("powershell")
+            .SetArgs(scriptFilename)
+            .SetInteractive(true)
+            .SetTty(true)
+        );
+
+        DockerCompose("stop");
+
+        // Commit changes
+        DockerCommit(x => x
+            .SetContainer(GetContainerName("mssql"))
+            .SetRepository(mssqlTargetImageName));
+
+        DockerCommit(x => x
+            .SetContainer(sitecoreContainerName)
+            .SetRepository(sitecoreTargetImageName));
+
+        // Remove build artefacts
+        DockerCompose("down");
     }
 
     Target All => _ => _

@@ -18,7 +18,7 @@ partial class Build : NukeBuild
     [Parameter("Docker image version tag for Sitecore XC")]
     readonly string XcVersion = "9.0.3";
 
-    private string XcFullImageName(string name) => $"{XcImagePrefix}{name}:{XcVersion}";
+    private string XcFullImageName(string name) => $"{RepoImagePrefix}{XcImagePrefix}{name}:{XcVersion}";
 
     // Packages
     [Parameter("Sitecore Identity server package")]
@@ -124,11 +124,11 @@ partial class Build : NukeBuild
                 .SetPath(".")
                 .SetFile("xc/mssql/Dockerfile")
                 .SetTag(XcFullImageName("mssql"))
+                .SetMemory(4000000000) // 4GB, SQL needs some more memory
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
                     $"DB_PREFIX={SQL_DB_PREFIX}",
-                    $"COMMERCE_SDK_PACKAGE={COMMERCE_SDK_PACKAGE}",
-                    $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}"
+                    $"COMMERCE_SDK_PACKAGE={COMMERCE_SDK_PACKAGE}"
                 })
             );
         });
@@ -169,33 +169,11 @@ partial class Build : NukeBuild
             System.IO.Directory.CreateDirectory(@"wwwroot/sitecore");
             Powershell("../CreateLogDirs.ps1");
 
-            DockerCompose(@"up -d");
-
-            // Install Commerce Connect package
-            var sitecoreContainerName = GetContainerName("sitecore");
-            DockerExec(x => x
-                .SetContainer(sitecoreContainerName)
-                .SetCommand("powershell")
-                .SetArgs(@"C:\Scripts\InstallCommercePackages.ps1")
-                .SetInteractive(true)
-                .SetTty(true)
+            InstallSitecorePackage(
+                @"C:\Scripts\InstallCommercePackages.ps1", 
+                XcFullImageName("sitecore"), 
+                XcFullImageName("mssql")
             );
-
-            DockerCompose("stop");
-
-            // Commit changes
-            DockerCommit(x => x
-                .SetContainer(GetContainerName("mssql"))
-                .SetRepository(XcFullImageName("mssql"))
-            );
-
-            DockerCommit(x => x
-                .SetContainer(sitecoreContainerName)
-                .SetRepository(XcFullImageName("sitecore"))
-            );
-
-            // Remove build artefacts
-            DockerCompose("down");
         });
     
     Target XcSolr => _ => _
@@ -253,33 +231,12 @@ partial class Build : NukeBuild
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XcVersion}", EnvironmentVariableTarget.Process);
 
-            DockerCompose(@"-f docker-compose.yml -f docker-compose.build-sxa.yml up -d");
-
-            // Install SXA package
-            var sitecoreContainerName = GetContainerName("sitecore");
-            DockerExec(x => x
-                .SetContainer(sitecoreContainerName)
-                .SetCommand("powershell")
-                .SetArgs(@"C:\sxa\InstallSXA.ps1")
-                .SetInteractive(true)
-                .SetTty(true)
+            InstallSitecorePackage(
+                @"C:\sxa\InstallSXA.ps1",
+                XcFullImageName("sitecore-sxa"), 
+                XcFullImageName("mssql-sxa"),
+                "-f docker-compose.yml -f docker-compose.build-sxa.yml"
             );
-
-            DockerCompose("stop");
-
-            // Commit changes
-            DockerCommit(x => x
-                .SetContainer(GetContainerName("mssql"))
-                .SetRepository(XcFullImageName("mssql-sxa"))
-            );
-
-            DockerCommit(x => x
-                .SetContainer(sitecoreContainerName)
-                .SetRepository(XcFullImageName("sitecore-sxa"))
-            );
-
-            // Remove build artefacts
-            DockerCompose("down");
         });
 
     Target XcSolrSxa => _ => _

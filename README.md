@@ -69,7 +69,7 @@ To push the Docker images to your repository use the `push` build targets, e.g. 
 PS> nuke push
 ```
 
-NB. To prefix the Docker images with your repository name change the `XpImagePrefix` and `XcImagePrefix` build setting parameters.
+NB. To prefix the Docker images with your repository name change the `RepoImagePrefix`, `XpImagePrefix` and/or `XcImagePrefix` build setting parameters.
 
 
 # Run
