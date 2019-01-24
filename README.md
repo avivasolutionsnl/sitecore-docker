@@ -1,4 +1,4 @@
-Run Sitecore 9 (with XConnect) using Docker and Windows containers.
+Run Sitecore 9 XP0 and XC using Docker for Windows.
 
 # Disclaimer
 This repository contains experimental code that we use in development setups. We do not consider the current code in this repository ready for production.
@@ -17,10 +17,12 @@ Hopefully this will help you to get up and running with Sitecore and Docker. By 
 As Sitecore does not distribute Docker images, the first step is to build the required Docker images.
 
 ## Pre-build steps
-For this you need the Sitecore installation files and a Sitecore license file. 
-What files to use are set in the [build configuration](./build/Build.cs).
+For this you need to place the Sitecore installation files and a Sitecore license file in the `files` directory. Which files to use are defined in the build configuration files:
+- [XP build config](./build/Build.Xp.cs)
+- [XC build config](./build/Build.Xc.cs)
+- [Overall build config](./build/Build.cs)
 
-The xp0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
+The XP0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
 xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script (note that this requires an Administrator elevated powershell environment and you may need to set the correct execution policy, e.g. `PS> powershell.exe -ExecutionPolicy Unrestricted`).
 
 ## Build
@@ -30,26 +32,51 @@ PS> nuke
 ```
 
 The build results in the following Docker images:
-- sitecore: IIS + ASP.NET + Sitecore
-- mssql: MS SQL + Sitecore databases
-- solr: Apache Solr 
-- xconnect: IIS + ASP.NET + XConnect
+- XP0
+    - `xp-sitecore-sitecore`: IIS + ASP.NET + Sitecore
+    - `xp-sitecore-mssql`: MS SQL + Sitecore databases
+    - `xp-sitecore-solr`: Apache Solr 
+    - `xp-sitecore-xconnect`: IIS + ASP.NET + XConnect
+- XP0 with SXA installed
+    - `xp-sitecore-sxa`
+    - `xp-solr-sxa`
+    - `xp-mssql-sxa`
 
-and two SXA images:
-- sitecore-sxa
-- mssql-sxa
+- XC
+    - `xc-sitecore-commerce`: ASP.NET
+    - `xc-sitecore-sitecore`: IIS + ASP.NET + Sitecore
+    - `xc-sitecore-mssql`: MS SQL + Sitecore databases
+    - `xc-sitecore-solr`: Apache Solr 
+    - `xc-sitecore-xconnect`: IIS + ASP.NET + XConnect
+- XC with SXA installed
+    - `xc-sitecore-sxa`
+    - `xc-solr-sxa`
+    - `xc-mssql-sxa`
+
+All images are contain a version tag that corresponds to the Sitecore commercial version number e.g. `xp-sitecore-sitecore:9.0.2`.
+
+### Build a selection of images
+To build a certain Docker image or set of images run a specific Nuke.Build target, e.g to build only XP0 images:
+```
+PS> nuke xp
+```
+Each Docker image (or set of images, e.g. `XP0` or `XC`) has a corresponding target definition in the build configuration.
+
 
 ### Push images
-Push the Docker images to your repository, e.g:
+To push the Docker images to your repository use the `push` build targets, e.g. to push all images:
 ```
 PS> nuke push
 ```
 
+NB. To prefix the Docker images with your repository name change the `RepoImagePrefix`, `XpImagePrefix` and/or `XcImagePrefix` build setting parameters.
+
 
 # Run
-Docker compose is used to start up all required services.
+Docker compose is used to start up all required services. 
+Docker compose files are present for each setup in their respective directories, e.g. `xp` and `xc`. Use your setup of choice as working directory for all docker-compose commands below.
 
-Place the Sitecore source files in the `.\wwwroot\sitecore` directory.
+Place the Sitecore source files in the `.\wwwroot\sitecore` (and `.\wwwroot\commerce` for XC) directory.
 
 Create a webroot directory:
 ```
@@ -80,6 +107,7 @@ Run-time parameters can be modified using the `.env` file:
 | IMAGE_PREFIX              | The Docker image prefix to use                   |
 | TAG                       | The version to tag the Docker images with        |
 
+NB. these run-time parameters should match the used build parameters.
 
 ## DNS
 To set the Docker container service names as DNS names on your host edit your `hosts` file. 
@@ -142,3 +170,7 @@ If none are returned for the `xConnect.client` certificate, you probably need to
 ```
 PS>  Grant-Permission -Identity sitecore -Permission GenericRead -Path 'cert:\localmachine\my\9CC4483261B92D7C5B32239115283933FC5014C4'
 ```
+
+## Commerce setup
+- We have quite a lot of custom powershell scripts for trivial installation tasks. This is because the commerce SIF scripts contain hardcoded values. For example, it is not possible to use hostnames other than localhost. We should be able to remove this custom code when those scripts get fixed.
+- During the installation of the commerce server instances, it tries to set permissions on the log folder. For some reason, this results in an exception saying the access control list is not in canonical form. This can be ignored, because the log folders are mounted on the host. However, it does cause an annoying delay in the installation. 

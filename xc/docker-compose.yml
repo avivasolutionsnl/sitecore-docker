@@ -1,0 +1,54 @@
+version: '2.4'
+
+services:
+ commerce:
+  image: "${IMAGE_PREFIX}commerce:${TAG}"
+  volumes:
+    - .\logs\commerce\CommerceAuthoring_Sc9:C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\logs
+    - .\logs\commerce\CommerceMinions_Sc9:C:\inetpub\wwwroot\CommerceMinions_Sc9\wwwroot\logs
+    - .\logs\commerce\CommerceOps_Sc9:C:\inetpub\wwwroot\CommerceOps_Sc9\wwwroot\logs
+    - .\logs\commerce\CommerceShops_Sc9:C:\inetpub\wwwroot\CommerceShops_Sc9\wwwroot\logs
+    - .\logs\commerce\SitecoreIdentityServer:C:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot\logs
+    - .\wwwroot\commerce:C:\Workspace
+  depends_on:
+    - xconnect
+    - mssql
+    - solr
+    - sitecore
+  mem_limit: 4096m
+  cpu_count: 6
+
+ mssql:
+  image: "${IMAGE_PREFIX}mssql:${TAG}"
+  environment:
+    ACCEPT_EULA: "Y"
+    sa_password: ${SQL_SA_PASSWORD}
+  mem_limit: 4096m
+  cpu_count: 4
+  
+ sitecore:
+  image: "${IMAGE_PREFIX}sitecore:${TAG}"
+  volumes:
+    - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
+    - .\wwwroot\sitecore:C:\Workspace
+  depends_on:
+    - xconnect
+    - mssql
+    - solr
+  mem_limit: 8192m
+  cpu_count: 6
+  
+ solr:
+  image: "${IMAGE_PREFIX}solr:${TAG}"
+  mem_limit: 4096m
+  cpu_count: 4
+  
+ xconnect:
+  image: "${IMAGE_PREFIX}xconnect:${TAG}"
+  volumes:
+    - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
+  depends_on:
+    - mssql
+    - solr
+  mem_limit: 2048m
+  cpu_count: 4

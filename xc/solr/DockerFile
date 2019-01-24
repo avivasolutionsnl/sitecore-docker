@@ -1,0 +1,29 @@
+# escape=`
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
+
+ARG HOST_NAME
+ARG PORT=8983
+ARG SERVICE_NAME="Solr-6"
+ARG SITECORE_CORE_PREFIX="xp0"
+ARG COMMERCE_SIF_PACKAGE
+
+ADD files/$COMMERCE_SIF_PACKAGE /Files/
+
+RUN Expand-Archive -Force -Path /Files/$Env:COMMERCE_SIF_PACKAGE -DestinationPath /Files/CommerceSIF
+
+# Set longer timeout after Solr start
+RUN $config = Get-Content "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json" | Where-Object { $_ -notmatch '^\s*\/\/'} | Out-String | ConvertFrom-Json; `
+    $config.Tasks.StartSolr.Params.PostDelay = 30000; `
+    ConvertTo-Json $config -Depth 50 | Set-Content -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json"
+
+RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
+    /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
+    Install-SitecoreConfiguration -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json" `
+        -SolrUrl $solrUrl `
+        -SolrRoot "c:\\solr\\solr-6.6.2" `
+        -SolrService $Env:SERVICE_NAME `
+        -CorePrefix $Env:SITECORE_CORE_PREFIX `
+        -SolrSchemas "C:\\Files\\CommerceSIF\\SolrSchemas"

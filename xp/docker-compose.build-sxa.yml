@@ -4,7 +4,7 @@ services:
   sitecore:
     volumes:
       - .\sitecore\sxa:C:\sxa
-      - .\files:C:\files-mount
+      - ..\files:C:\files-mount
     environment:
       PSE_PACKAGE: ${PSE_PACKAGE}
       SXA_PACKAGE: ${SXA_PACKAGE}
