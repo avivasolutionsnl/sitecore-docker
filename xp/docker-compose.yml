@@ -3,14 +3,18 @@ version: '2.4'
 services:
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
+  isolation: process
   environment:
     ACCEPT_EULA: "Y"
     sa_password: ${SQL_SA_PASSWORD}
+  volumes:
+    - .\data\mssql:C:\Data
   mem_limit: 4096m
   cpu_count: 4
 
  sitecore:
   image: "${IMAGE_PREFIX}sitecore:${TAG}"
+  isolation: process
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
@@ -23,11 +27,15 @@ services:
 
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
+  isolation: process
+  volumes:
+    - .\data\solr:C:\Data
   mem_limit: 4096m
   cpu_count: 4
 
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
+  isolation: process
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
   depends_on:
