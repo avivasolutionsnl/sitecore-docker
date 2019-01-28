@@ -1,0 +1,7 @@
+build
+data
+databases
+logs
+tmp
+.tmp
+.log

@@ -6,8 +6,8 @@ Hopefully this will help you to get up and running with Sitecore and Docker. By 
 
 
 # Requirements
-- Windows 10 update 1709 (with Hyper-V enabled)
-- Docker for Windows (version 1712 or better): https://docs.docker.com/docker-for-windows/
+- Windows 10 update 1809 (with Hyper-V enabled)
+- Docker for Windows (version 18.09.1 or better): https://docs.docker.com/docker-for-windows/
 - Visual Studio 15.5.3
 - Sitecore installation files
 - [Nuke.build](https://nuke.build)
@@ -18,8 +18,9 @@ As Sitecore does not distribute Docker images, the first step is to build the re
 
 ## Pre-build steps
 For this you need to place the Sitecore installation files and a Sitecore license file in the `files` directory. Which files to use are defined in the build configuration files:
-- [XP build config](./build/Build.Xp.cs)
-- [XC build config](./build/Build.Xc.cs)
+- [Base images build config](./build/Build.Base.cs)
+- [XP images build config](./build/Build.Xp.cs)
+- [XC images build config](./build/Build.Xc.cs)
 - [Overall build config](./build/Build.cs)
 
 The XP0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
@@ -32,6 +33,10 @@ PS> nuke
 ```
 
 The build results in the following Docker images:
+- Base
+    - `base-sitecore-sitecore`: IIS + ASP.NET
+    - `base-sitecore-openjdk`: Windows Server Core + OpenJDK
+
 - XP0
     - `xp-sitecore-sitecore`: IIS + ASP.NET + Sitecore
     - `xp-sitecore-mssql`: MS SQL + Sitecore databases
