@@ -49,8 +49,6 @@ partial class Build : NukeBuild
     readonly string XCONNECT_SITE_NAME = "xconnect";
     [Parameter("Xconnect Solr core prefix")]
     readonly string XCONNECT_SOLR_CORE_PREFIX = "xp0";
-    [Parameter("Sitecore site name")]
-    readonly string SITECORE_SITE_NAME = "sitecore";
     [Parameter("Sitecore Solr core prefix")]
     readonly string SITECORE_SOLR_CORE_PREFIX = "Sitecore";
 
@@ -74,14 +72,16 @@ partial class Build : NukeBuild
     Target XpSitecore => _ => _
         .Executes(() =>
         {
+            var baseImage = BaseFullImageName("sitecore");
+
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/sitecore/Dockerfile")
                 .SetTag(XpFullImageName("sitecore"))
                 .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
                     $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
                     $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
-                    $"SITE_NAME={SITECORE_SITE_NAME}",
                     $"SOLR_PORT={SOLR_PORT}",
                     $"SITECORE_PACKAGE={SITECORE_PACKAGE}",
                     $"CONFIG_PACKAGE={CONFIG_PACKAGE}"
@@ -90,19 +90,21 @@ partial class Build : NukeBuild
         });
     
     Target XpSolr => _ => _
+        .DependsOn(BaseOpenJdk, BaseSitecore)
         .Executes(() =>
         {
+            var baseImage = BaseFullImageName("openjdk");
+            var builderBaseImage = BaseFullImageName("sitecore");
+
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/solr/Dockerfile")
                 .SetTag(XpFullImageName("solr"))
                 .SetBuildArg(new string[] {
-                    $"HOST_NAME={SOLR_HOST_NAME}",
-                    $"PORT={SOLR_PORT}",
-                    $"SERVICE_NAME={SOLR_SERVICE_NAME}",
+                    $"BASE_IMAGE={baseImage}",
+                    $"BUILDER_BASE_IMAGE={builderBaseImage}",
                     $"XCONNECT_CORE_PREFIX={XCONNECT_SOLR_CORE_PREFIX}",
-                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}",
-                    $"CONFIG_PACKAGE={CONFIG_PACKAGE}"
+                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}"
                 })
             );
         });
@@ -110,11 +112,14 @@ partial class Build : NukeBuild
     Target XpXconnect => _ => _
         .Executes(() =>
         {
+            var baseImage = BaseFullImageName("sitecore");
+
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/xconnect/Dockerfile")
                 .SetTag(XpFullImageName("xconnect"))
                 .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
                     $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
                     $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
                     $"SITE_NAME={XCONNECT_SITE_NAME}",

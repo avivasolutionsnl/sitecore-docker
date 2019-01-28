@@ -24,7 +24,7 @@ Write-Host "Using: $sqlPackageExePath"
 
 Push-Location -Path $InstallPath
 
-Get-ChildItem -Path $InstallPath -Filter "*.dacpac" | ForEach-Object {
+(Get-ChildItem -Path $InstallPath -Filter "*.dacpac" | Where-Object { !($_.Name -like "*Xdb*") }) | ForEach-Object {
     $databaseName = $_.BaseName.Replace("Sitecore.", "$DatabasePrefix`_").Replace(".Database.Sql", ".ShardMapManager")
     $dacpacPath = ".\{0}" -f $_.Name
 

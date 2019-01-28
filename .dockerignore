@@ -3,5 +3,7 @@ data
 databases
 logs
 tmp
+xc/data
+xp/data
 .tmp
 .log

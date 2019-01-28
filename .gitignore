@@ -1,6 +1,7 @@
 build/bin
 build/obj
 cores
+data
 databases
 files
 logs

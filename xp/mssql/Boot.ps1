@@ -34,6 +34,15 @@ Get-ChildItem -Path $DataPath -Filter "*.mdf" | ForEach-Object {
     Invoke-Sqlcmd -Query $sqlcmd
 }
 
+# See http://jonnekats.nl/2017/sql-connection-issue-xconnect/
+$DbNameManager='{0}_Xdb.Collection.ShardMapManager' -f $env:DB_PREFIX;
+$sqlcmd = 'UPDATE [{0}].[__ShardManagement].[ShardsGlobal] SET ServerName = ''{1}''' -f $DbNameManager, $env:HOST_NAME;
+Invoke-Sqlcmd -Query $sqlcmd
+
+$sqlcmd = "EXEC sp_MSforeachdb 'IF charindex(''{0}'', ''?'' ) = 1 BEGIN EXEC [?]..sp_changedbowner ''sa'' END'" -f $env:DB_PREFIX;
+Invoke-Sqlcmd -Query $sqlcmd
+
+# Dbs are now ready
 Write-Host "### Sitecore databases ready!"
 
 # Call Start.ps1 from the base image https://github.com/Microsoft/mssql-docker/blob/master/windows/mssql-server-windows-developer/dockerfile
