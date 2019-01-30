@@ -1,5 +1,5 @@
 Param(
-    $solrVersion = "6.6.2",
+    $solrVersion = "7.2.1",
 	$installFolder = "c:\solr",
 	$solrHost = "",
 	$certPath = ""

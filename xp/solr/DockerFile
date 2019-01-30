@@ -5,7 +5,7 @@ SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';
 
 ARG HOST_NAME="SOLR"
 ARG PORT=8983
-ARG SERVICE_NAME="Solr-6"
+ARG SERVICE_NAME="Solr-7"
 ARG XCONNECT_CORE_PREFIX="xp0"
 ARG SITECORE_CORE_PREFIX="xp0"
 ARG CONFIG_PACKAGE
@@ -22,7 +22,7 @@ RUN Invoke-WebRequest -Method Get -Uri http://javadl.oracle.com/webapps/download
 RUN setx PATH '%PATH%;c:\\Java\\jre'
 
 # Download and extract Solr project files
-RUN Invoke-WebRequest -Method Get -Uri "http://archive.apache.org/dist/lucene/solr/6.6.2/solr-6.6.2.zip" -OutFile /solr.zip ; `
+RUN Invoke-WebRequest -Method Get -Uri "http://archive.apache.org/dist/lucene/solr/7.2.1/solr-7.2.1.zip" -OutFile /solr.zip ; `
     Expand-Archive -Path /solr.zip -DestinationPath /solr ; `
     Remove-Item /solr.zip -Force
 
@@ -38,14 +38,14 @@ RUN $hostFileName = 'c:\\windows\\system32\\drivers\\etc\\hosts'; '\"`r`n127.0.0
 
 RUN /Scripts/Install-SIF.ps1
 
-WORKDIR "/solr/solr-6.6.2"
+WORKDIR "/solr/solr-7.2.1"
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
     Invoke-WebRequest -Method Get -Uri "https://nssm.cc/release/nssm-2.24.zip" -OutFile /nssm.zip ; `
     Expand-Archive -Path /nssm.zip -DestinationPath /nssm ; `
     Remove-Item /nssm.zip -Force
 
-RUN /nssm/nssm-2.24/win64/nssm.exe install $Env:SERVICE_NAME "/solr/solr-6.6.2/bin/solr.cmd" "start" "-f" "-p $Env:PORT"
+RUN /nssm/nssm-2.24/win64/nssm.exe install $Env:SERVICE_NAME "/solr/solr-7.2.1/bin/solr.cmd" "start" "-f" "-p $Env:PORT"
 RUN /nssm/nssm-2.24/win64/nssm.exe set $Env:SERVICE_NAME AppEnvironmentExtra JAVA_HOME=C:\java\jre
 
 RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config
@@ -59,7 +59,7 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
     /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
     Install-SitecoreConfiguration -Path "C:\\Files\\Config\\xconnect-solr.json" `
         -SolrUrl $solrUrl `
-        -SolrRoot "c:\\solr\\solr-6.6.2" `
+        -SolrRoot "c:\\solr\\solr-7.2.1" `
         -SolrService $Env:SERVICE_NAME `
         -CorePrefix $Env:XCONNECT_CORE_PREFIX
 
@@ -72,7 +72,7 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
     /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
     Install-SitecoreConfiguration -Path "C:\\Files\\Config\\sitecore-solr.json" `
         -SolrUrl $solrUrl `
-        -SolrRoot "c:\\solr\\solr-6.6.2" `
+        -SolrRoot "c:\\solr\\solr-7.2.1" `
         -SolrService $Env:SERVICE_NAME `
         -CorePrefix $Env:SITECORE_CORE_PREFIX
 

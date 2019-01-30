@@ -23,7 +23,7 @@ RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
     /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
     Install-SitecoreConfiguration -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json" `
         -SolrUrl $solrUrl `
-        -SolrRoot "c:\\solr\\solr-6.6.2" `
+        -SolrRoot "c:\\solr\\solr-7.2.1" `
         -SolrService $Env:SERVICE_NAME `
         -CorePrefix $Env:SITECORE_CORE_PREFIX `
         -SolrSchemas "C:\\Files\\CommerceSIF\\SolrSchemas"

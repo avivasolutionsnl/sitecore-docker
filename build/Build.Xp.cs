@@ -15,24 +15,30 @@ partial class Build : NukeBuild
     public readonly string XpImagePrefix = "sitecore-xp-";
     
     [Parameter("Docker image version tag for Sitecore XP")]
-    readonly string XpVersion = "9.0.2";
+    readonly string XpVersion = "9.1.0";
 
     private string XpFullImageName(string name) => $"{RepoImagePrefix}{XpImagePrefix}{name}:{XpVersion}";
 
     // Packages
     [Parameter("Sitecore XPO configuration package")]
-    readonly string CONFIG_PACKAGE = "XP0 Configuration files 9.0.2 rev. 180604.zip";
+    readonly string CONFIG_PACKAGE = "XP0 Configuration files 9.1.0 rev. 001564.zip"; 
     [Parameter("Sitecore package")]
-    readonly string SITECORE_PACKAGE = "Sitecore 9.0.2 rev. 180604 (OnPrem)_single.scwdp.zip";
+    readonly string SITECORE_PACKAGE = "Sitecore 9.1.0 rev. 001564 (OnPrem)_single.scwdp.zip";
     
     [Parameter("Sitecore XConnect package")]
-    readonly string XCONNECT_PACKAGE = "Sitecore 9.0.2 rev. 180604 (OnPrem)_xp0xconnect.scwdp.zip";
+    readonly string XCONNECT_PACKAGE = "Sitecore 9.1.0 rev. 001564 (OnPrem)_xp0xconnect.scwdp.zip";
+
+    [Parameter("Identity Server Package")]
+    readonly string IDENTITYSERVER_PACKAGE = "Sitecore.IdentityServer 2.0.0 rev. 00157 (OnPrem)_identityserver.scwdp.zip";
     
     [Parameter("Powershell Extension package")]
     readonly string PSE_PACKAGE = "Sitecore PowerShell Extensions-5.0.zip";
     
     [Parameter("SXA package")]
-    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.0.zip";
+    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip";
+
+    [Parameter("Dac framework msi")]
+    readonly string DAC_INSTALLATION = "DacFramework.msi";
 
     // Build configuration parameters
     [Parameter("SQL password")]
@@ -44,13 +50,15 @@ partial class Build : NukeBuild
     [Parameter("Solr port")]
     readonly string SOLR_PORT = "8983";
     [Parameter("Solr service name")]
-    readonly string SOLR_SERVICE_NAME = "Solr-6";
+    readonly string SOLR_SERVICE_NAME = "Solr-7";
     [Parameter("Xconnect site name")]
     readonly string XCONNECT_SITE_NAME = "xconnect";
     [Parameter("Xconnect Solr core prefix")]
     readonly string XCONNECT_SOLR_CORE_PREFIX = "xp0";
     [Parameter("Sitecore site name")]
     readonly string SITECORE_SITE_NAME = "sitecore";
+    [Parameter("Identity server site name")]
+    readonly string IDENTITY_SITE_NAME = "identity";
     [Parameter("Sitecore Solr core prefix")]
     readonly string SITECORE_SOLR_CORE_PREFIX = "Sitecore";
 
@@ -66,7 +74,8 @@ partial class Build : NukeBuild
                     $"DB_PREFIX={SQL_DB_PREFIX}",
                     $"SITECORE_PACKAGE={SITECORE_PACKAGE}",
                     $"XCONNECT_PACKAGE={XCONNECT_PACKAGE}",
-                    $"HOST_NAME=mssql"
+                    $"HOST_NAME=mssql",
+                    $"DAC_INSTALLATION={DAC_INSTALLATION}"
                 })
             );
         });
@@ -89,6 +98,24 @@ partial class Build : NukeBuild
             );
         });
     
+    Target XpIdentityServer => _ => _
+        .Executes(() =>
+        {
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xp/identityserver/Dockerfile")
+                .SetTag(XpFullImageName("identity"))
+                .SetBuildArg(new string[]{
+                    $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
+                    $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
+                    $"SQL_SERVER=mssql",
+                    $"SITE_NAME={IDENTITY_SITE_NAME}",
+                    $"IDENTITYSERVER_PACKAGE={IDENTITYSERVER_PACKAGE}",
+                    $"CONFIG_PACKAGE={CONFIG_PACKAGE}"
+                })
+            );
+        });
+
     Target XpSolr => _ => _
         .Executes(() =>
         {
@@ -164,7 +191,7 @@ partial class Build : NukeBuild
         });
 
     Target Xp => _ => _
-        .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect);
+        .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect, XpIdentityServer);
 
     Target XpSxa => _ => _
         .DependsOn(XpSitecoreSxa, XpSolrSxa);
@@ -173,6 +200,7 @@ partial class Build : NukeBuild
         .DependsOn(Xp)
         .Executes(() => {
             DockerPush(x => x.SetName(XpFullImageName("mssql")));
+            DockerPush(x => x.SetName(XpFullImageName("identity")));
             DockerPush(x => x.SetName(XpFullImageName("sitecore")));
             DockerPush(x => x.SetName(XpFullImageName("solr")));
             DockerPush(x => x.SetName(XpFullImageName("xconnect")));

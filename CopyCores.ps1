@@ -5,7 +5,7 @@ param(
     [Parameter(Mandatory=$false)]
     [string]$Container = 'sitecore-xp_solr_1',
     [Parameter(Mandatory=$false)]
-    [string]$FromCoresFilePath = 'C:\solr\solr-6.6.2\server\solr',
+    [string]$FromCoresFilePath = 'C:\solr\solr-7.2.1\server\solr',
     [Parameter(Mandatory=$false)]
     [string]$ToCoresFilePath = 'cores/'
 )
