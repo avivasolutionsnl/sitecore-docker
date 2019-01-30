@@ -43,6 +43,9 @@ services:
   
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
+  isolation: process
+  volumes:
+    - .\data\solr:C:\Data
   mem_limit: 4096m
   cpu_count: 4
   

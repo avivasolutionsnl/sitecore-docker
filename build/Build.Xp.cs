@@ -39,12 +39,8 @@ partial class Build : NukeBuild
     readonly string SQL_SA_PASSWORD = "my_Sup3rSecret!!";
     [Parameter("SQL db prefix")]
     readonly string SQL_DB_PREFIX = "Sitecore";
-    [Parameter("Solr hostname")]
-    readonly string SOLR_HOST_NAME = "solr";
     [Parameter("Solr port")]
     readonly string SOLR_PORT = "8983";
-    [Parameter("Solr service name")]
-    readonly string SOLR_SERVICE_NAME = "Solr-6";
     [Parameter("Xconnect site name")]
     readonly string XCONNECT_SITE_NAME = "xconnect";
     [Parameter("Xconnect Solr core prefix")]

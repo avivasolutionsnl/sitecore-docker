@@ -184,6 +184,7 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             var baseImage = XpFullImageName("solr");
+            var builderBaseImage = BaseFullImageName("solr-builder");
 
             DockerBuild(x => x
                 .SetPath(".")
@@ -191,9 +192,7 @@ partial class Build : NukeBuild
                 .SetTag(XcFullImageName("solr"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
-                    $"HOST_NAME={SOLR_HOST_NAME}",
-                    $"PORT={SOLR_PORT}",
-                    $"SERVICE_NAME={SOLR_SERVICE_NAME}",
+                    $"BUILDER_BASE_IMAGE={builderBaseImage}",
                     $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}",
                     $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}"
                 })
@@ -246,12 +245,15 @@ partial class Build : NukeBuild
         .DependsOn(XcSolr)
         .Executes(() => {
             var baseImage = XcFullImageName("solr");
+            var builderBaseImage = BaseFullImageName("solr-builder");
 
             DockerBuild(x => x
                 .SetPath("xc/solr/sxa")
                 .SetTag(XcFullImageName("solr-sxa"))
                 .SetBuildArg(new string[] {
-                    $"BASE_IMAGE={baseImage}"
+                    $"BASE_IMAGE={baseImage}",
+                    $"BUILDER_BASE_IMAGE={builderBaseImage}",
+                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}"
                 })
             );
         });
