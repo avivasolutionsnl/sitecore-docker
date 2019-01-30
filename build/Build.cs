@@ -30,6 +30,8 @@ partial class Build : NukeBuild
 
     // Install a Sitecore package using the given script file and the docker-compose.yml file in the current directory
     private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "") {
+        EnsureCleanDirectory("./data/mssql");
+
         DockerCompose($"{dockerComposeOptions} up -d");
 
         // Install Commerce Connect package
@@ -44,9 +46,23 @@ partial class Build : NukeBuild
 
         DockerCompose("stop");
 
+        // Persist changes to DB installation directory
+        DockerCompose("up -d mssql");
+
+        var mssqlContainerName = GetContainerName("mssql");
+        DockerExec(x => x
+            .SetContainer(mssqlContainerName)
+            .SetCommand("powershell")
+            .SetArgs(@"C:\Persist-Databases.ps1")
+            .SetInteractive(true)
+            .SetTty(true)
+        );
+
+        DockerCompose("stop");
+
         // Commit changes
         DockerCommit(x => x
-            .SetContainer(GetContainerName("mssql"))
+            .SetContainer(mssqlContainerName)
             .SetRepository(mssqlTargetImageName));
 
         DockerCommit(x => x
