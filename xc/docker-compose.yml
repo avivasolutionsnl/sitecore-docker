@@ -51,6 +51,7 @@ services:
   
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
+  isolation: process
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
   depends_on:

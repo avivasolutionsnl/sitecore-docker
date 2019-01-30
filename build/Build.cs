@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using Nuke.Common;
 using Nuke.Common.ProjectModel;
 using static Nuke.Common.EnvironmentInfo;
@@ -31,6 +32,7 @@ partial class Build : NukeBuild
     // Install a Sitecore package using the given script file and the docker-compose.yml file in the current directory
     private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "") {
         EnsureCleanDirectory("./data/mssql");
+        SpinWait.SpinUntil(() => System.IO.Directory.Exists("./data/mssql"));
 
         DockerCompose($"{dockerComposeOptions} up -d");
 
