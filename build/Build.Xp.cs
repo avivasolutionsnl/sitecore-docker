@@ -90,11 +90,11 @@ partial class Build : NukeBuild
         });
     
     Target XpSolr => _ => _
-        .DependsOn(BaseOpenJdk, BaseSitecore)
+        .DependsOn(BaseOpenJdk, BaseSolrBuilder)
         .Executes(() =>
         {
             var baseImage = BaseFullImageName("openjdk");
-            var builderBaseImage = BaseFullImageName("sitecore");
+            var builderBaseImage = BaseFullImageName("solr-builder");
 
             DockerBuild(x => x
                 .SetPath(".")
@@ -158,12 +158,15 @@ partial class Build : NukeBuild
         .DependsOn(XpSolr)
         .Executes(() => {
             var baseImage = XpFullImageName("solr");
+            var builderBaseImage = BaseFullImageName("solr-builder");
 
             DockerBuild(x => x
                 .SetPath("xp/solr/sxa")
                 .SetTag(XpFullImageName("solr-sxa"))
                 .SetBuildArg(new string[] {
-                    $"BASE_IMAGE={baseImage}"
+                    $"BASE_IMAGE={baseImage}",
+                    $"BUILDER_BASE_IMAGE={builderBaseImage}",
+                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}"
                 })
             );
         });
