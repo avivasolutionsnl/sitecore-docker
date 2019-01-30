@@ -40,6 +40,22 @@ partial class Build : NukeBuild
             );
         });
 
+    Target BaseSolrBuilder => _ => _
+        .DependsOn(BaseSitecore)
+        .Executes(() =>
+        {
+            var baseImage = BaseFullImageName("sitecore");
+
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("base/solr-builder/Dockerfile")
+                .SetTag(BaseFullImageName("solr-builder"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}"
+                })
+            );
+        });
+
     Target Base => _ => _
         .DependsOn(BaseOpenJdk, BaseSitecore);
 
