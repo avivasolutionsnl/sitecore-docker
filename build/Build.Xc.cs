@@ -86,6 +86,9 @@ partial class Build : NukeBuild
     [Parameter("Commerce environment name")]
     readonly string ENVIRONMENT_NAME = "HabitatAuthoring";
 
+    [Parameter("Commerce database prefix")]    
+    readonly string COMMERCE_DB_PREFIX = "SitecoreCommerce9";
+
     Target XcCommerce => _ => _
         .Executes(() =>
         {
@@ -127,7 +130,7 @@ partial class Build : NukeBuild
                 .SetMemory(4000000000) // 4GB, SQL needs some more memory
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
-                    $"DB_PREFIX={SQL_DB_PREFIX}",
+                    $"COMMERCE_DB_PREFIX={COMMERCE_DB_PREFIX}",
                     $"COMMERCE_SDK_PACKAGE={COMMERCE_SDK_PACKAGE}"
                 })
             );

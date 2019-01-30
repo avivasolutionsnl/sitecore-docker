@@ -20,9 +20,12 @@ services:
 
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
+  isolation: process
   environment:
     ACCEPT_EULA: "Y"
     sa_password: ${SQL_SA_PASSWORD}
+  volumes:
+    - .\data\mssql:C:\Data
   mem_limit: 4096m
   cpu_count: 4
   
