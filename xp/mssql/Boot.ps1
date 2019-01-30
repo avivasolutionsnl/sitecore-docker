@@ -24,7 +24,9 @@ else
 }
 
 Get-ChildItem -Path $DataPath -Filter "*.mdf" | ForEach-Object {
-    $databaseName = $_.BaseName.Replace("_Primary", "")
+    # Replace case-insensitive,
+    # Move-Item removes casing: https://stackoverflow.com/questions/54437210/move-item-and-preserve-filename-casing?noredirect=1#comment95683944_54437210
+    $databaseName = $_.BaseName.Replace("_Primary", "").Replace("_primary", "")
     $mdfPath = $_.FullName
     $ldfPath = $mdfPath.Replace(".mdf", ".ldf")
     $sqlcmd = "IF EXISTS (SELECT 1 FROM SYS.DATABASES WHERE NAME = '$databaseName') BEGIN EXEC sp_detach_db [$databaseName] END;CREATE DATABASE [$databaseName] ON (FILENAME = N'$mdfPath'), (FILENAME = N'$ldfPath') FOR ATTACH;"

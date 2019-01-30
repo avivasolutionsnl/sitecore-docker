@@ -60,5 +60,6 @@ RUN & (Join-Path $env:INSTALL_PATH "Extract-Databases.ps1") -Path $env:INSTALL_P
      Get-ChildItem -Path $env:INSTALL_PATH -Exclude "*.mdf", "*.ldf" | Remove-Item -Force;
 
 COPY xp/mssql/Boot.ps1 .
+COPY xp/mssql/Persist-Databases.ps1 .
 
 CMD C:/Boot.ps1 -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH
