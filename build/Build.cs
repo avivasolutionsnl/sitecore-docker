@@ -48,8 +48,11 @@ partial class Build : NukeBuild
 
         DockerCompose("stop");
 
+        // Give some time to really stop
+        Thread.Sleep(10000);
+
         // Persist changes to DB installation directory
-        DockerCompose("up -d mssql");
+        DockerCompose($"{dockerComposeOptions} up -d mssql");
 
         var mssqlContainerName = GetContainerName("mssql");
         DockerExec(x => x
