@@ -6,5 +6,5 @@ databases
 files
 logs
 tmp
-.tmp
-.log
+*.tmp
+*.log

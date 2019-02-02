@@ -4,6 +4,10 @@ databases
 logs
 tmp
 xc/data
+xc/logs
+xc/wwwroot
 xp/data
-.tmp
-.log
+xp/logs
+xp/wwwroot
+*.tmp
+*.log
