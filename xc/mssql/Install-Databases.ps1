@@ -27,7 +27,7 @@ Push-Location -Path $InstallPath
 (Get-ChildItem -Path $InstallPath -Filter "*.dacpac" | Where-Object { ($_.Name -like "*Sitecore.Commerce.Engine*") }) | ForEach-Object {
     $dacpacPath = ".\{0}" -f $_.Name
     
-    $sharedDatabaseName = "$DatabasePrefix`_SharedEnvironment"
+    $sharedDatabaseName = "$DatabasePrefix`_SharedEnvironments"
     $globalDatabaseName = "$DatabasePrefix`_Global"
 
     # Install
