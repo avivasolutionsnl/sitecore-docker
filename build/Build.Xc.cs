@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Nuke.Common;
 using Nuke.Common.ProjectModel;
@@ -36,14 +37,14 @@ partial class Build : NukeBuild
     [Parameter("Commerce Connect Engine package")]
     readonly string COMMERCE_CONNECT_ENGINE_PACKAGE = "Sitecore.Commerce.Engine.Connect.2.4.32.update";
 
+    [Parameter("Commerce SIF package")]
+    readonly string COMMERCE_SIF_PACKAGE = "SIF.Sitecore.Commerce.1.4.7.zip";
+
     [Parameter("Commerce Marketing Automation package")]
     readonly string COMMERCE_MA_PACKAGE = "Sitecore Commerce Marketing Automation Core 11.4.15.zip";
 
     [Parameter("Commerce Marketing Automation for AutomationEngine package")]
     readonly string COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE = "Sitecore Commerce Marketing Automation for AutomationEngine 11.4.15.zip";
-
-    [Parameter("Commerce SIF package")]
-    readonly string COMMERCE_SIF_PACKAGE = "SIF.Sitecore.Commerce.1.4.7.zip";
 
     [Parameter("Commerce SDK package")]
     readonly string COMMERCE_SDK_PACKAGE = "Sitecore.Commerce.Engine.SDK.2.4.43.zip";
@@ -73,11 +74,8 @@ partial class Build : NukeBuild
     [Parameter("Sitecore certificate file")]
     readonly string SITECORE_CERT_PATH = "sitecore.pfx";
 
-    [Parameter("Solr certificate file")]
-    readonly string SOLR_CERT_PATH = "solr.pfx";
-
     [Parameter("Xconnect certificate file")]
-    readonly string XCONNECT_CERT_PATH = "xConnect.pfx";
+    readonly string XCONNECT_CERT_PATH = "xconnect-client.pfx";
 
     // Build configuration parameters
     [Parameter("Commerce shop name")]
@@ -110,14 +108,13 @@ partial class Build : NukeBuild
                     $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
                     $"ROOT_CERT_PATH={ROOT_CERT_PATH}",
                     $"SITECORE_CERT_PATH={SITECORE_CERT_PATH}",
-                    $"SOLR_CERT_PATH={SOLR_CERT_PATH}",
                     $"XCONNECT_CERT_PATH={XCONNECT_CERT_PATH}",
                     $"PLUMBER_FILE_NAME={PLUMBER_FILE_NAME}"
                 })
             );
         });
 
-    Target XcMssql => _ => _
+    Target XcMssqlIntermediate => _ => _
         .DependsOn(XpMssql)
         .Executes(() =>
         {
@@ -126,7 +123,7 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xc/mssql/Dockerfile")
-                .SetTag(XcFullImageName("mssql"))
+                .SetTag(XcFullImageName("mssql-intermediate"))
                 .SetMemory(4000000000) // 4GB, SQL needs some more memory
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
@@ -136,7 +133,7 @@ partial class Build : NukeBuild
             );
         });
 
-    Target XcSitecoreBase => _ => _
+    Target XcSitecoreIntermediate => _ => _
         .DependsOn(XpSitecore)
         .Executes(() =>
         {
@@ -145,7 +142,7 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xc/sitecore/Dockerfile")
-                .SetTag(XcFullImageName("sitecore"))
+                .SetTag(XcFullImageName("sitecore-intermediate"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
                     $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
@@ -162,8 +159,8 @@ partial class Build : NukeBuild
             );
         });
 
-    Target XcSitecore => _ => _
-        .DependsOn(XcCommerce, XcMssql, XcSitecoreBase, XcSolr, XcXconnect)
+    Target XcSitecoreMssql => _ => _
+        .DependsOn(XcCommerce, XcMssqlIntermediate, XcSitecoreIntermediate, XcSolr, XcXconnect)
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xc");
 
@@ -175,12 +172,15 @@ partial class Build : NukeBuild
             InstallSitecorePackage(
                 @"C:\Scripts\InstallCommercePackages.ps1", 
                 XcFullImageName("sitecore"), 
-                XcFullImageName("mssql")
+                XcFullImageName("mssql"),
+                "-f docker-compose.yml -f docker-compose.build.yml"
             );
+
+            System.IO.Directory.SetCurrentDirectory("..");
         });
     
     Target XcSolr => _ => _
-        .DependsOn(XpSolr)
+        .DependsOn(BaseSolrBuilder, XpSolr)
         .Executes(() =>
         {
             var baseImage = XpFullImageName("solr");
@@ -217,8 +217,11 @@ partial class Build : NukeBuild
         });
 
     Target XcSitecoreSxa => _ => _
-        .DependsOn(XcSitecore, XcSolrSxa)
+        .DependsOn(XcSitecoreMssql, XcSolrSxa)
         .Executes(() => {
+            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
+            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
+            
             System.IO.Directory.SetCurrentDirectory("xc");
 
             // Setup
@@ -239,10 +242,12 @@ partial class Build : NukeBuild
                 XcFullImageName("mssql-sxa"),
                 "-f docker-compose.yml -f docker-compose.build-sxa.yml"
             );
+
+            System.IO.Directory.SetCurrentDirectory("..");
         });
 
     Target XcSolrSxa => _ => _
-        .DependsOn(XcSolr)
+        .DependsOn(BaseSolrBuilder, XcSolr)
         .Executes(() => {
             var baseImage = XcFullImageName("solr");
             var builderBaseImage = BaseFullImageName("solr-builder");
@@ -259,7 +264,7 @@ partial class Build : NukeBuild
         });
 
     Target Xc => _ => _
-        .DependsOn(XcCommerce, XcMssql, XcSitecore, XcSolr, XcXconnect);
+        .DependsOn(XcCommerce, XcSitecoreMssql, XcSolr, XcXconnect);
 
     Target XcSxa => _ => _
         .DependsOn(Xc, XcSitecoreSxa, XcSolrSxa);

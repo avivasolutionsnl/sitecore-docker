@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Nuke.Common;
 using Nuke.Common.ProjectModel;
@@ -66,6 +67,7 @@ partial class Build : NukeBuild
         });
 
     Target XpSitecore => _ => _
+        .DependsOn(BaseSitecore)
         .Executes(() =>
         {
             var baseImage = BaseFullImageName("sitecore");
@@ -106,6 +108,7 @@ partial class Build : NukeBuild
         });
 
     Target XpXconnect => _ => _
+        .DependsOn(BaseSitecore)
         .Executes(() =>
         {
             var baseImage = BaseFullImageName("sitecore");
@@ -127,9 +130,12 @@ partial class Build : NukeBuild
             );
         });
     
-    Target XpSitecoreSxa => _ => _
+    Target XpSitecoreMssqlSxa => _ => _
         .DependsOn(Xp)
         .Executes(() => {
+            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
+            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
+
             System.IO.Directory.SetCurrentDirectory("xp");
 
             // Setup
@@ -148,10 +154,12 @@ partial class Build : NukeBuild
                 XpFullImageName("mssql-sxa"),
                 "-f docker-compose.yml -f docker-compose.build-sxa.yml"
             );
+
+            System.IO.Directory.SetCurrentDirectory("..");
         });
 
     Target XpSolrSxa => _ => _
-        .DependsOn(XpSolr)
+        .DependsOn(BaseSolrBuilder, XpSolr)
         .Executes(() => {
             var baseImage = XpFullImageName("solr");
             var builderBaseImage = BaseFullImageName("solr-builder");
@@ -171,7 +179,7 @@ partial class Build : NukeBuild
         .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect);
 
     Target XpSxa => _ => _
-        .DependsOn(XpSitecoreSxa, XpSolrSxa);
+        .DependsOn(XpSitecoreMssqlSxa, XpSolrSxa);
 
     Target PushXp => _ => _
         .DependsOn(Xp)
