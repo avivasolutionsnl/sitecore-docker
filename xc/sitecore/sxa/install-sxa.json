@@ -1,5 +1,15 @@
 {
   "Parameters": {
+    "SiteName": {
+        "Type": "string",
+        "DefaultValue": "Sitecore",
+        "Description": "The name of the site to be deployed."
+    },
+    "SitecoreAdminPassword": {
+        "Type": "string",
+        "DefaultValue": "b",
+        "Description": "The admin password for the Sitecore instance."
+    },
     "PowershellExtensionPackageFullPath": {
       "Type": "string",
       "Description": "The path to the Sitecore Powershell Extensions zip.",
@@ -28,6 +38,16 @@
   },
   "Modules": [ "SitecoreUtilityTasks" ],
   "Tasks": {
+    "UpdateSolrSchema": {
+        // Update the solr schemas.
+        "Type": "SitecoreUrl",
+        "Params": {
+            "SitecoreInstanceRoot": "[concat('http://', parameter('SiteName'))]",
+            "SitecoreActionPath": "sitecore/admin/PopulateManagedSchema.aspx?indexes=all",
+            "UserName": "admin",
+            "Password": "[parameter('SitecoreAdminPassword')]"
+        }
+    },
     "CheckPaths": {
       "Type": "EnsurePath",
       "Params": {
