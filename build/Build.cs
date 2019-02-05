@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using Nuke.Common;
 using Nuke.Common.ProjectModel;
 using static Nuke.Common.EnvironmentInfo;
@@ -30,6 +31,9 @@ partial class Build : NukeBuild
 
     // Install a Sitecore package using the given script file and the docker-compose.yml file in the current directory
     private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "") {
+        EnsureCleanDirectory("./data/mssql");
+        SpinWait.SpinUntil(() => System.IO.Directory.Exists("./data/mssql"), 5000);
+
         DockerCompose($"{dockerComposeOptions} up -d");
 
         // Install Commerce Connect package
@@ -44,9 +48,26 @@ partial class Build : NukeBuild
 
         DockerCompose("stop");
 
+        // Give some time to really stop
+        Thread.Sleep(10000);
+
+        // Persist changes to DB installation directory
+        DockerCompose($"{dockerComposeOptions} up -d mssql");
+
+        var mssqlContainerName = GetContainerName("mssql");
+        DockerExec(x => x
+            .SetContainer(mssqlContainerName)
+            .SetCommand("powershell")
+            .SetArgs(@"C:\Persist-Databases.ps1")
+            .SetInteractive(true)
+            .SetTty(true)
+        );
+
+        DockerCompose("stop");
+
         // Commit changes
         DockerCommit(x => x
-            .SetContainer(GetContainerName("mssql"))
+            .SetContainer(mssqlContainerName)
             .SetRepository(mssqlTargetImageName));
 
         DockerCommit(x => x

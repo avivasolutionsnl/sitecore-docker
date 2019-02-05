@@ -15,7 +15,7 @@
 
         "SolrUrl": {
             "Type": "string",
-            "DefaultValue": "https://solr:8983/solr",
+            "DefaultValue": "http://localhost:8983/solr",
             "Description": "The Solr instance url."
         },
         "SolrRoot": {

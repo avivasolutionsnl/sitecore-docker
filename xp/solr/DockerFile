@@ -1,81 +1,53 @@
 # escape=`
-FROM microsoft/aspnet:4.7.1-windowsservercore-1709
+ARG BUILDER_BASE_IMAGE
+ARG BASE_IMAGE
+FROM ${BUILDER_BASE_IMAGE} as builder
 
-SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
-
-ARG HOST_NAME="SOLR"
-ARG PORT=8983
-ARG SERVICE_NAME="Solr-7"
-ARG XCONNECT_CORE_PREFIX="xp0"
-ARG SITECORE_CORE_PREFIX="xp0"
+# Install Sitecore Solr cores using SIF
 ARG CONFIG_PACKAGE
+ARG INSTALL_TEMP='c:\\install'
+ARG SIF_CONFIG=${INSTALL_TEMP}\\sitecore-solr.json
+ARG SITECORE_CORE_PREFIX="Sitecore"
+ARG XCONNECT_CORE_PREFIX="xp0"
 
-ENV SERVICE_NAME=${SERVICE_NAME}
-ENV JAVA_HOME /Java/jre
+ADD files/$CONFIG_PACKAGE ${INSTALL_TEMP}/
 
-# Download and install Java - Solr dependency
-RUN Invoke-WebRequest -Method Get -Uri http://javadl.oracle.com/webapps/download/AutoDL?BundleId=210185 -OutFile /jreinstaller.exe ; `
-    Start-Process -FilePath C:\jreinstaller.exe -PassThru -wait -ArgumentList "/s,INSTALLDIR=c:\Java\jre" ; `
-    del C:\jreinstaller.exe
+RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
+    Expand-Archive -Path (Join-Path $env:INSTALL_TEMP '*Configuration files*.zip') -DestinationPath $env:INSTALL_TEMP; `
+    Install-SitecoreConfiguration -Path (Join-Path $env:INSTALL_TEMP 'sitecore-solr.json') `
+    -SolrUrl "http://localhost:8983/solr" `
+    -SolrRoot "c:/solr" `
+    -SolrService "void" `
+    -CorePrefix $env:SITECORE_CORE_PREFIX `
+    -Skip "StopSolr", "StartSolr"; `
+    Install-SitecoreConfiguration -Path (Join-Path $env:INSTALL_TEMP 'xconnect-solr.json') `
+    -SolrUrl "http://localhost:8983/solr" `
+    -SolrRoot "c:/solr" `
+    -SolrService "void" `
+    -CorePrefix $env:XCONNECT_CORE_PREFIX `
+    -Skip "StopSolr", "StartSolr"; `
+    Get-Process -Name "java" | Stop-Process -Force;
 
-# Write variables to the master environment in the registry
-RUN setx PATH '%PATH%;c:\\Java\\jre'
+# Copy the clean cores for later use
+RUN New-Item -Path 'c:/clean' -ItemType Directory | Out-Null; `
+    Get-ChildItem -Path 'c:/solr/server/solr' | Foreach-Object { Copy-Item -Path $_.FullName -Destination 'c:/clean' -Recurse }
 
-# Download and extract Solr project files
-RUN Invoke-WebRequest -Method Get -Uri "http://archive.apache.org/dist/lucene/solr/7.2.1/solr-7.2.1.zip" -OutFile /solr.zip ; `
-    Expand-Archive -Path /solr.zip -DestinationPath /solr ; `
-    Remove-Item /solr.zip -Force
+# Runtime image
+FROM ${BASE_IMAGE} as final
 
-ADD files/$CONFIG_PACKAGE /Files/
-ADD files/solr.pfx /Files/
-ADD scripts /Scripts
-ADD xp/solr/Configure-SSL.ps1 /Scripts/
-ADD xp/solr/WaitForSolr.ps1 /Scripts/
+COPY --from=builder /solr /solr
+COPY --from=builder /clean /clean
+COPY --from=builder /windows/system32/find.exe /windows/system32/
 
-RUN C:\Scripts\Configure-SSL.ps1 -solrHost "$Env:HOST_NAME" -certPath c:\Files\solr.pfx
+VOLUME c:/data
 
-RUN $hostFileName = 'c:\\windows\\system32\\drivers\\etc\\hosts'; '\"`r`n127.0.0.1`t$Env:HOST_NAME\"' | Add-Content $hostFileName
+# Set solr home dir to volume
+ENV SOLR_HOME=c:/data
 
-RUN /Scripts/Install-SIF.ps1
-
-WORKDIR "/solr/solr-7.2.1"
-
-RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
-    Invoke-WebRequest -Method Get -Uri "https://nssm.cc/release/nssm-2.24.zip" -OutFile /nssm.zip ; `
-    Expand-Archive -Path /nssm.zip -DestinationPath /nssm ; `
-    Remove-Item /nssm.zip -Force
-
-RUN /nssm/nssm-2.24/win64/nssm.exe install $Env:SERVICE_NAME "/solr/solr-7.2.1/bin/solr.cmd" "start" "-f" "-p $Env:PORT"
-RUN /nssm/nssm-2.24/win64/nssm.exe set $Env:SERVICE_NAME AppEnvironmentExtra JAVA_HOME=C:\java\jre
-
-RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config
-
-# Set longer timeout after Solr start
-RUN $config = Get-Content "C:\\Files\\Config\\xconnect-solr.json" | Where-Object { $_ -notmatch '^\s*\/\/'} | Out-String | ConvertFrom-Json; `
-    $config.Tasks.StartSolr.Params.PostDelay = 30000; `
-    ConvertTo-Json $config -Depth 50 | Set-Content -Path "C:\\Files\\Config\\xconnect-solr.json"
-
-RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
-    /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
-    Install-SitecoreConfiguration -Path "C:\\Files\\Config\\xconnect-solr.json" `
-        -SolrUrl $solrUrl `
-        -SolrRoot "c:\\solr\\solr-7.2.1" `
-        -SolrService $Env:SERVICE_NAME `
-        -CorePrefix $Env:XCONNECT_CORE_PREFIX
-
-# Set longer timeout after Solr start
-RUN $config = Get-Content "C:\\Files\\Config\\sitecore-solr.json" | Where-Object { $_ -notmatch '^\s*\/\/'} | Out-String | ConvertFrom-Json; `
-    $config.Tasks.StartSolr.Params.PostDelay = 30000; `
-    ConvertTo-Json $config -Depth 50 | Set-Content -Path "C:\\Files\\Config\\sitecore-solr.json"
-
-RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
-    /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
-    Install-SitecoreConfiguration -Path "C:\\Files\\Config\\sitecore-solr.json" `
-        -SolrUrl $solrUrl `
-        -SolrRoot "c:\\solr\\solr-7.2.1" `
-        -SolrService $Env:SERVICE_NAME `
-        -CorePrefix $Env:SITECORE_CORE_PREFIX
-
+# Expose default port
 EXPOSE 8983
 
-ENTRYPOINT C:\ServiceMonitor.exe $Env:SERVICE_NAME
+# Boot
+COPY xp/solr/Boot.cmd .
+
+CMD Boot.cmd c:\\solr 8983 c:\\clean c:\\data

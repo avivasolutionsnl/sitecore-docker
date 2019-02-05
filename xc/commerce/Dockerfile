@@ -1,7 +1,7 @@
 # escape=`
 
 # Stage 0: prepare files & build prerequisites
-FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
+FROM mcr.microsoft.com/dotnet/framework/aspnet:4.7.2-windowsservercore-ltsc2019 AS prepare
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -20,7 +20,7 @@ RUN Expand-Archive -Force -Path "/Files/$Env:COMMERCE_SDK_PACKAGE" -DestinationP
     Expand-Archive -Force -Path "/Files/$Env:SITECORE_BIZFX_PACKAGE" -DestinationPath '/Files/Sitecore.BizFX'; 
 
 # Stage 1: create actual image
-FROM microsoft/aspnet:4.7.1-windowsservercore-1709
+FROM mcr.microsoft.com/dotnet/framework/aspnet:4.7.2-windowsservercore-ltsc2019
 
 ARG HOST_NAME="commerce"
 ARG SITECORE_HOSTNAME="sitecore"
@@ -38,7 +38,6 @@ ARG SOLR_PORT=8983
 ARG SOLR_CORE_PREFIX="xp0"
 
 ARG XCONNECT_CERT_PATH
-ARG SOLR_CERT_PATH
 ARG SITECORE_CERT_PATH
 ARG COMMERCE_CERT_PATH
 ARG ROOT_CERT_PATH
@@ -58,19 +57,14 @@ COPY --from=prepare /Files/${COMMERCE_ENGINE_PACKAGE} /Files/
 COPY --from=prepare /Files/${SITECORE_IDENTITY_PACKAGE} /Files/
 COPY --from=prepare /Files/${PLUMBER_FILE_NAME} /Files/
 
-# Trust Self signed certificates
-RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:SOLR_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+# Trust & import self signed certificates
+RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
-
-# Import certificate
-RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
-
-# Import XConnect certificate
-RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
+    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
 RUN net user /add commerceuser 'Pa$$w0rd'; `
     Set-LocalUser -Name 'commerceuser' -PasswordNeverExpires:$true
@@ -167,12 +161,11 @@ RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceAutho
     -password $Env:SQL_SA_PASSWORD `
     -server $Env:SQL_SERVER
 
-# Install hosting
+# Install hosting, IIS URL Rewrite, and vim
 RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')); `
-    choco install -y --params="Quiet" dotnetcore-windowshosting
-
-# Install IIS URL Rewrite
-RUN choco install -y --params="Quiet" urlrewrite
+    choco install -y --params="Quiet" dotnetcore-windowshosting; `
+    choco install -y --params="Quiet" urlrewrite; `
+    /Scripts/Install-Vim.ps1;
 
 RUN $pathToAppSettings  = $(Join-Path -Path c:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot -ChildPath "appsettings.json"); `
     $json = Get-Content $pathToAppSettings -raw | ConvertFrom-Json; `

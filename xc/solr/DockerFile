@@ -1,29 +1,34 @@
 # escape=`
+ARG BUILDER_BASE_IMAGE
+ARG BASE_IMAGE
+FROM ${BUILDER_BASE_IMAGE} as builder
+
+# Install Sitecore Solr cores using SIF
+ARG INSTALL_TEMP='c:\\install'
+ARG SITECORE_CORE_PREFIX
+ARG COMMERCE_SIF_PACKAGE
+
+ADD files/$COMMERCE_SIF_PACKAGE ${INSTALL_TEMP}/
+
+RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
+    Expand-Archive -Path (Join-Path $env:INSTALL_TEMP $env:COMMERCE_SIF_PACKAGE) -DestinationPath $env:INSTALL_TEMP; `
+    $sifConfigFile = Join-Path $env:INSTALL_TEMP 'Configuration/Commerce/Solr/sitecore-commerce-solr.json'; `
+    $solrSchemasPath = Join-Path $env:INSTALL_TEMP 'SolrSchemas'; `
+    Install-SitecoreConfiguration -Path $sifConfigFile `
+    -SolrUrl "http://localhost:8983/solr" `
+    -SolrRoot "c:/solr" `
+    -SolrService "void" `
+    -CorePrefix $env:SITECORE_CORE_PREFIX `
+    -SolrSchemas $solrSchemasPath `
+    -Skip "StopSolr", "StartSolr"; `
+   Get-Process -Name "java" | Stop-Process -Force;
+
+# Copy the clean cores for later use
+RUN New-Item -Path 'c:/clean' -ItemType Directory | Out-Null; `
+    Get-ChildItem -Path 'c:/solr/server/solr' | Foreach-Object { Copy-Item -Path $_.FullName -Destination 'c:/clean' -Recurse }
+
+# Runtime image
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
-
-ARG HOST_NAME
-ARG PORT=8983
-ARG SERVICE_NAME="Solr-6"
-ARG SITECORE_CORE_PREFIX="xp0"
-ARG COMMERCE_SIF_PACKAGE
-
-ADD files/$COMMERCE_SIF_PACKAGE /Files/
-
-RUN Expand-Archive -Force -Path /Files/$Env:COMMERCE_SIF_PACKAGE -DestinationPath /Files/CommerceSIF
-
-# Set longer timeout after Solr start
-RUN $config = Get-Content "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json" | Where-Object { $_ -notmatch '^\s*\/\/'} | Out-String | ConvertFrom-Json; `
-    $config.Tasks.StartSolr.Params.PostDelay = 30000; `
-    ConvertTo-Json $config -Depth 50 | Set-Content -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json"
-
-RUN $solrUrl = 'https://{0}:{1}/solr' -f $Env:HOST_NAME, $Env:PORT; `
-    /Scripts/WaitForSolr.ps1 $Env:HOST_NAME; `
-    Install-SitecoreConfiguration -Path "C:\\Files\\CommerceSIF\\Configuration\\Commerce\\Solr\\sitecore-commerce-solr.json" `
-        -SolrUrl $solrUrl `
-        -SolrRoot "c:\\solr\\solr-7.2.1" `
-        -SolrService $Env:SERVICE_NAME `
-        -CorePrefix $Env:SITECORE_CORE_PREFIX `
-        -SolrSchemas "C:\\Files\\CommerceSIF\\SolrSchemas"
+COPY --from=builder /clean /clean
