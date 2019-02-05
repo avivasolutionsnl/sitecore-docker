@@ -1,0 +1,13 @@
+build
+data
+databases
+logs
+tmp
+xc/data
+xc/logs
+xc/wwwroot
+xp/data
+xp/logs
+xp/wwwroot
+*.tmp
+*.log

@@ -1,7 +1,8 @@
 # escape=`
 
 # Stage 0: prepare files
-FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} AS prepare
 
 ARG CONFIG_PACKAGE
 
@@ -13,7 +14,7 @@ RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Conf
 
 
 # Stage 1: create actual image
-FROM microsoft/aspnet:4.7.1-windowsservercore-1709
+FROM ${BASE_IMAGE}
 
 ARG SQL_SA_PASSWORD
 ARG SQL_DB_PREFIX
@@ -29,31 +30,17 @@ COPY files/license.xml /Files/
 COPY files/$XCONNECT_PACKAGE /Files/
 COPY files/*.pfx /Files/
 COPY --from=prepare /Files/Config /Files/Config/
+COPY xp/xconnect/disable-solr-ssl.json /Files/Config/
 ADD scripts /Scripts
 
-ENV SOLR_CERT_PATH "c:\\Files\\solr.pfx"
-ENV XCONNECT_CERT_PATH "C:\\Files\\xConnect.pfx"
+ENV XCONNECT_CLIENT_CERT_PATH "C:\\Files\\xconnect-client.pfx"
+ENV XCONNECT_SSL_CERT_PATH "C:\\Files\\xconnect-ssl.pfx"
+ENV SITE_NAME=${SITE_NAME}
 
-# Trust Self signed certificates
-RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:SOLR_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
-RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
-
-# Import XConnect certificate
-RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
-
-RUN /Scripts/Install-SIF.ps1
-
-# Install WebDeploy
-ENV WEBDEPLOY_MSI="webdeploy.msi"
-ADD http://download.microsoft.com/download/0/1/D/01DC28EA-638C-4A22-A57B-4CEF97755C6C/WebDeploy_amd64_en-US.msi ${WEBDEPLOY_MSI}
-RUN Start-Process msiexec.exe -ArgumentList '/i', $Env:WEBDEPLOY_MSI, '/quiet', '/norestart' -NoNewWindow -Wait
-
-# Install IIS URL Rewrite
-ENV URLREWRITE_MSI="urlrewrite.msi"
-ADD http://download.microsoft.com/download/D/D/E/DDE57C26-C62C-4C59-A1BB-31D58B36ADA2/rewrite_amd64_en-US.msi ${URLREWRITE_MSI}
-RUN Start-Process msiexec.exe -ArgumentList '/i', $Env:URLREWRITE_MSI, '/quiet', '/norestart' -NoNewWindow -Wait
-
-RUN Remove-Website -Name 'Default Web Site'
+# Trust Self signed certificates & import XConnect certificate
+RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_SSL_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
 ENV SIF_CONFIG="c:\\Files\\Config\\xconnect-xp0.json"
 
@@ -61,15 +48,13 @@ RUN $config = Get-Content $Env:SIF_CONFIG | Where-Object { $_ -notmatch '^\s*\/\
     $config.Tasks.InstallWDP.Params.Arguments | Add-Member -Name 'Skip' -Value @(@{'ObjectName' = 'dbDacFx'}, @{'ObjectName' = 'dbFullSql'}) -MemberType NoteProperty; `
     ConvertTo-Json $config -Depth 50 | Set-Content -Path $Env:SIF_CONFIG
 
-RUN Install-SitecoreConfiguration -Path "c:\\Files\\Config\\xconnect-createcert.json" `
-    -CertificateName "xconnect_client"
-
-RUN $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
+RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -Package c:/Files/$Env:XCONNECT_PACKAGE `
     -LicenseFile "c:\\Files\\license.xml" `
     -Sitename $Env:SITE_NAME `
     -XConnectCert "xConnect.client" `
+    -SslCert "xconnect" `
     -SqlDbPrefix $Env:SQL_DB_PREFIX `
     -SqlServer $Env:SQL_SERVER `
     -SqlAdminUser "sa" `
@@ -86,12 +71,10 @@ RUN $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SqlMarketingAutomationPassword $Env:SQL_SA_PASSWORD `    
     -SolrCorePrefix $Env:SOLR_CORE_PREFIX `
     -SolrURL $solrUrl `
-    -Skip "CleanShards", "CreateShards", "CreateShardApplicationDatabaseServerLoginSqlCmd", "CreateShardManagerApplicationDatabaseUserSqlCmd", "CreateShard0ApplicationDatabaseUserSqlCmd", "CreateShard1ApplicationDatabaseUserSqlCmd", "ConfigureSolrSchemas"
-
-RUN Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs
-
-RUN Start-WebAppPool -Name $Env:SITE_NAME 
-RUN Start-Website -Name $Env:SITE_NAME
+    -Skip "CleanShards", "CreateShards", "CreateShardApplicationDatabaseServerLoginSqlCmd", "CreateShardManagerApplicationDatabaseUserSqlCmd", `
+        "CreateShard0ApplicationDatabaseUserSqlCmd", "CreateShard1ApplicationDatabaseUserSqlCmd", "ConfigureSolrSchemas", "StartServices"; `
+    Install-SitecoreConfiguration -Path 'c:/Files/Config/disable-solr-ssl.json' -Sitename $Env:SITE_NAME; `
+    Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs
 
 EXPOSE 443
 

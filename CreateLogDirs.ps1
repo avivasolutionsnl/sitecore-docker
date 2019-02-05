@@ -1,7 +1,9 @@
-mkdir -p .\logs\sitecore
-mkdir -p .\logs\xconnect
-mkdir -p .\logs\commerce\CommerceAuthoring_Sc9
-mkdir -p .\logs\commerce\CommerceMinions_Sc9
-mkdir -p .\logs\commerce\CommerceOps_Sc9
-mkdir -p .\logs\commerce\CommerceShops_Sc9
-mkdir -p .\logs\commerce\SitecoreIdentityServer
+# As mkdir does not give an error exit code when it fails, 
+# suppress all warnings as it clutters the build output
+mkdir -p .\logs\sitecore 2> $null
+mkdir -p .\logs\xconnect 2> $null
+mkdir -p .\logs\commerce\CommerceAuthoring_Sc9 2> $null 
+mkdir -p .\logs\commerce\CommerceMinions_Sc9 2> $null
+mkdir -p .\logs\commerce\CommerceOps_Sc9 2> $null
+mkdir -p .\logs\commerce\CommerceShops_Sc9 2> $null
+mkdir -p .\logs\commerce\SitecoreIdentityServer 2> $null

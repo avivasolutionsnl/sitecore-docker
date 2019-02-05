@@ -6,9 +6,8 @@ Hopefully this will help you to get up and running with Sitecore and Docker. By 
 
 
 # Requirements
-- Windows 10 update 1709 (with Hyper-V enabled)
-- Docker for Windows (version 1712 or better): https://docs.docker.com/docker-for-windows/
-- Visual Studio 15.5.3
+- Windows 10 update 1809
+- Docker for Windows (version 18.09.1 or better): https://docs.docker.com/docker-for-windows/
 - Sitecore installation files
 - [Nuke.build](https://nuke.build)
 
@@ -18,12 +17,15 @@ As Sitecore does not distribute Docker images, the first step is to build the re
 
 ## Pre-build steps
 For this you need to place the Sitecore installation files and a Sitecore license file in the `files` directory. Which files to use are defined in the build configuration files:
-- [XP build config](./build/Build.Xp.cs)
-- [XC build config](./build/Build.Xc.cs)
+- [Base images build config](./build/Build.Base.cs)
+- [XP images build config](./build/Build.Xp.cs)
+- [XC images build config](./build/Build.Xc.cs)
 - [Overall build config](./build/Build.cs)
 
 The XP0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
 xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script (note that this requires an Administrator elevated powershell environment and you may need to set the correct execution policy, e.g. `PS> powershell.exe -ExecutionPolicy Unrestricted`).
+
+> SXA is installed using Commerce SIF. Therefore building SXA images requires you have the Commerce SIF package availabled in the `Files` directory.
 
 ## Build
 Build all images using:
@@ -32,26 +34,33 @@ PS> nuke
 ```
 
 The build results in the following Docker images:
+- Base
+    - `sitecore-base-sitecore`: IIS + ASP.NET
+    - `sitecore-base-openjdk`: Windows Server Core + OpenJDK
+    - `sitecore-base-solr-builder`: sitecore-base-openjdk + Solr
+
 - XP0
-    - `xp-sitecore-sitecore`: IIS + ASP.NET + Sitecore
-    - `xp-sitecore-mssql`: MS SQL + Sitecore databases
-    - `xp-sitecore-solr`: Apache Solr 
-    - `xp-sitecore-xconnect`: IIS + ASP.NET + XConnect
+    - `sitecore-xp-sitecore`: IIS + ASP.NET + Sitecore
+    - `sitecore-xp-mssql`: MS SQL + Sitecore databases
+    - `sitecore-xp-solr`: Apache Solr 
+    - `sitecore-xp-xconnect`: IIS + ASP.NET + XConnect
 - XP0 with SXA installed
-    - `xp-sitecore-sxa`
-    - `xp-solr-sxa`
-    - `xp-mssql-sxa`
+    - `sitecore-xp-sitecore-sxa`
+    - `sitecore-xp-solr-sxa`
+    - `sitecore-xp-mssql-sxa`
 
 - XC
-    - `xc-sitecore-commerce`: ASP.NET
-    - `xc-sitecore-sitecore`: IIS + ASP.NET + Sitecore
-    - `xc-sitecore-mssql`: MS SQL + Sitecore databases
-    - `xc-sitecore-solr`: Apache Solr 
-    - `xc-sitecore-xconnect`: IIS + ASP.NET + XConnect
+    - `sitecore-xc-commerce`: ASP.NET
+    - `sitecore-xc-sitecore`: IIS + ASP.NET + Sitecore
+    - `sitecore-xc-sitecore-intermediate`: *Only used during build*
+    - `sitecore-xc-mssql`: MS SQL + Sitecore databases
+    - `sitecore-xc-mssql-intermediate`: *Only used during build*
+    - `sitecore-xc-solr`: Apache Solr 
+    - `sitecore-xc-xconnect`: IIS + ASP.NET + XConnect
 - XC with SXA installed
-    - `xc-sitecore-sxa`
-    - `xc-solr-sxa`
-    - `xc-mssql-sxa`
+    - `sitecore-xc-sitecore-sxa`
+    - `sitecore-xc-solr-sxa`
+    - `sitecore-xc-mssql-sxa`
 
 All images are contain a version tag that corresponds to the Sitecore commercial version number e.g. `xp-sitecore-sitecore:9.0.2`.
 
@@ -113,18 +122,6 @@ NB. these run-time parameters should match the used build parameters.
 To set the Docker container service names as DNS names on your host edit your `hosts` file. 
 A convenient tool to automatically do this is [whales-names](https://github.com/gregolsky/whales-names).
 
-## (Optionally) Obtain Solr cores
-Stop the `solr` container and copy the cores to your the `cores` directory:
-```
-PS> ./CopyCores.ps1
-```
-
-## (Optionally) Obtain database files from images
-Stop the `mssql` container and copy the databases to the `databases` directory:
-```
-PS> ./CopyDatabases.ps1
-```
-
 
 # Known issues
 Docker for Windows can be unstable at times, some troubleshooting tips are listed below.
@@ -171,6 +168,34 @@ If none are returned for the `xConnect.client` certificate, you probably need to
 PS>  Grant-Permission -Identity sitecore -Permission GenericRead -Path 'cert:\localmachine\my\9CC4483261B92D7C5B32239115283933FC5014C4'
 ```
 
+## Certificates issues with Commerce
+Communication between services might fail when the certificates are not installed correctly. Verify what certificates are installed by:
+```
+PS> Get-ChildItem cert:\localmachine\my
+```
+
+The certificate thumbprint in `<Your>.Commerce.Engine/wwwroot/config.json` should match the one in `Y.Commerce.Engine/Sitecore.Commerce.Engine.Connect.config`.
+Note that when you have build new images the thumbprint in the `<Your>.Commerce.Engine/wwwroot/config.json` has to be manually updated.
+
+To determine and set the root certificate to use for a HTTPS connection:
+1. Determine certificate used for IIS: `PS> Get-WebBinding | Select certificateHash`
+2. Determine root certificate used to sign the in step 1 obtained certificate: `PS> Get-ChildItem cert:\localmachine\my\<certificateHash> | Select Issuer`
+3. Lookup thumbprint of the issuer: `PS> Get-ChildItem cert:\localmachine\root\
+3. Export the root certificate: `PS> Export-Certificate -Cert cert:\localmachine\root\<thumbprint> -FilePath <file>`
+4. Import the root certificate (on the client): `PS> Import-Certificate <file> -CertStoreLocation cert:\localmachine\root`
+
 ## Commerce setup
 - We have quite a lot of custom powershell scripts for trivial installation tasks. This is because the commerce SIF scripts contain hardcoded values. For example, it is not possible to use hostnames other than localhost. We should be able to remove this custom code when those scripts get fixed.
 - During the installation of the commerce server instances, it tries to set permissions on the log folder. For some reason, this results in an exception saying the access control list is not in canonical form. This can be ignored, because the log folders are mounted on the host. However, it does cause an annoying delay in the installation. 
+
+## Solr errors in Sitecore log
+After a clean start Sitecore reports errors like:
+```
+ERROR: [doc=sitecore://master/{731cb645-faa3-4440-9511-a27556a63ad9}?lang=fr-fr&amp;ver=1&amp;ndx=sitecore_master_index] unknown field '_indexname_t_fr'
+```
+
+Populating the Solr managed schemas will solve this, e.g. do this via the Sitecore Control Panel.
+An automated solution is planned in [this](https://github.com/avivasolutionsnl/sitecore-docker/issues/38) issue.
+
+## Commerce SXA installation sometimes fails
+Seems to be timing related. Solution is to try harder and/or manually populate the Solr schemas from the Sitecore Control Panel to reduce load generated by errors.

@@ -1,9 +1,10 @@
 build/bin
 build/obj
 cores
+data
 databases
 files
 logs
 tmp
-.tmp
-.log
+*.tmp
+*.log

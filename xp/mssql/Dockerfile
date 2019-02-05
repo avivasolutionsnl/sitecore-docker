@@ -1,63 +1,66 @@
 # escape=`
+# Based on https://github.com/sitecoreops/sitecore-images/blob/master/images/9.0.2%20rev.%20180604/windowsservercore-ltsc2019/sitecore-sqldev/Dockerfile
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
-# Stage 0: prepare files
-FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
+# Download Links:
+ENV exe "https://go.microsoft.com/fwlink/?linkid=840945"
+ENV box "https://go.microsoft.com/fwlink/?linkid=840944"
+
+ENV sa_password="_" `
+    attach_dbs="[]" `
+    ACCEPT_EULA="_" `
+    sa_password_path="C:\ProgramData\Docker\secrets\sa-password"
+
+# make install files accessible
+COPY xp/mssql/start.ps1 /
+WORKDIR /
+
+RUN Invoke-WebRequest -Uri $env:box -OutFile SQL.box; `
+    Invoke-WebRequest -Uri $env:exe -OutFile SQL.exe; `
+    Start-Process -Wait -FilePath .\SQL.exe -ArgumentList /qs, /x:setup; `
+    .\setup\setup.exe /q /ACTION=Install /INSTANCENAME=MSSQLSERVER /FEATURES=SQLEngine /UPDATEENABLED=0 /SQLSVCACCOUNT='NT AUTHORITY\System' /SQLSYSADMINACCOUNTS='BUILTIN\ADMINISTRATORS' /TCPENABLED=1 /NPENABLED=0 /IACCEPTSQLSERVERLICENSETERMS; `
+    Remove-Item -Recurse -Force SQL.exe, SQL.box, setup;
+
+RUN Stop-Service MSSQLSERVER; `
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql14.MSSQLSERVER\mssqlserver\supersocketnetlib\tcp\ipall' -Name tcpdynamicports -Value ''; `
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql14.MSSQLSERVER\mssqlserver\supersocketnetlib\tcp\ipall' -Name tcpport -Value 1433; `
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql14.MSSQLSERVER\mssqlserver' -Name LoginMode -Value 2;
+
+HEALTHCHECK CMD [ "sqlcmd", "-Q", "select 1" ]
+
+# ABOVE HERE SHOULD BE REMOVE WHEN A 1803 VERSION IS RELEASED
+ARG DB_PREFIX
 ARG SITECORE_PACKAGE
 ARG XCONNECT_PACKAGE
-
-SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
-
-ADD files/ /Files/
-
-RUN Expand-Archive -Path /Files/$Env:SITECORE_PACKAGE -DestinationPath /Files/Sitecore 
-RUN Expand-Archive -Path /Files/$Env:XCONNECT_PACKAGE -DestinationPath /Files/Xconnect 
-
-
-# Stage 1: create actual image
-FROM microsoft/mssql-server-windows-express:2016-sp1-windowsservercore-10.0.14393.1715
-
-SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
-
-ARG DB_PREFIX
 ARG HOST_NAME
 
-ENV ACCEPT_EULA "Y"
-ENV SQL_PACKAGE_EXE='C:\Program Files (x86)\Microsoft SQL Server\*\DAC\bin\SqlPackage.exe'
+ENV ACCEPT_EULA=Y
+ENV sa_password=my_Sup3rSecret!!
+ENV INSTALL_PATH='c:/install/'
+ENV DATA_PATH='c:/data/'
+ENV HOST_NAME=${HOST_NAME}
+ENV DB_PREFIX=${DB_PREFIX}
 
-# Add files
-COPY --from=prepare /Files/Sitecore /Files/Sitecore/
-COPY --from=prepare /Files/Xconnect /Files/Xconnect/
+VOLUME ${DATA_PATH}
 
-# Install databases
-RUN $name = '{0}_MarketingAutomation' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Marketingautomation.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
-    $name = '{0}_Processing.Pools' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Processing.pools.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
-    $name = '{0}_ReferenceData' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Referencedata.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
-    $name = '{0}_Core' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Core.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
-    $name = '{0}_Master' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Master.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
-    $name = '{0}_Web' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Web.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
-    $name = '{0}_Reporting' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Reporting.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
-    $name = '{0}_Processing.Tasks' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Processing.tasks.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `       
-    $name = '{0}_Messaging' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Messaging.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `
-    $name = '{0}_EXM.Master' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.Exm.master.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `  	
-    $name = '{0}_Xdb.Collection.Shard1' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Xconnect/Sitecore.Xdb.Collection.Shard1.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME; `  	
-    $name = '{0}_ExperienceForms' -f $Env:DB_PREFIX; & $Env:SQL_PACKAGE_EXE /a:Publish /sf:'c:/Files/Sitecore/Sitecore.ExperienceForms.dacpac' /tdn:$name /tsn:$Env:COMPUTERNAME 
+COPY files/$SITECORE_PACKAGE ${INSTALL_PATH}/ 
+COPY files/$XCONNECT_PACKAGE ${INSTALL_PATH}/ 
 
-RUN $DB_NAME='{0}_Xdb.Collection.ShardMapManager' -f $Env:DB_PREFIX; `
-    $SHARD_NAME_PREFIX='{0}_Xdb.Collection.Shard' -f $Env:DB_PREFIX; `
-    /Files/Xconnect/Content/Website/App_data/collectiondeployment/Sitecore.Xdb.Collection.Database.SqlShardingDeploymentTool.exe `
-    /operation create `
-    /connectionstring 'Server=.;Trusted_Connection=True;' `
-    /dbedition Basic `
-    /shardMapManagerDatabaseName "$DB_NAME" `
-    /shardMapNames 'ContactIdShardMap,DeviceProfileIdShardMap,ContactIdentifiersIndexShardMap' `
-    /shardnumber 2 `
-    /shardnameprefix "$SHARD_NAME_PREFIX" ` 
-    /shardnamesuffix '\"\"' `
-    /dacpac '/Files/Xconnect/Content/Website/App_data/collectiondeployment/Sitecore.Xdb.Collection.Database.Sql.dacpac'
+COPY xp/mssql/*.ps1 ${INSTALL_PATH}
 
-RUN $sqlcmd = 'UPDATE [{0}_Xdb.Collection.ShardMapManager].[__ShardManagement].[ShardsGlobal] SET ServerName = ''{1}''' -f $Env:DB_PREFIX, $Env:HOST_NAME; `
-    sqlcmd -Q $sqlcmd; `
-    sqlcmd -Q \"EXEC sp_MSforeachdb 'IF charindex(''Sitecore'', ''?'' ) = 1 BEGIN EXEC [?]..sp_changedbowner ''sa'' END'\" 
+ADD https://dist.nuget.org/win-x86-commandline/v4.1.0/nuget.exe C:\\Windows\\nuget.exe
+RUN New-Item -Path 'C:/tools' -ItemType Directory | Out-Null; `
+    & nuget install Microsoft.Data.Tools.Msbuild -Version 10.0.61710.120 -OutputDirectory c:/tools
+    
+RUN & (Join-Path $env:INSTALL_PATH "Extract-Databases.ps1") -Path $env:INSTALL_PATH; `
+     & (Join-Path $env:INSTALL_PATH "Extract-ShardTool.ps1") -Path $env:INSTALL_PATH; `
+     & (Join-Path $env:INSTALL_PATH "Install-Databases.ps1") -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH -DatabasePrefix $Env:DB_PREFIX; ` 
+     & (Join-Path $env:INSTALL_PATH "Install-Shards.ps1") -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH -DatabasePrefix $Env:DB_PREFIX; `
+     Get-ChildItem -Path $env:INSTALL_PATH -Exclude "*.mdf", "*.ldf" | Remove-Item -Force;
 
-RUN Add-WindowsFeature Web-Server
+COPY xp/mssql/Boot.ps1 .
+COPY xp/mssql/Persist-Databases.ps1 .
+
+CMD C:/Boot.ps1 -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH

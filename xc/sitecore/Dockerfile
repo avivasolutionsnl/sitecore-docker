@@ -2,7 +2,7 @@
 
 # Stage 0: prepare files
 ARG BASE_IMAGE
-FROM microsoft/aspnet:4.7.1-windowsservercore-1709 AS prepare
+FROM ${BASE_IMAGE} as builder
 
 ARG COMMERCE_SIF_PACKAGE
 ARG COMMERCE_CONNECT_PACKAGE
@@ -32,31 +32,28 @@ ARG ROOT_CERT_PATH
 ARG WEB_TRANSFORM_TOOL
 ARG COMMERCE_CONNECT_ENGINE_PACKAGE
 
-COPY --from=prepare /Files/CommerceSIF /Files/CommerceSIF/
-COPY --from=prepare /Files/SitecoreCommerceConnectCore /Files/SitecoreCommerceConnectCore
-COPY --from=prepare /Files/CommerceMACore /Files/CommerceMACore
-COPY --from=prepare /Files/CommerceMACoreForAE /Files/CommerceMACoreForAE
-COPY --from=prepare /Files/CommerceXProfiles /Files/CommerceXProfiles
-COPY --from=prepare /Files/CommerceXAnalytics /Files/CommerceXAnalytics
-COPY --from=prepare /Files/${WEB_TRANSFORM_TOOL} /Files/Microsoft.Web.XmlTransform.dll
-COPY --from=prepare /Files/${COMMERCE_CONNECT_ENGINE_PACKAGE} /Files/Sitecore.Commerce.Engine.Connect.update
-COPY --from=prepare /Files/${ROOT_CERT_PATH} /Files/${ROOT_CERT_PATH}
+COPY --from=builder /Files/CommerceSIF /Files/CommerceSIF/
+COPY --from=builder /Files/SitecoreCommerceConnectCore /Files/SitecoreCommerceConnectCore
+COPY --from=builder /Files/CommerceMACore /Files/CommerceMACore
+COPY --from=builder /Files/CommerceMACoreForAE /Files/CommerceMACoreForAE
+COPY --from=builder /Files/CommerceXProfiles /Files/CommerceXProfiles
+COPY --from=builder /Files/CommerceXAnalytics /Files/CommerceXAnalytics
+COPY --from=builder /Files/${WEB_TRANSFORM_TOOL} /Files/Microsoft.Web.XmlTransform.dll
+COPY --from=builder /Files/${COMMERCE_CONNECT_ENGINE_PACKAGE} /Files/Sitecore.Commerce.Engine.Connect.update
+COPY --from=builder /Files/${ROOT_CERT_PATH} /Files/${ROOT_CERT_PATH}
 
 ADD xc/sitecore/InstallCommercePackages.ps1 /Scripts/
 ADD files/$COMMERCE_CERT_PATH /Files/
 ADD scripts/Import-Certificate.ps1 /Scripts/
 
-# Trust Self signed certificates
+# Trust Self signed certificates & import XConnect certificate
 RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'
-
-# Import XConnect certificate
-RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
 # Patch Solr config, set initializeOnAdd = true
 # See: https://sitecore.stackexchange.com/questions/11523/index-sitecore-marketingdefinitions-master-was-not-found-exception-in-sitecore
-ADD xc/sitecore/Sitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config /Files/
-RUN cp /Files/Sitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config /inetpub/wwwroot/sitecore/App_Config/Include/zSitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config
+ADD xc/sitecore/Sitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config /inetpub/wwwroot/sitecore/App_Config/Include/zSitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config
 
 ENTRYPOINT /Scripts/Watch-Directory.ps1 -Path C:\Workspace -Destination c:\inetpub\wwwroot\sitecore

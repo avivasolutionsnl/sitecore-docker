@@ -1,5 +1,5 @@
-.\Generate-Self-Signed-Certificate.ps1 -dnsName 'xConnect.client' -file '.\Files\xConnect.pfx' -secret 'secret'
-.\Generate-Self-Signed-Certificate.ps1 -dnsName 'solr' -file '.\Files\solr.pfx' -secret 'secret'
+.\Generate-Self-Signed-Certificate.ps1 -dnsName 'xconnect.client' -file '.\Files\xconnect-client.pfx' -secret 'secret'
+.\Generate-Self-Signed-Certificate.ps1 -dnsName 'xconnect' -file '.\Files\xconnect-ssl.pfx' -secret 'secret'
 .\Generate-Self-Signed-Certificate.ps1 -dnsName 'sitecore' -file '.\Files\sitecore.pfx' -secret 'secret'
 .\Generate-Self-Signed-Certificate.ps1 -dnsName 'commerce.client' -file '.\Files\commerce.pfx' -secret 'secret'
 
