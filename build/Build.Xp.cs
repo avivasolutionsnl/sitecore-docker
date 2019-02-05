@@ -16,7 +16,7 @@ partial class Build : NukeBuild
     public readonly string XpImagePrefix = "sitecore-xp-";
     
     [Parameter("Docker image version tag for Sitecore XP")]
-    readonly string XpVersion = "9.0.2";
+    readonly string XpVersion = "9.0.2-ltsc2019";
 
     private string XpFullImageName(string name) => $"{RepoImagePrefix}{XpImagePrefix}{name}:{XpVersion}";
 

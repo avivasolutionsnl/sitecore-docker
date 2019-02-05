@@ -17,7 +17,7 @@ partial class Build : NukeBuild
     readonly string XcImagePrefix = "sitecore-xc-";
 
     [Parameter("Docker image version tag for Sitecore XC")]
-    readonly string XcVersion = "9.0.3";
+    readonly string XcVersion = "9.0.3-ltsc2019";
 
     private string XcFullImageName(string name) => $"{RepoImagePrefix}{XcImagePrefix}{name}:{XcVersion}";
 
