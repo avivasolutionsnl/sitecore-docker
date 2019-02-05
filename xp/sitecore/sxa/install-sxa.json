@@ -3,17 +3,17 @@
     "PowershellExtensionPackageFullPath": {
       "Type": "string",
       "Description": "The path to the Sitecore Powershell Extensions zip.",
-      "DefaultValue": "/files-mount/pse-package.zip"
+      "DefaultValue": "/files-mount/Sitecore PowerShell Extensions-5.0.zip"
     },
     "SXAPackageFullPath": {
       "Type": "string",
       "Description": "The path to the SXA zip.",
-      "DefaultValue": "/files-mount/sxa-package.zip"
+      "DefaultValue": "/files-mount/Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip"
     },
     "PackagesDirDst": {
       "Type": "string",
       "Description": "The path to packages directory.",
-      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\sitecore\\admin\\Packages\\"
+      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\upload"
     },
     "BaseUrl": {
       "Type": "string",

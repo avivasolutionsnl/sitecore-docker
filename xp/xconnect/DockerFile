@@ -74,12 +74,16 @@ RUN $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SqlServer $Env:SQL_SERVER `
     -SqlAdminUser "sa" `
     -SqlAdminPassword $Env:SQL_SA_PASSWORD `
+    -SqlReportingUser "sa" `
+    -SqlReportingPassword $Env:SQL_SA_PASSWORD`
     -SqlCollectionUser "sa" `
     -SqlCollectionPassword $Env:SQL_SA_PASSWORD `
     -SqlProcessingPoolsUser "sa" `
     -SqlProcessingPoolsPassword $Env:SQL_SA_PASSWORD `
     -SqlReferenceDataUser "sa" `
     -SqlReferenceDataPassword $Env:SQL_SA_PASSWORD `
+    -SqlProcessingEngineUser "sa" `
+    -SqlProcessingEnginePassword $Env:SQL_SA_PASSWORD `
     -SqlMessagingUser "sa" `
     -SqlMessagingPassword $Env:SQL_SA_PASSWORD `
     -SqlMarketingAutomationUser "sa" `
