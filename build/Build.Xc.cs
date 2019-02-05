@@ -272,7 +272,6 @@ partial class Build : NukeBuild
         .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);
 
     Target PushXc => _ => _
-        .DependsOn(Xc)
         .Executes(() => {
             DockerPush(x => x.SetName(XcFullImageName("commerce")));
             DockerPush(x => x.SetName(XcFullImageName("mssql")));
@@ -282,7 +281,6 @@ partial class Build : NukeBuild
         });
     
     Target PushXcSxa => _ => _
-        .DependsOn(XcSxa)
         .Executes(() => {
             DockerPush(x => x.SetName(XcFullImageName("mssql-sxa")));
             DockerPush(x => x.SetName(XcFullImageName("sitecore-sxa")));
