@@ -169,6 +169,9 @@ partial class Build : NukeBuild
             System.IO.Directory.CreateDirectory(@"wwwroot/sitecore");
             Powershell("../CreateLogDirs.ps1");
 
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XcVersion}", EnvironmentVariableTarget.Process);
+
             InstallSitecorePackage(
                 @"C:\Scripts\InstallCommercePackages.ps1", 
                 XcFullImageName("sitecore"), 
@@ -216,7 +219,7 @@ partial class Build : NukeBuild
             );
         });
 
-    Target XcSitecoreSxa => _ => _
+    Target XcSitecoreMssqlSxa => _ => _
         .DependsOn(XcSitecoreMssql, XcSolrSxa)
         .Executes(() => {
             var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
@@ -233,7 +236,7 @@ partial class Build : NukeBuild
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SCXA_PACKAGE", $"{SCXA_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XcVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
@@ -257,8 +260,7 @@ partial class Build : NukeBuild
                 .SetTag(XcFullImageName("solr-sxa"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
-                    $"BUILDER_BASE_IMAGE={builderBaseImage}",
-                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}"
+                    $"BUILDER_BASE_IMAGE={builderBaseImage}"
                 })
             );
         });
@@ -267,7 +269,7 @@ partial class Build : NukeBuild
         .DependsOn(XcCommerce, XcSitecoreMssql, XcSolr, XcXconnect);
 
     Target XcSxa => _ => _
-        .DependsOn(Xc, XcSitecoreSxa, XcSolrSxa);
+        .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);
 
     Target PushXc => _ => _
         .DependsOn(Xc)
