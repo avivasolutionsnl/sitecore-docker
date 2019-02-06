@@ -29,10 +29,21 @@ partial class Build : NukeBuild
         return $"{dirName}_{serviceName}_1";
     }
 
+    private void AssertCleanDirectory(string dir) {
+        if (System.IO.Directory.Exists(dir)) {
+            System.IO.Directory.CreateDirectory(dir);
+        } else {
+            Nuke.Common.ControlFlow.Assert(
+                System.IO.Directory.GetFiles(dir).Length == 0,
+                $"{dir} is not empty"
+            );  
+        }
+    }
+
     // Install a Sitecore package using the given script file and the docker-compose.yml file in the current directory
     private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "") {
-        EnsureCleanDirectory("./data/mssql");
-        SpinWait.SpinUntil(() => System.IO.Directory.Exists("./data/mssql"), 5000);
+        AssertCleanDirectory("./data/mssql");
+        AssertCleanDirectory("./data/solr");
 
         DockerCompose($"{dockerComposeOptions} up -d");
 

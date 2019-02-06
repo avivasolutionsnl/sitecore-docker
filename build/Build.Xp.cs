@@ -145,7 +145,7 @@ partial class Build : NukeBuild
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XpImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XpImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XpVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
@@ -182,7 +182,6 @@ partial class Build : NukeBuild
         .DependsOn(XpSitecoreMssqlSxa, XpSolrSxa);
 
     Target PushXp => _ => _
-        .DependsOn(Xp)
         .Executes(() => {
             DockerPush(x => x.SetName(XpFullImageName("mssql")));
             DockerPush(x => x.SetName(XpFullImageName("sitecore")));
@@ -191,7 +190,6 @@ partial class Build : NukeBuild
         });
     
     Target PushXpSxa => _ => _
-        .DependsOn(XpSxa)
         .Executes(() => {
             DockerPush(x => x.SetName(XpFullImageName("mssql-sxa")));
             DockerPush(x => x.SetName(XpFullImageName("sitecore-sxa")));

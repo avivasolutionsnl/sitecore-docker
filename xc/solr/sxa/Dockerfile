@@ -5,7 +5,7 @@ FROM ${BUILDER_BASE_IMAGE} as builder
 
 # Install Sitecore Solr cores using SIF
 ARG INSTALL_TEMP='c:\\install'
-ARG SITECORE_CORE_PREFIX="Sitecore"
+ARG SITECORE_CORE_PREFIX="sitecore"
 
 ADD sxa-solr.json ${INSTALL_TEMP}/
 

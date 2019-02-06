@@ -60,7 +60,6 @@ partial class Build : NukeBuild
         .DependsOn(BaseOpenJdk, BaseSitecore);
 
     Target PushBase => _ => _
-        .DependsOn(Base)
         .Executes(() => {
             DockerPush(x => x.SetName(BaseFullImageName("openjdk")));
             DockerPush(x => x.SetName(BaseFullImageName("sitecore")));
