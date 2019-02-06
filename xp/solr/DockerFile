@@ -13,7 +13,7 @@ ARG XCONNECT_CORE_PREFIX="xp0"
 ADD files/$CONFIG_PACKAGE ${INSTALL_TEMP}/
 
 RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
-    Expand-Archive -Path (Join-Path $env:INSTALL_TEMP '*Configuration files*.zip') -DestinationPath $env:INSTALL_TEMP; `
+    Expand-Archive -Path (Join-Path $env:INSTALL_TEMP '*Configuration files*.zip') -DestinationPath $env:INSTALL_TEMP  -Force; `
     Install-SitecoreConfiguration -Path (Join-Path $env:INSTALL_TEMP 'sitecore-solr.json') `
     -SolrUrl "http://localhost:8983/solr" `
     -SolrRoot "c:/solr" `

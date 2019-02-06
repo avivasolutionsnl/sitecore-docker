@@ -21,6 +21,11 @@ $tempModulePath = Join-Path $tempPath "Modules"
 $from = Join-Path $tempModulePath "SitecoreUtilityTasks"
 $to = Join-Path $ToPath "Modules"
 
+$Acl = Get-ACL $to
+$AccessRule= New-Object System.Security.AccessControl.FileSystemAccessRule("everyone","FullControl","ContainerInherit,Objectinherit","none","Allow")
+$Acl.AddAccessRule($AccessRule)
+Set-Acl $to $Acl
+
 mkdir -Path $to 2>$null
 
 Move-Item $from -Destination $to -Force

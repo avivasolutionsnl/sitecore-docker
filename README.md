@@ -1,10 +1,8 @@
 Run Sitecore 9.1 XP0 and XC using Docker for Windows.
 
 # 9.1 differences
-You need to provide dac framework msi for the mssql image for now this has to be done 
-manualy : https://www.microsoft.com/en-us/download/details.aspx?id=57468
-Put it in te files folder.
 
+Todo
 
 
 # Disclaimer

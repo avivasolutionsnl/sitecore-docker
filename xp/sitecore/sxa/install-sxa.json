@@ -2,7 +2,7 @@
   "Parameters": {
     "SiteName": {
       "Type": "string",
-      "DefaultValue": "Sitecore",
+      "DefaultValue": "sitecore",
       "Description": "The name of the site to be deployed."
     },
     "SitecoreAdminPassword": {
@@ -23,7 +23,7 @@
     "PackagesDirDst": {
       "Type": "string",
       "Description": "The path to packages directory.",
-      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\upload"
+      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\sitecore\\admin\\Packages\\"
     },
     "BaseUrl": {
       "Type": "string",
