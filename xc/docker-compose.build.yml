@@ -1,8 +1,0 @@
-version: '2.4'
-
-services:
- mssql:
-  image: "${IMAGE_PREFIX}mssql-intermediate:${TAG}"
-  
- sitecore:
-  image: "${IMAGE_PREFIX}sitecore-intermediate:${TAG}"
