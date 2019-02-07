@@ -20,7 +20,7 @@ ARG SQL_USER="sa"
 ARG SQL_SA_PASSWORD
 ARG SQL_DB_PREFIX
 ARG SQL_SERVER="mssql"
-ARG SITE_NAME="sitecore"
+ARG SITE_NAME
 ARG SOLR_PORT=8983
 ARG SITECORE_PACKAGE
 
@@ -56,6 +56,7 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -Package c:/Files/$Env:SITECORE_PACKAGE `
     -LicenseFile "c:/Files/license.xml" `
     -Sitename $Env:SITE_NAME `
+    -SitecoreIdentityAuthority "https://identity" `
     -SqlDbPrefix $Env:SQL_DB_PREFIX `
     -SqlServer $Env:SQL_SERVER `
     -SqlAdminUser $Env:SQL_USER `

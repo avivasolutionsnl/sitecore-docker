@@ -38,6 +38,9 @@ partial class Build : NukeBuild
     [Parameter("SXA package")]
     readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip";
 
+    [Parameter("Commerce SIF package")]
+    readonly string COMMERCE_SIF_PACKAGE = "SIF.Sitecore.Commerce.1.4.7.zip";
+
     [Parameter("Dac framework msi")]
     readonly string DAC_INSTALLATION = "DacFramework.msi";
 
@@ -54,8 +57,8 @@ partial class Build : NukeBuild
     readonly string IDENTITY_SITE_NAME = "identity";
     [Parameter("Xconnect Solr core prefix")]
     readonly string XCONNECT_SOLR_CORE_PREFIX = "xp0";
-    [Parameter("Sitecore Solr core prefix")]
-    readonly string SITECORE_SOLR_CORE_PREFIX = "Sitecore";
+    [Parameter("Sitecore site name")]
+    readonly string SITECORE_SITE_NAME = "sitecore";
 
     Target XpMssql => _ => _
         .Executes(() =>
@@ -87,6 +90,7 @@ partial class Build : NukeBuild
                 .SetTag(XpFullImageName("sitecore"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
+                    $"SITE_NAME={SITECORE_SITE_NAME}",
                     $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
                     $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
                     $"SOLR_PORT={SOLR_PORT}",
@@ -96,14 +100,17 @@ partial class Build : NukeBuild
             );
         });
     
-    Target XpIdentityServer => _ => _
+    Target XpIdentity => _ => _
         .Executes(() =>
         {
+            var baseImage = BaseFullImageName("sitecore");
+
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/identityserver/Dockerfile")
                 .SetTag(XpFullImageName("identity"))
                 .SetBuildArg(new string[]{
+                    $"BASE_IMAGE={baseImage}",
                     $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
                     $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
                     $"SQL_SERVER=mssql",
@@ -129,7 +136,7 @@ partial class Build : NukeBuild
                     $"BASE_IMAGE={baseImage}",
                     $"BUILDER_BASE_IMAGE={builderBaseImage}",
                     $"XCONNECT_CORE_PREFIX={XCONNECT_SOLR_CORE_PREFIX}",
-                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}"
+                    $"SITECORE_CORE_PREFIX={SITECORE_SITE_NAME}"
                 })
             );
         });
@@ -197,13 +204,13 @@ partial class Build : NukeBuild
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
                     $"BUILDER_BASE_IMAGE={builderBaseImage}",
-                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}"
+                    $"SITECORE_CORE_PREFIX={SITECORE_SITE_NAME}"
                 })
             );
         });
 
     Target Xp => _ => _
-        .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect, XpIdentityServer);
+        .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect, XpIdentity);
 
     Target XpSxa => _ => _
         .DependsOn(XpSitecoreMssqlSxa, XpSolrSxa);

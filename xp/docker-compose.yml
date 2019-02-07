@@ -1,6 +1,16 @@
 version: '2.4'
 
 services:
+ identity:
+  image: "${IMAGE_PREFIX}identity:${TAG}"
+  isolation: process
+  volumes:
+    - .\logs\identity:C:\inetpub\wwwroot\identity\app_data\logs
+  depends_on:
+    - mssql
+  mem_limit: 2048m
+  cpu_count: 4
+
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
   isolation: process
@@ -42,14 +52,5 @@ services:
   depends_on:
     - mssql
     - solr
-  mem_limit: 2048m
-  cpu_count: 4
-
- identity:
-  image: "${IMAGE_PREFIX}identity:${TAG}"
-  volumes:
-    - .\logs\identity:C:\inetpub\wwwroot\identity\app_data\logs
-  depends_on:
-    - mssql
   mem_limit: 2048m
   cpu_count: 4
