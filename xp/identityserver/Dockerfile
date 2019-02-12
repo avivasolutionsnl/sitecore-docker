@@ -15,6 +15,7 @@ RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Conf
 # Stage 1: create actual image
 FROM ${BASE_IMAGE}
 
+ARG SQL_USER="sa"
 ARG SQL_SA_PASSWORD
 ARG SQL_DB_PREFIX
 ARG SQL_SERVER="mssql"
@@ -30,6 +31,9 @@ COPY --from=prepare /Files/Config /Files/Config/
 ADD scripts /Scripts
 
 ENV IDENTITY_CERT_PATH "C:\\Files\\identity.pfx"
+
+#Instal donet core windows hosting
+RUN choco install -y --params="Quiet" dotnetcore-windowshosting; 
 
 # Trust Self signed certificates & certificate
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
@@ -47,7 +51,7 @@ RUN Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -SitecoreIdentityCert "Identity"`
     -LicenseFile "c:/Files/license.xml" `
     -SiteName $Env:SITE_NAME `
-    -SqlCoreUser "sa "`
+    -SqlCoreUser $Env:SQL_USER `
     -SqlCorePassword $Env:SQL_SA_PASSWORD `
     -SqlServer $Env:SQL_SERVER `
     -PasswordRecoveryUrl http://$Env:SITE_NAME `

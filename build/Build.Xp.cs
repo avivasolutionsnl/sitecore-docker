@@ -94,6 +94,7 @@ partial class Build : NukeBuild
                     $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
                     $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
                     $"SOLR_PORT={SOLR_PORT}",
+                    $"SOLR_CORE_PREFIX={SITECORE_SITE_NAME}",
                     $"SITECORE_PACKAGE={SITECORE_PACKAGE}",
                     $"CONFIG_PACKAGE={CONFIG_PACKAGE}"
                 })

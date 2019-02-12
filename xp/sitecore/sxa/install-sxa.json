@@ -2,7 +2,7 @@
   "Parameters": {
     "SiteName": {
       "Type": "string",
-      "DefaultValue": "sitecore",
+      "DefaultValue": "Sitecore",
       "Description": "The name of the site to be deployed."
     },
     "SitecoreAdminPassword": {
