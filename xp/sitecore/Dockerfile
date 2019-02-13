@@ -40,9 +40,10 @@ ENV IDENTITY_CERT_PATH "C:\\Files\\identity.pfx"
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_SSL_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
 # Install chocolatey
 RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')); `

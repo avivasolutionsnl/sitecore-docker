@@ -20,6 +20,7 @@ ARG SQL_SA_PASSWORD
 ARG SQL_DB_PREFIX
 ARG SQL_SERVER="mssql"
 ARG SITE_NAME="identity"
+ARG SITECORE_SITE_NAME="sitecore"
 ARG IDENTITYSERVER_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"] 
@@ -55,5 +56,5 @@ RUN Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -SqlCorePassword $Env:SQL_SA_PASSWORD `
     -SqlServer $Env:SQL_SERVER `
     -PasswordRecoveryUrl http://$Env:SITE_NAME `
-    -AllowedCorsOrigins http://$Env:SITE_NAME `
+    -AllowedCorsOrigins http://$Env:SITECORE_SITE_NAME `
     -ClientSecret "SIF-Default"
