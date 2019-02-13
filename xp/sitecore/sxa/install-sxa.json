@@ -13,7 +13,7 @@
     "PowershellExtensionPackageFullPath": {
       "Type": "string",
       "Description": "The path to the Sitecore Powershell Extensions zip.",
-      "DefaultValue": "/files-mount/Sitecore PowerShell Extensions-5.0.zip"
+      "DefaultValue": "/files-mount/pse-package.zip"
     },
     "SXAPackageFullPath": {
       "Type": "string",

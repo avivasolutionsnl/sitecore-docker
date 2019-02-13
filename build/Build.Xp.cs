@@ -41,9 +41,6 @@ partial class Build : NukeBuild
     [Parameter("Commerce SIF package")]
     readonly string COMMERCE_SIF_PACKAGE = "SIF.Sitecore.Commerce.1.4.7.zip";
 
-    [Parameter("Dac framework msi")]
-    readonly string DAC_INSTALLATION = "DacFramework.msi";
-
     // Build configuration parameters
     [Parameter("SQL password")]
     readonly string SQL_SA_PASSWORD = "my_Sup3rSecret!!";
@@ -73,7 +70,6 @@ partial class Build : NukeBuild
                     $"SITECORE_PACKAGE={SITECORE_PACKAGE}",
                     $"XCONNECT_PACKAGE={XCONNECT_PACKAGE}",
                     $"HOST_NAME=mssql",
-                    $"DAC_INSTALLATION={DAC_INSTALLATION}"
                 })
             );
         });
@@ -219,8 +215,8 @@ partial class Build : NukeBuild
     Target PushXp => _ => _
         .DependsOn(Xp)
         .Executes(() => {
-            DockerPush(x => x.SetName(XpFullImageName("mssql")));
             DockerPush(x => x.SetName(XpFullImageName("identity")));
+            DockerPush(x => x.SetName(XpFullImageName("mssql")));
             DockerPush(x => x.SetName(XpFullImageName("sitecore")));
             DockerPush(x => x.SetName(XpFullImageName("solr")));
             DockerPush(x => x.SetName(XpFullImageName("xconnect")));
