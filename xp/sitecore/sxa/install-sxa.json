@@ -18,7 +18,7 @@
     "SXAPackageFullPath": {
       "Type": "string",
       "Description": "The path to the SXA zip.",
-      "DefaultValue": "/files-mount/Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip"
+      "DefaultValue": "/files-mount/sxa-package.zip"
     },
     "PackagesDirDst": {
       "Type": "string",
