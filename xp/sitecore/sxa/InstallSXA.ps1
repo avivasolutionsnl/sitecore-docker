@@ -9,7 +9,7 @@ $filesPath = "/files-mount"
 # Copy utilities to install packages (this is taken from Sitecore Commerce SIF)
 Copy-Item -Path $env:INSTALL_TEMP/SiteUtilityPages -Destination c:\\inetpub\\wwwroot\\sitecore -Force -Recurse
 
-# Install PSE and SXA packages
+#Install PSE and SXA packages
 Install-SitecoreConfiguration -Path '/sxa/install-sxa.json' `
-    -PowershellExtensionPackageFullPath "$filesPath/$env:PSE_PACKAGE" `
-    -SXAPackageFullPath "$filesPath/$env:SXA_PACKAGE"
+   -PowershellExtensionPackageFullPath "$filesPath/$env:PSE_PACKAGE" `
+   -SXAPackageFullPath "$filesPath/$env:SXA_PACKAGE"
