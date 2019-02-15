@@ -97,11 +97,7 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     Remove-Item -Recurse -Force -Path "c:\inetpub\wwwroot\$Env:SITE_NAME\App_Data\logs"
 
 # Get the web binding of the site
-RUN $pwd = ConvertTo-SecureString -String 'secret' -Force -AsPlainText; `
-    $PFXCert = Get-PfxData -FilePath $Env:SITECORE_CERT_PATH -Password $pwd; `
-    New-WebBinding -Name $Env:SITE_NAME -IPAddress * -Port 443 -Protocol "https"; `
-    $binding = Get-WebBinding -Name $Env:SITE_NAME -Protocol "https"; `
-    $binding.AddSslCertificate($PFXCert.EndEntityCertificates.ThumbPrint, 'my')
+RUN /Scripts/CreateWebBinding.ps1 -certpath $Env:SITECORE_CERT_PATH -sitename $Env:SITE_NAME -hostname $Env:SITE_NAME;
 
 # Copy custom config & enable live-mode
 ADD xp/sitecore/config /Config
