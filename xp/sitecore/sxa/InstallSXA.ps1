@@ -12,4 +12,10 @@ Copy-Item -Path $env:INSTALL_TEMP/SiteUtilityPages -Destination c:\\inetpub\\www
 #Install PSE and SXA packages
 Install-SitecoreConfiguration -Path '/sxa/install-sxa.json' `
    -PowershellExtensionPackageFullPath "$filesPath/$env:PSE_PACKAGE" `
-   -SXAPackageFullPath "$filesPath/$env:SXA_PACKAGE"
+   -SXAPackageFullPath "$filesPath/$env:SXA_PACKAGE" `
+   -DataExchangeFrameworkPackageFullPath "$filesPath/$env:DataExchangeFrameworkPackage" `
+   -SqlProviderPackageFullPath "$filesPath/$env:SqlProviderPackage" `
+   -SitecoreProviderPackageFullPath "$filesPath/$env:SitecoreProviderPackage" `
+   -XConnectProviderPackageFullPath "$filesPath/$env:XConnectProviderPackage" `
+   -DynamicsProviderPackageFullPath "$filesPath/$env:DynamicsProviderPackage" `
+   -ConnectForDynamicsPackageFullPath "$filesPath/$env:ConnectForDynamicsPackage"

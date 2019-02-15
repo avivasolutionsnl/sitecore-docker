@@ -38,6 +38,24 @@ partial class Build : NukeBuild
     [Parameter("SXA package")]
     readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip";
 
+    [Parameter("DataExchangeFrameworkPackage")]
+    readonly string DataExchangeFrameworkPackage = "Data Exchange Framework 2.0.1 rev. 180108.zip";
+
+    [Parameter("SqlProviderPackage")]
+    readonly string SqlProviderPackage = "SQL Provider for Data Exchange Framework 2.0.1 rev. 180108.zip";
+
+    [Parameter("SitecoreProviderPackage")]
+    readonly string SitecoreProviderPackage = "Sitecore Provider for Data Exchange Framework 2.0.1 rev. 180108.zip";
+
+    [Parameter("XConnectProviderPackage")]
+    readonly string XConnectProviderPackage = "xConnect Provider for Data Exchange Framework 2.0.1 rev. 180108.zip";
+
+    [Parameter("DynamicsProviderPackage")]
+    readonly string DynamicsProviderPackage = "Dynamics Provider for Data Exchange Framework 2.0.1 rev. 180108 (1).zip";
+
+    [Parameter("ConnectForDynamicsPackage")]
+    readonly string ConnectForDynamicsPackage = "Connect for Microsoft Dynamics 2.0.1 rev. 180108 (1).zip";
+
     [Parameter("Commerce SIF package")]
     readonly string COMMERCE_SIF_PACKAGE = "SIF.Sitecore.Commerce.1.4.7.zip";
 
@@ -176,6 +194,13 @@ partial class Build : NukeBuild
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("DataExchangeFrameworkPackage", $"{DataExchangeFrameworkPackage}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("SqlProviderPackage", $"{SqlProviderPackage}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("SitecoreProviderPackage", $"{SitecoreProviderPackage}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("XConnectProviderPackage", $"{XConnectProviderPackage}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("DynamicsProviderPackage", $"{DynamicsProviderPackage}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("ConnectForDynamicsPackage", $"{ConnectForDynamicsPackage}", EnvironmentVariableTarget.Process);
+
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XpImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XpVersion}", EnvironmentVariableTarget.Process);
 

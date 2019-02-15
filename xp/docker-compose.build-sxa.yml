@@ -8,3 +8,10 @@ services:
     environment:
       PSE_PACKAGE: ${PSE_PACKAGE}
       SXA_PACKAGE: ${SXA_PACKAGE}
+      DataExchangeFrameworkPackage: ${DataExchangeFrameworkPackage}
+      SqlProviderPackage: ${SqlProviderPackage}
+      SitecoreProviderPackage : ${SitecoreProviderPackage}
+      XConnectProviderPackage: ${XConnectProviderPackage}
+      DynamicsProviderPackage: ${DynamicsProviderPackage}
+      ConnectForDynamicsPackage: ${ConnectForDynamicsPackage}
+

@@ -20,6 +20,36 @@
       "Description": "The path to the SXA zip.",
       "DefaultValue": "/files-mount/sxa-package.zip"
     },
+    "DataExchangeFrameworkPackageFullPath": {
+      "Type": "string",
+      "Description": "The path to the Data Exchange Framework zip.",
+      "DefaultValue": "/files-mount/def-package.zip"
+    },
+    "SqlProviderPackageFullPath": {
+      "Type": "string",
+      "Description": "The path to the sql provider zip.",
+      "DefaultValue": "/files-mount/sqlprovider-package.zip"
+    },
+    "SitecoreProviderPackageFullPath": {
+      "Type": "string",
+      "Description": "The path to the Sitecore provider zip.",
+      "DefaultValue": "/files-mount/sitecoreprovider-package.zip"
+    },
+    "XConnectProviderPackageFullPath": {
+      "Type": "string",
+      "Description": "The path to the xconnect provider zip.",
+      "DefaultValue": "/files-mount/xconnectprovider-package.zip"
+    },
+    "DynamicsProviderPackageFullPath": {
+      "Type": "string",
+      "Description": "The path to the dynamics provier zip.",
+      "DefaultValue": "/files-mount/dynamicsprovider-package.zip"
+    },
+    "ConnectForDynamicsPackageFullPath": {
+      "Type": "string",
+      "Description": "The path to the Connect for dynamics zip.",
+      "DefaultValue": "/files-mount/connectdynamics-package.zip"
+    },
     "PackagesDirDst": {
       "Type": "string",
       "Description": "The path to packages directory.",
@@ -68,7 +98,59 @@
         "PackagesDirDst": "[parameter('PackagesDirDst')]",
         "BaseUrl": "[parameter('BaseUrl')]"
       }
-    }
+    },
+    "InstallDataExchangeFramework":{
+			"Type": "InstallPackage",
+			"Params": { 
+        "PackageFullPath": "[parameter('DataExchangeFrameworkPackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+				}
+		},
+		"InstallSqlProvider":{
+			"Type": "InstallPackage",
+			"Params": { 
+        "PackageFullPath": "[parameter('SqlProviderPackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+			}
+		},
+		"InstallSitecoreProvider":{
+			"Type": "InstallPackage",
+			"Params": { 
+        "PackageFullPath": "[parameter('SitecoreProviderPackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+			}
+			
+		},
+		"InstallXConnectProvider":{
+			"Type": "InstallPackage",
+			"Params": { 
+        "PackageFullPath": "[parameter('XConnectProviderPackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+			}
+			
+		},
+		"InstallDynamicsProvider":{
+			"Type": "InstallPackage",
+			"Params": { 
+        "PackageFullPath": "[parameter('DynamicsProviderPackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+			}
+			
+		},
+		"InstallConnectForDynamics":{
+			"Type": "InstallPackage",
+			"Params": { 
+        "PackageFullPath": "[parameter('ConnectForDynamicsPackageFullPath')]",
+        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "BaseUrl": "[parameter('BaseUrl')]"
+			}
+			
+		}
   }
 }
   
