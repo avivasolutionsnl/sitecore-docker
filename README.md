@@ -196,3 +196,28 @@ ERROR: [doc=sitecore://master/{731cb645-faa3-4440-9511-a27556a63ad9}?lang=fr-fr&
 
 Populating the Solr managed schemas will solve this, e.g. do this via the Sitecore Control Panel.
 An automated solution is planned in [this](https://github.com/avivasolutionsnl/sitecore-docker/issues/38) issue.
+
+## Solr container not starting because of /data/solr folder rights and no error logs in /logs/xconnect and /logs/sitecore
+When starting the Solr docker container the following error can show up:
+
+```
+solr_1      | SOLR_PATH=c:\\solr
+solr_1      | SOLR_PORT=8983
+solr_1      | INSTALL_PATH=c:\\clean
+solr_1      | DATA_PATH=c:\\data
+solr_1      | "### No Sitecore Solr cores found in 'c:\\data', seeding clean cores from 'c:\\clean'..."
+solr_1      | Access denied
+solr_1      | Unable to create directory - C:\data
+solr_1      | 0 File(s) copied
+solr_1      | "### Starting Solr..."
+solr_1      |
+solr_1      | ERROR: Solr home directory c:/data must contain solr.xml
+solr_1      |
+mssql_1     | ### Existing Sitecore databases found in 'c:/data/'...
+mssql_1     | ### Attaching 'Sitecore_Core'...
+xp_solr_1 exited with code 1
+```
+
+Make sure the /data/solr folder has the 'Users' group added with Modify, Read & Execute, List folder contents, Read and Write permissions.
+
+For logging make sure the /logs/xconnect and /logs/sitecore folder has the 'Authenticated Users' group added with Modify, Read & Execute, List folder contents, Read and Write permissions.
