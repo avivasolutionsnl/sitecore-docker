@@ -43,8 +43,6 @@ ENV DATA_PATH='c:/data/'
 ENV HOST_NAME=${HOST_NAME}
 ENV DB_PREFIX=${DB_PREFIX}
 
-VOLUME ${DATA_PATH}
-
 COPY files/$SITECORE_PACKAGE ${INSTALL_PATH}/ 
 COPY files/$XCONNECT_PACKAGE ${INSTALL_PATH}/ 
 
@@ -54,7 +52,8 @@ ADD https://dist.nuget.org/win-x86-commandline/v4.1.0/nuget.exe C:\\Windows\\nug
 RUN New-Item -Path 'C:/tools' -ItemType Directory | Out-Null; `
     & nuget install Microsoft.Data.Tools.Msbuild -Version 10.0.61710.120 -OutputDirectory c:/tools
     
-RUN & (Join-Path $env:INSTALL_PATH "Extract-Databases.ps1") -Path $env:INSTALL_PATH; `
+RUN mkdir -p $env:DATA_PATH; `
+     & (Join-Path $env:INSTALL_PATH "Extract-Databases.ps1") -Path $env:INSTALL_PATH; `
      & (Join-Path $env:INSTALL_PATH "Extract-ShardTool.ps1") -Path $env:INSTALL_PATH; `
      & (Join-Path $env:INSTALL_PATH "Install-Databases.ps1") -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH -DatabasePrefix $Env:DB_PREFIX; ` 
      & (Join-Path $env:INSTALL_PATH "Install-Shards.ps1") -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH -DatabasePrefix $Env:DB_PREFIX; `
