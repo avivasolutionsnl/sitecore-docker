@@ -9,7 +9,6 @@ Param(
     $hostname,
     $port = "443",
     $protocol = "https"
-
 )
 
 $password = ConvertTo-SecureString -String $secret -Force -AsPlainText;
