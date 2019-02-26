@@ -63,5 +63,6 @@ partial class Build : NukeBuild
         .Executes(() => {
             DockerPush(x => x.SetName(BaseFullImageName("openjdk")));
             DockerPush(x => x.SetName(BaseFullImageName("sitecore")));
+            DockerPush(x => x.SetName(BaseFullImageName("solr-builder")));
         });
 }
