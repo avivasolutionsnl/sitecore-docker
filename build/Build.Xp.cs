@@ -37,6 +37,9 @@ partial class Build : NukeBuild
     
     [Parameter("SXA package")]
     readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.0.zip";
+        
+    [Parameter("JSS package")]
+    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.0 11.0.0 rev. 181031.zip";
 
     // Build configuration parameters
     [Parameter("SQL password")]
@@ -179,11 +182,41 @@ partial class Build : NukeBuild
             );
         });
 
+    Target XpSitecoreMssqlJss => _ => _
+        .DependsOn(Xp)
+        .Executes(() => {
+            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
+            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
+
+            System.IO.Directory.SetCurrentDirectory("xp");
+
+            // Setup
+            System.IO.Directory.CreateDirectory(@"wwwroot/sitecore");
+            Powershell("../CreateLogDirs.ps1");
+
+            // Set env variables for docker-compose
+            Environment.SetEnvironmentVariable("JSS_PACKAGE", $"{JSS_PACKAGE}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XpImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XpVersion}", EnvironmentVariableTarget.Process);
+
+            InstallSitecorePackage(
+                @"C:\jss\InstallJSS.ps1",
+                XpFullImageName("sitecore-jss"),
+                XpFullImageName("mssql-jss"),
+                "-f docker-compose.yml -f docker-compose.build-jss.yml"
+            );
+
+            System.IO.Directory.SetCurrentDirectory("..");
+        });        
+
     Target Xp => _ => _
         .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect);
 
     Target XpSxa => _ => _
         .DependsOn(XpSitecoreMssqlSxa, XpSolrSxa);
+
+    Target XpJss => _ => _
+        .DependsOn(XpSitecoreMssqlJss);
 
     Target PushXp => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))

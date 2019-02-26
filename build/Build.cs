@@ -37,7 +37,7 @@ partial class Build : NukeBuild
     }
 
     private void AssertCleanDirectory(string dir) {
-        if (System.IO.Directory.Exists(dir)) {
+        if (!System.IO.Directory.Exists(dir)) {
             System.IO.Directory.CreateDirectory(dir);
         } else {
             Nuke.Common.ControlFlow.Assert(
