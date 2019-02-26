@@ -47,7 +47,7 @@ partial class Build : NukeBuild
     [Parameter("Xconnect Solr core prefix")]
     readonly string XCONNECT_SOLR_CORE_PREFIX = "xp0";
     [Parameter("Sitecore Solr core prefix")]
-    readonly string SITECORE_SOLR_CORE_PREFIX = "Sitecore";
+    readonly string SITECORE_SOLR_CORE_PREFIX = "sitecore";
 
     Target XpMssql => _ => _
         .Executes(() =>

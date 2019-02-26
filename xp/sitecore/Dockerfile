@@ -22,6 +22,7 @@ ARG SQL_DB_PREFIX
 ARG SQL_SERVER="mssql"
 ARG SITE_NAME="sitecore"
 ARG SOLR_PORT=8983
+ARG SITECORE_CORE_PREFIX
 ARG SITECORE_PACKAGE
 
 COPY files/*.pfx /Files/
@@ -68,7 +69,7 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SqlWebPassword $Env:SQL_SA_PASSWORD `
     -SqlFormsUser $Env:SQL_USER `
     -SqlFormsPassword $Env:SQL_SA_PASSWORD `
-    -SolrCorePrefix $Env:SQL_DB_PREFIX `
+    -SolrCorePrefix $Env:SITECORE_CORE_PREFIX `
     -SqlProcessingTasksUser $Env:SQL_USER `
     -SqlProcessingTasksPassword $Env:SQL_SA_PASSWORD `
     -SqlReferenceDataUser $Env:SQL_USER `
