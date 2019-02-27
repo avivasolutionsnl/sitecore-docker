@@ -29,6 +29,13 @@
                 { "FilePath": "[joinpath(variable('Site.DataFolder'), 'jobs', 'continuous', 'IndexWorker', 'App_data', 'Config', 'Sitecore', 'SearchIndexer', 'sc.Xdb.Collection.IndexWriter.SOLR.xml')]", "Xpath":"//Solr.SolrWriterSettings//Options//RequireHttps", "Value": "false" },
                 { "FilePath": "[joinpath(variable('Site.DataFolder'), 'jobs', 'continuous', 'IndexWorker', 'App_data', 'Config', 'Sitecore', 'CollectionSearch', 'sc.Xdb.Collection.IndexReader.SOLR.xml')]", "Xpath":"//Solr.SolrReaderSettings//Options//RequireHttps", "Value": "false" }
             ]
+        },
+        "EnableAnonymousTracking": {
+            "Type": "SetXml",
+            "Params": [
+                { "FilePath": "[joinpath(variable('Site.DataFolder'), 'Config', 'sitecore', 'SearchIndexer', 'sc.Xdb.Collection.IndexerSettings.xml')]", "Xpath":"//IndexerSettings//Options//IndexAnonymousContactData", "Value": "true" },
+                { "FilePath": "[joinpath(variable('Site.DataFolder'), 'jobs', 'continuous', 'IndexWorker', 'App_data', 'Config', 'Sitecore', 'SearchIndexer', 'sc.Xdb.Collection.IndexerSettings.xml')]", "Xpath":"//IndexerSettings//Options//IndexAnonymousContactData", "Value": "true" }
+            ]
         }
     }
 }
