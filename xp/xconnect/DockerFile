@@ -35,7 +35,6 @@ ADD scripts /Scripts
 
 ENV XCONNECT_CLIENT_CERT_PATH "C:\\Files\\xconnect-client.pfx"
 ENV XCONNECT_SSL_CERT_PATH "C:\\Files\\xconnect-ssl.pfx"
-ENV INDEXERSETTINGS_CONFIG_PATH "C:\\inetpub\\wwwroot\\xconnect\\App_data\\jobs\\continuous\\IndexWorker\\App_data\\config\\Sitecore\\SearchIndexer\\sc.xdb.collection.indexersettings.xml"
 ENV SITE_NAME=${SITE_NAME}
 
 # Trust Self signed certificates & import XConnect certificate
