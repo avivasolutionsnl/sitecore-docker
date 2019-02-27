@@ -9,7 +9,10 @@ ARG INSTALL_TEMP='c:\\install'
 ARG SIF_CONFIG=${INSTALL_TEMP}\\sitecore-solr.json
 ARG SITECORE_CORE_PREFIX
 ARG XCONNECT_CORE_PREFIX
+ARG XCONNECT_PACKAGE
 
+COPY files/$XCONNECT_PACKAGE /Files/
+COPY xp/solr/xconnect-xp0-configuresolrschemas.json ${INSTALL_TEMP}/
 ADD files/$CONFIG_PACKAGE ${INSTALL_TEMP}/
 
 RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
@@ -26,6 +29,13 @@ RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
     -SolrService "void" `
     -CorePrefix $env:XCONNECT_CORE_PREFIX `
     -Skip "StopSolr", "StartSolr"; `
+    Add-Type -Assembly System.IO.Compression.FileSystem; `
+    $zip = [IO.Compression.ZipFile]::OpenRead('c:/Files/' + $Env:XCONNECT_PACKAGE); `
+    $zip.Entries | where {$_.Name -like 'schema.json'} | foreach {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, 'C:/Files/schema.json', $true)}; `
+    $zip.Dispose(); `
+    Install-SitecoreConfiguration -Path (Join-Path $env:INSTALL_TEMP 'xconnect-xp0-configuresolrschemas.json') `
+    -SolrUrl "http://localhost:8983/solr" `
+    -SolrCorePrefix $Env:XCONNECT_CORE_PREFIX; `
     Get-Process -Name "java" | Stop-Process -Force;
 
 # Copy the clean cores for later use

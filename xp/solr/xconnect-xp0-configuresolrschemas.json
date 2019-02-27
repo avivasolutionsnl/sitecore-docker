@@ -1,0 +1,59 @@
+// -------------------------------------------------------------------------------------- //
+// Sitecore Install Framework - XConnect XP0 configuresolrschemas Configuration   	  //
+//                                                                            		  //
+//  Run this configuration to install the solr schemas of xconnect            		  //
+//                                                                            		  //
+//  NOTE: Only single line comments are accepted in configurations.           		  //
+// -------------------------------------------------------------------------------------- //
+
+{
+    "Parameters": {
+        // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
+        // Parameters must declare a Type and may declare a DefaultValue and Description.
+        // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
+        "SolrCorePrefix": {
+            "Type": "string",
+            "Description": "The prefix used for all Solr cores."
+        },
+        "SolrUrl": {
+            "Type": "string",
+            "DefaultValue": "https://localhost:8983/solr",
+            "Description": "The Solr instance to use."
+        }
+    },
+    "Variables": {
+        // Variables are values calculated in a configuration.
+        // They can reference Parameters, other Variables, and config functions.
+        // The prefix for shards created by the tool
+
+        // The solr configuration details.
+        "Xdb.Name":         "[concat(parameter('SolrCorePrefix'), '_xdb')]",
+        "Xdb.Rebuild.Name": "[concat(variable('Xdb.Name'), '_rebuild')]",
+        "Solr.Url.Xdb":     "[concat(parameter('SolrUrl'), '/', variable('Xdb.Name'))]",
+
+        // The content at this path is installed by the wdp
+        "Solr.Config.Path": "[joinpath(environment('SystemDrive'), 'Files', 'schema.json')]"
+    },
+    "Tasks": {
+        // Tasks are separate units of work in a configuration.
+        // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
+        // By default, tasks are applied in the order they are declared.
+        // Tasks may reference Parameters, Variables, and config functions.
+        "ConfigureSolrSchemas": {
+            // Applies schema to the new cores.
+            "Type": "ManageSolrSchema",
+            "Params": [
+                {
+                    "Address": "[parameter('SolrUrl')]",
+                    "Core": "[variable('Xdb.Name')]",
+                    "ArgumentsFile": "[variable('Solr.Config.Path')]"
+                },
+                {
+                    "Address": "[parameter('SolrUrl')]",
+                    "Core": "[variable('Xdb.Rebuild.Name')]",
+                    "ArgumentsFile": "[variable('Solr.Config.Path')]"
+                }
+            ]
+        }
+    }
+}

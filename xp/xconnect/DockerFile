@@ -35,6 +35,7 @@ ADD scripts /Scripts
 
 ENV XCONNECT_CLIENT_CERT_PATH "C:\\Files\\xconnect-client.pfx"
 ENV XCONNECT_SSL_CERT_PATH "C:\\Files\\xconnect-ssl.pfx"
+ENV INDEXERSETTINGS_CONFIG_PATH "C:\\inetpub\\wwwroot\\xconnect\\App_data\\jobs\\continuous\\IndexWorker\\App_data\\config\\Sitecore\\SearchIndexer\\sc.xdb.collection.indexersettings.xml"
 ENV SITE_NAME=${SITE_NAME}
 
 # Trust Self signed certificates & import XConnect certificate
@@ -75,6 +76,9 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
         "CreateShard0ApplicationDatabaseUserSqlCmd", "CreateShard1ApplicationDatabaseUserSqlCmd", "ConfigureSolrSchemas", "StartServices"; `
     Install-SitecoreConfiguration -Path 'c:/Files/Config/disable-solr-ssl.json' -Sitename $Env:SITE_NAME; `
     Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs
+
+RUN ((Get-Content -path $Env:INDEXERSETTINGS_CONFIG_PATH -Raw) -replace '<IndexAnonymousContactData>false</IndexAnonymousContactData>','<IndexAnonymousContactData>true</IndexAnonymousContactData>') `
+    | Set-Content -Path $Env:INDEXERSETTINGS_CONFIG_PATH;
 
 EXPOSE 443
 
