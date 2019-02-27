@@ -82,7 +82,8 @@ partial class Build : NukeBuild
                     $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
                     $"SOLR_PORT={SOLR_PORT}",
                     $"SITECORE_PACKAGE={SITECORE_PACKAGE}",
-                    $"CONFIG_PACKAGE={CONFIG_PACKAGE}"
+                    $"CONFIG_PACKAGE={CONFIG_PACKAGE}",
+                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}"
                 })
             );
         });
@@ -102,7 +103,8 @@ partial class Build : NukeBuild
                     $"BASE_IMAGE={baseImage}",
                     $"BUILDER_BASE_IMAGE={builderBaseImage}",
                     $"XCONNECT_CORE_PREFIX={XCONNECT_SOLR_CORE_PREFIX}",
-                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}"
+                    $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}",
+                    $"XCONNECT_PACKAGE={XCONNECT_PACKAGE}"
                 })
             );
         });

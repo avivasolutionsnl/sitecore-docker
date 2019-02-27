@@ -30,7 +30,7 @@ COPY files/license.xml /Files/
 COPY files/$XCONNECT_PACKAGE /Files/
 COPY files/*.pfx /Files/
 COPY --from=prepare /Files/Config /Files/Config/
-COPY xp/xconnect/disable-solr-ssl.json /Files/Config/
+COPY xp/xconnect/custom-settings.json /Files/Config/
 ADD scripts /Scripts
 
 ENV XCONNECT_CLIENT_CERT_PATH "C:\\Files\\xconnect-client.pfx"
@@ -73,7 +73,7 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SolrURL $solrUrl `
     -Skip "CleanShards", "CreateShards", "CreateShardApplicationDatabaseServerLoginSqlCmd", "CreateShardManagerApplicationDatabaseUserSqlCmd", `
         "CreateShard0ApplicationDatabaseUserSqlCmd", "CreateShard1ApplicationDatabaseUserSqlCmd", "ConfigureSolrSchemas", "StartServices"; `
-    Install-SitecoreConfiguration -Path 'c:/Files/Config/disable-solr-ssl.json' -Sitename $Env:SITE_NAME; `
+    Install-SitecoreConfiguration -Path 'c:/Files/Config/custom-settings.json' -Sitename $Env:SITE_NAME; `
     Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs
 
 EXPOSE 443
