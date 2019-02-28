@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.sitecore.net/licenseviewer/license.xsl"?>
+<signedlicense id="123">
+	<Signature>
+		<SignedInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+			<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" />
+			<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+			<Reference URI="#123">
+				<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+				<DigestValue>123</DigestValue>
+			</Reference>
+		</SignedInfo>
+		<SignatureValue xmlns="http://www.w3.org/2000/09/xmldsig#">123</SignatureValue>
+		<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+			<KeyValue>
+				<RSAKeyValue>
+					<Modulus>123</Modulus>
+					<Exponent>123</Exponent>
+				</RSAKeyValue>
+			</KeyValue>
+		</KeyInfo>
+		<Object Id="SiteCore.License" xmlns="http://www.w3.org/2000/09/xmldsig#">
+			<license xmlns="">
+				<id>123</id>
+				<expiration>123</expiration>
+				<version>9</version>
+				<urls>?</urls>
+				<licensee>123</licensee>
+				<companyno />
+				<purpose />
+				<address />
+				<countryiso>NL</countryiso>
+				<country>Netherlands</country>
+				<reseller />
+				<resellerurl />
+				<licenseagreement id="123" title="License Agreement">
+					<![CDATA[Your usage rights to the Sitecore Software are as set forth in your license agreement with Sitecore.]]>
+				</licenseagreement>
+			</license>
+		</Object>
+	</Signature>
+</signedlicense>

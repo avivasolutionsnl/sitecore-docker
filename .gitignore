@@ -8,3 +8,9 @@ logs
 tmp
 *.tmp
 *.log
+xp/license
+xc/license
+.vs/ProjectSettings.json
+.vs/slnx.sqlite
+
+\.vs/
