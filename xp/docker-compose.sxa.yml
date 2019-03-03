@@ -1,12 +1,10 @@
-# Overlay file for SXA specific Docker images
 version: '2.4'
 
 services:
-  mssql:
-    image: "${IMAGE_PREFIX}mssql-sxa:${TAG}"
-
   sitecore:
-    image: "${IMAGE_PREFIX}sitecore-sxa:${TAG}"
-
-  solr:
-    image: "${IMAGE_PREFIX}solr-sxa:${TAG}"
+    volumes:
+      - .\sitecore\sxa:C:\sxa
+      - ..\files:C:\files-mount
+    environment:
+      PSE_PACKAGE: ${PSE_PACKAGE}
+      SXA_PACKAGE: ${SXA_PACKAGE}

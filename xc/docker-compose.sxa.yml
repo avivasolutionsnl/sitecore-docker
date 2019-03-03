@@ -1,18 +1,18 @@
-# Overlay file for Aviva Solutions SXA specific Docker image names
 version: '2.4'
 
 services:
-  commerce:
-    image: "${IMAGE_PREFIX}commerce:${TAG}"
+  sitecore:
+    image: "${IMAGE_PREFIX}sitecore:${TAG}"
+    volumes:
+      - .\sitecore\sxa:C:\sxa
+      - ..\files:C:\files-mount
+    environment:
+      PSE_PACKAGE: ${PSE_PACKAGE}
+      SXA_PACKAGE: ${SXA_PACKAGE}
+      SCXA_PACKAGE: ${SCXA_PACKAGE}
 
   mssql:
-    image: "${IMAGE_PREFIX}mssql-sxa:${TAG}"
-
-  sitecore:
-    image: "${IMAGE_PREFIX}sitecore-sxa:${TAG}"
+    image: "${IMAGE_PREFIX}mssql:${TAG}"
 
   solr:
     image: "${IMAGE_PREFIX}solr-sxa:${TAG}"
-
-  xconnect:
-    image: "${IMAGE_PREFIX}xconnect:${TAG}"

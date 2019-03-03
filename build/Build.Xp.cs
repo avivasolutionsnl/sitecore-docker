@@ -140,10 +140,6 @@ partial class Build : NukeBuild
 
             System.IO.Directory.SetCurrentDirectory("xp");
 
-            // Setup
-            System.IO.Directory.CreateDirectory(@"wwwroot/sitecore");
-            Powershell("../CreateLogDirs.ps1");
-
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
@@ -154,7 +150,7 @@ partial class Build : NukeBuild
                 @"C:\sxa\InstallSXA.ps1",
                 XpFullImageName("sitecore-sxa"),
                 XpFullImageName("mssql-sxa"),
-                "-f docker-compose.yml -f docker-compose.build-sxa.yml"
+                "-f docker-compose.yml -f docker-compose.sxa.yml"
             );
 
             System.IO.Directory.SetCurrentDirectory("..");

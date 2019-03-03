@@ -86,19 +86,14 @@ NB. To prefix the Docker images with your repository name change the `RepoImageP
 
 # Run
 Docker compose is used to start up all required services. 
-Docker compose files are present for each setup in their respective directories, e.g. `xp` and `xc`. Use your setup of choice as working directory for all docker-compose commands below.
+Examples of docker compose files are present for each setup in their respective directories, e.g. `example\xp` and `example\xc`. Use your setup of choice as working directory for all docker-compose commands below.
+
+Create the directories (logs, website, data) which are mounted in the Docker compose file:
+```
+PS> ./CreateDirs.ps1
+```
 
 Place the Sitecore source files in the `.\wwwroot\sitecore` (and `.\wwwroot\commerce` for XC) directory.
-
-Create a webroot directory:
-```
-PS> mkdir -p wwwroot/sitecore
-```
-
-Create the log directories which are mounted in the Docker compose file:
-```
-PS> ./CreateLogDirs.ps1
-```
 
 To start Sitecore;
 ```

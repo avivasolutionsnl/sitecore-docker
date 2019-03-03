@@ -7,3 +7,7 @@ mkdir -p .\logs\commerce\CommerceMinions_Sc9 2> $null
 mkdir -p .\logs\commerce\CommerceOps_Sc9 2> $null
 mkdir -p .\logs\commerce\CommerceShops_Sc9 2> $null
 mkdir -p .\logs\commerce\SitecoreIdentityServer 2> $null
+mkdir -p .\data\mssql 2> $null
+mkdir -p .\data\solr 2> $null
+mkdir -p .\wwwroot\sitecore 2> $null
+mkdir -p .\wwwroot\commerce 2> $null

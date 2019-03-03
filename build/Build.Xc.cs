@@ -164,11 +164,6 @@ partial class Build : NukeBuild
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xc");
 
-            // Setup
-            System.IO.Directory.CreateDirectory(@"wwwroot/commerce");
-            System.IO.Directory.CreateDirectory(@"wwwroot/sitecore");
-            Powershell("../CreateLogDirs.ps1");
-
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XcVersion}", EnvironmentVariableTarget.Process);
 
@@ -176,7 +171,7 @@ partial class Build : NukeBuild
                 @"C:\Scripts\InstallCommercePackages.ps1", 
                 XcFullImageName("sitecore"), 
                 XcFullImageName("mssql"),
-                "-f docker-compose.yml -f docker-compose.build.yml"
+                "-f docker-compose.yml"
             );
 
             System.IO.Directory.SetCurrentDirectory("..");
@@ -227,11 +222,6 @@ partial class Build : NukeBuild
             
             System.IO.Directory.SetCurrentDirectory("xc");
 
-            // Setup
-            System.IO.Directory.CreateDirectory(@"wwwroot/commerce");
-            System.IO.Directory.CreateDirectory(@"wwwroot/sitecore");
-            Powershell("../CreateLogDirs.ps1");
-
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
@@ -243,7 +233,7 @@ partial class Build : NukeBuild
                 @"C:\sxa\InstallSXA.ps1",
                 XcFullImageName("sitecore-sxa"), 
                 XcFullImageName("mssql-sxa"),
-                "-f docker-compose.yml -f docker-compose.build-sxa.yml"
+                "-f docker-compose.yml -f docker-compose.sxa.yml"
             );
 
             System.IO.Directory.SetCurrentDirectory("..");

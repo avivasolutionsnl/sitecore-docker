@@ -3,6 +3,7 @@ data
 databases
 logs
 tmp
+example
 xc/data
 xc/logs
 xc/wwwroot
