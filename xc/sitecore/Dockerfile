@@ -13,7 +13,7 @@ ARG COMMERCE_XANALYTICS_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
 
-ADD files/ /Files/
+COPY files/ /Files/
 
 RUN Expand-Archive -Path "/Files/$Env:COMMERCE_SIF_PACKAGE" -DestinationPath /Files/CommerceSIF -Force; `
     Expand-Archive -Path "/Files/$Env:COMMERCE_CONNECT_PACKAGE" -DestinationPath /Files/SitecoreCommerceConnectCore -Force; `
@@ -42,9 +42,9 @@ COPY --from=builder /Files/${WEB_TRANSFORM_TOOL} /Files/Microsoft.Web.XmlTransfo
 COPY --from=builder /Files/${COMMERCE_CONNECT_ENGINE_PACKAGE} /Files/Sitecore.Commerce.Engine.Connect.update
 COPY --from=builder /Files/${ROOT_CERT_PATH} /Files/${ROOT_CERT_PATH}
 
-ADD xc/sitecore/InstallCommercePackages.ps1 /Scripts/
-ADD files/$COMMERCE_CERT_PATH /Files/
-ADD scripts/Import-Certificate.ps1 /Scripts/
+COPY xc/sitecore/InstallCommercePackages.ps1 /Scripts/
+COPY files/$COMMERCE_CERT_PATH /Files/
+COPY scripts/Import-Certificate.ps1 /Scripts/
 
 # Trust Self signed certificates & import XConnect certificate
 RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
@@ -54,6 +54,6 @@ RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_P
 
 # Patch Solr config, set initializeOnAdd = true
 # See: https://sitecore.stackexchange.com/questions/11523/index-sitecore-marketingdefinitions-master-was-not-found-exception-in-sitecore
-ADD xc/sitecore/Sitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config /inetpub/wwwroot/sitecore/App_Config/Include/zSitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config
+COPY xc/sitecore/Sitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config /inetpub/wwwroot/sitecore/App_Config/Include/zSitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config
 
 ENTRYPOINT /Scripts/Watch-Directory.ps1 -Path C:\Workspace -Destination c:\inetpub\wwwroot\sitecore

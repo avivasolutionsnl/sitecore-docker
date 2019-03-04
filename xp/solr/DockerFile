@@ -13,7 +13,7 @@ ARG XCONNECT_PACKAGE
 
 COPY files/$XCONNECT_PACKAGE /Files/
 COPY xp/solr/xconnect-xp0-configuresolrschemas.json ${INSTALL_TEMP}/
-ADD files/$CONFIG_PACKAGE ${INSTALL_TEMP}/
+COPY files/$CONFIG_PACKAGE ${INSTALL_TEMP}/
 
 RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
     Expand-Archive -Path (Join-Path $env:INSTALL_TEMP '*Configuration files*.zip') -DestinationPath $env:INSTALL_TEMP; `

@@ -7,7 +7,7 @@ FROM ${BUILDER_BASE_IMAGE} as builder
 ARG INSTALL_TEMP='c:\\install'
 ARG SITECORE_CORE_PREFIX="Sitecore"
 
-ADD sxa-solr.json ${INSTALL_TEMP}/
+COPY sxa-solr.json ${INSTALL_TEMP}/
 
 RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
     Install-SitecoreConfiguration -Path (Join-Path $env:INSTALL_TEMP 'sxa-solr.json') `

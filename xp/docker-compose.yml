@@ -17,6 +17,7 @@ services:
   isolation: process
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
+    - .\license:C:\license
     - .\wwwroot\sitecore:C:\Workspace
   depends_on:
     - xconnect
@@ -38,6 +39,7 @@ services:
   isolation: process
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
+    - .\license:C:\license
   depends_on:
     - mssql
     - solr

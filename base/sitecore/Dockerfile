@@ -12,7 +12,7 @@ ARG VCREDISTX64_EXE=${INSTALL_TEMP}\\VC_redist.x64.exe
 ADD https://download.microsoft.com/download/0/1/D/01DC28EA-638C-4A22-A57B-4CEF97755C6C/WebDeploy_amd64_en-US.msi ${WEBDEPLOY_MSI}
 ADD https://download.microsoft.com/download/1/2/8/128E2E22-C1B9-44A4-BE2A-5859ED1D4592/rewrite_amd64_en-US.msi ${URLREWRITE_MSI}
 ADD https://aka.ms/vs/15/release/VC_redist.x64.exe ${VCREDISTX64_EXE}
-ADD /Scripts/Install-Vim.ps1 ${INSTALL_TEMP}
+COPY /Scripts/Install-Vim.ps1 ${INSTALL_TEMP}
 COPY base/sitecore/*.ps1 ${INSTALL_TEMP}
 
 # Install Sitecore dependencies, SIF, choco, vim

@@ -1,0 +1,55 @@
+// -------------------------------------------------------------------------- //
+//         Sitecore Install Framework - XConnect XP0 Configuration            //
+//                                                                            //
+//  Run this configuration to install a single instance of XConnect.          //
+//                                                                            //
+//  NOTE: Only single line comments are accepted in configurations.           //
+// -------------------------------------------------------------------------- //
+{
+    "Parameters": {
+        // Parameters are values that may be passed when Install-SitecoreConfiguration is called.
+        // Parameters must declare a Type and may declare a DefaultValue and Description.
+        // Parameters with no DefaultValue are required when Install-SitecoreConfiguration is called.
+        "SiteName": {
+            "Type": "string",
+            "DefaultValue": "XConnect",
+            "Description": "The name of the site to be deployed."
+        }
+    },
+    "Variables": {
+        // The sites full path on disk
+        "Site.PhysicalPath": "[joinpath(environment('SystemDrive'), 'inetpub', 'wwwroot', parameter('SiteName'))]",
+        "Site.DataFolder":  "[joinpath(variable('Site.PhysicalPath'), 'App_Data')]",
+
+        // The path to the index worker windows service
+        "Services.IndexWorker.InstallPath": "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','IndexWorker')]",
+        "Services.IndexWorker.Name":        "[concat(parameter('SiteName'), '-IndexWorker')]",
+
+        // The path to the automation engine windows service
+        "Services.MarketingAutomationEngine.InstallPath":   "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','AutomationEngine')]",
+        "Services.MarketingAutomationEngine.Name":          "[concat(parameter('SiteName'), '-MarketingAutomationService')]"
+    },
+    "Tasks": {
+        // Tasks are separate units of work in a configuration.
+        // Each task is an action that will be completed when Install-SitecoreConfiguration is called.
+        // By default, tasks are applied in the order they are declared.
+        // Tasks may reference Parameters, Variables, and config functions.
+        "RegisterWindowsServices": {
+            // Registers the services.
+            "Type": "RegisterWindowsService",
+            "Params": [
+                {
+                    "Path": "[joinpath(variable('Services.IndexWorker.InstallPath'), 'XConnectSearchIndexer.exe')]",
+                    "Name": "[variable('Services.IndexWorker.Name')]"
+                },
+                {
+                    "Path": "[joinpath(variable('Services.MarketingAutomationEngine.InstallPath'), 'maengine.exe')]",
+                    "Name": "[variable('Services.MarketingAutomationEngine.Name')]"
+                }
+            ]
+        }
+    },
+    "Modules":[
+		"c:/Files/Config/Invoke-RegisterWindowsService.psm1"
+	]
+}

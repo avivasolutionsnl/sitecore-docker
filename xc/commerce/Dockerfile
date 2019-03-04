@@ -11,8 +11,8 @@ ARG SITECORE_BIZFX_PACKAGE
 
 WORKDIR /Files
 
-ADD files /Files
-ADD scripts /Scripts
+COPY files /Files
+COPY scripts /Scripts
 
 # Expand installation files
 RUN Expand-Archive -Force -Path "/Files/$Env:COMMERCE_SDK_PACKAGE" -DestinationPath '/Files/Sitecore.Commerce.SDK'; `
@@ -47,7 +47,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 WORKDIR /Files
 
 # Copy required files
-ADD scripts /Scripts
+COPY scripts /Scripts
 
 COPY files/*.pfx /Files/
 COPY --from=prepare /Files/Sitecore.Commerce.SDK /Files/Sitecore.Commerce.SDK/
@@ -142,7 +142,7 @@ RUN $certificates = Get-ChildItem -Path 'cert:\localmachine\my' -DnsName 'DO_NOT
     $binding = Get-WebBinding -Name 'SitecoreIdentityServer' -Protocol 'https'; `
     $binding.AddSslCertificate($certificate.GetCertHashString(), 'My');
 
-ADD xc/commerce/UpdateConnectionString.ps1 /Scripts
+COPY xc/commerce/UpdateConnectionString.ps1 /Scripts
 
 RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
     -userName 'sa' `
@@ -176,7 +176,7 @@ RUN $pathToAppSettings  = $(Join-Path -Path c:\inetpub\wwwroot\SitecoreIdentityS
 
 RUN $hostFileName = 'c:\\windows\\system32\\drivers\\etc\\hosts'; '\"`r`n127.0.0.1`t$Env:HOST_NAME\"' | Add-Content $hostFileName
 
-ADD xc/commerce/UpdateIdentityServerUrl.ps1 /Scripts
+COPY xc/commerce/UpdateIdentityServerUrl.ps1 /Scripts
 
 RUN /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
     -hostName $Env:HOST_NAME; `
@@ -187,7 +187,7 @@ RUN /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceAuth
     /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
     -hostName $Env:HOST_NAME;
 
-ADD xc/commerce/UpdateSitecoreUrl.ps1 /Scripts
+COPY xc/commerce/UpdateSitecoreUrl.ps1 /Scripts
 
 RUN /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
     -hostName $Env:SITECORE_HOSTNAME; `
@@ -279,7 +279,7 @@ RUN Expand-Archive -Path "/Files/$Env:PLUMBER_FILE_NAME" -DestinationPath 'c:\\i
 # Expose Plumber port
 EXPOSE 4000
 
-ADD xc/commerce/WatchDirectoryMultiple.ps1 /Scripts
-ADD xc/commerce/WatchDefaultDirectories.ps1 /Scripts
+COPY xc/commerce/WatchDirectoryMultiple.ps1 /Scripts
+COPY xc/commerce/WatchDefaultDirectories.ps1 /Scripts
 
 ENTRYPOINT /Scripts/WatchDefaultDirectories.ps1

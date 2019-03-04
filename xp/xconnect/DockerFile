@@ -8,7 +8,8 @@ ARG CONFIG_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"]
 
-ADD files/$CONFIG_PACKAGE /Files/
+COPY files/$CONFIG_PACKAGE /Files/
+COPY [ "xp/xconnect/custom-settings.json", "xp/xconnect/register-services.json", "xp/xconnect/Invoke-RegisterWindowsService.psm1", "/Files/Config/" ]
 
 RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config 
 
@@ -26,23 +27,23 @@ ARG XCONNECT_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"] 
 
-COPY files/license.xml /Files/
-COPY files/$XCONNECT_PACKAGE /Files/
 COPY files/*.pfx /Files/
+COPY files/$XCONNECT_PACKAGE /Files/
+COPY dummylicense.xml /license/license.xml
+COPY xp/xconnect/Boot.ps1 ./
 COPY --from=prepare /Files/Config /Files/Config/
 COPY xp/xconnect/custom-settings.json /Files/Config/
-ADD scripts /Scripts
+COPY scripts /Scripts
 
-ENV XCONNECT_CLIENT_CERT_PATH "C:\\Files\\xconnect-client.pfx"
-ENV XCONNECT_SSL_CERT_PATH "C:\\Files\\xconnect-ssl.pfx"
+ENV XCONNECT_CLIENT_CERT_PATH="C:\\Files\\xconnect-client.pfx"
+ENV XCONNECT_SSL_CERT_PATH="C:\\Files\\xconnect-ssl.pfx"
 ENV SITE_NAME=${SITE_NAME}
+ENV SIF_CONFIG="c:\\Files\\Config\\xconnect-xp0.json"
 
 # Trust Self signed certificates & import XConnect certificate
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_SSL_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
-
-ENV SIF_CONFIG="c:\\Files\\Config\\xconnect-xp0.json"
 
 RUN $config = Get-Content $Env:SIF_CONFIG | Where-Object { $_ -notmatch '^\s*\/\/'} | Out-String | ConvertFrom-Json; `
     $config.Tasks.InstallWDP.Params.Arguments | Add-Member -Name 'Skip' -Value @(@{'ObjectName' = 'dbDacFx'}, @{'ObjectName' = 'dbFullSql'}) -MemberType NoteProperty; `
@@ -51,7 +52,7 @@ RUN $config = Get-Content $Env:SIF_CONFIG | Where-Object { $_ -notmatch '^\s*\/\
 RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -Package c:/Files/$Env:XCONNECT_PACKAGE `
-    -LicenseFile "c:\\Files\\license.xml" `
+    -LicenseFile "c:\\license\\license.xml" `
     -Sitename $Env:SITE_NAME `
     -XConnectCert "xConnect.client" `
     -SslCert "xconnect" `
@@ -72,10 +73,11 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SolrCorePrefix $Env:SOLR_CORE_PREFIX `
     -SolrURL $solrUrl `
     -Skip "CleanShards", "CreateShards", "CreateShardApplicationDatabaseServerLoginSqlCmd", "CreateShardManagerApplicationDatabaseUserSqlCmd", `
-        "CreateShard0ApplicationDatabaseUserSqlCmd", "CreateShard1ApplicationDatabaseUserSqlCmd", "ConfigureSolrSchemas", "StartServices"; `
+        "CreateShard0ApplicationDatabaseUserSqlCmd", "CreateShard1ApplicationDatabaseUserSqlCmd", "ConfigureSolrSchemas", "StartServices", "InstallServices"; `
+    Install-SitecoreConfiguration -Path 'c:/Files/Config/register-services.json' -Sitename $Env:SITE_NAME; `
     Install-SitecoreConfiguration -Path 'c:/Files/Config/custom-settings.json' -Sitename $Env:SITE_NAME; `
     Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs
 
 EXPOSE 443
 
-ENTRYPOINT C:\ServiceMonitor.exe w3svc
+ENTRYPOINT /Boot.ps1

@@ -8,7 +8,7 @@ ARG INSTALL_TEMP='c:\\install'
 ARG SITECORE_CORE_PREFIX
 ARG COMMERCE_SIF_PACKAGE
 
-ADD files/$COMMERCE_SIF_PACKAGE ${INSTALL_TEMP}/
+COPY files/$COMMERCE_SIF_PACKAGE ${INSTALL_TEMP}/
 
 RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
     Expand-Archive -Path (Join-Path $env:INSTALL_TEMP $env:COMMERCE_SIF_PACKAGE) -DestinationPath $env:INSTALL_TEMP; `

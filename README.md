@@ -10,6 +10,7 @@ Hopefully this will help you to get up and running with Sitecore and Docker. By 
 - Docker for Windows (version 18.09.1 or better): https://docs.docker.com/docker-for-windows/
 - Sitecore installation files
 - [Nuke.build](https://nuke.build)
+- A valid license.xml file
 
 
 # Build
@@ -21,6 +22,8 @@ For this you need to place the Sitecore installation files and a Sitecore licens
 - [XP images build config](./build/Build.Xp.cs)
 - [XC images build config](./build/Build.Xc.cs)
 - [Overall build config](./build/Build.cs)
+
+Put the license.xml in xp/license/ for xp containers or in xc/license/ for xc containers.
 
 The XP0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
 xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script (note that this requires an Administrator elevated powershell environment and you may need to set the correct execution policy, e.g. `PS> powershell.exe -ExecutionPolicy Unrestricted`).
@@ -181,8 +184,8 @@ To determine and set the root certificate to use for a HTTPS connection:
 1. Determine certificate used for IIS: `PS> Get-WebBinding | Select certificateHash`
 2. Determine root certificate used to sign the in step 1 obtained certificate: `PS> Get-ChildItem cert:\localmachine\my\<certificateHash> | Select Issuer`
 3. Lookup thumbprint of the issuer: `PS> Get-ChildItem cert:\localmachine\root\
-3. Export the root certificate: `PS> Export-Certificate -Cert cert:\localmachine\root\<thumbprint> -FilePath <file>`
-4. Import the root certificate (on the client): `PS> Import-Certificate <file> -CertStoreLocation cert:\localmachine\root`
+4. Export the root certificate: `PS> Export-Certificate -Cert cert:\localmachine\root\<thumbprint> -FilePath <file>`
+5. Import the root certificate (on the client): `PS> Import-Certificate <file> -CertStoreLocation cert:\localmachine\root`
 
 ## Commerce setup
 - We have quite a lot of custom powershell scripts for trivial installation tasks. This is because the commerce SIF scripts contain hardcoded values. For example, it is not possible to use hostnames other than localhost. We should be able to remove this custom code when those scripts get fixed.

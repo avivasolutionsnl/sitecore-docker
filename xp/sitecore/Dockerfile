@@ -6,7 +6,7 @@ FROM ${BASE_IMAGE} AS prepare
 
 ARG CONFIG_PACKAGE
 
-ADD files /Files
+COPY files /Files
 
 RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Config 
 
@@ -26,10 +26,11 @@ ARG SITECORE_CORE_PREFIX
 ARG SITECORE_PACKAGE
 
 COPY files/*.pfx /Files/
-COPY files/license.xml /Files/
+COPY dummylicense.xml /license/license.xml
+COPY xp/sitecore/Boot.ps1 ./
 COPY files/$SITECORE_PACKAGE /Files/
 COPY --from=prepare /Files/Config /Files/Config/
-ADD scripts /Scripts
+COPY scripts /Scripts
 
 ENV XCONNECT_CLIENT_CERT_PATH "c:\\Files\\xconnect-client.pfx"
 ENV XCONNECT_SSL_CERT_PATH "c:\\Files\\xconnect-ssl.pfx"
@@ -55,7 +56,7 @@ RUN $config = Get-Content $Env:SIF_CONFIG | Where-Object { $_ -notmatch '^\s*\/\
 RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -Package c:/Files/$Env:SITECORE_PACKAGE `
-    -LicenseFile "c:/Files/license.xml" `
+    -LicenseFile "c:/license/license.xml" `
     -Sitename $Env:SITE_NAME `
     -SqlDbPrefix $Env:SQL_DB_PREFIX `
     -SqlServer $Env:SQL_SERVER `
@@ -98,8 +99,8 @@ RUN $pwd = ConvertTo-SecureString -String 'secret' -Force -AsPlainText; `
     $binding.AddSslCertificate($PFXCert.EndEntityCertificates.ThumbPrint, 'my')
 
 # Copy custom config & enable live-mode
-ADD xp/sitecore/config /Config
+COPY xp/sitecore/config /Config
 RUN Copy-Item /Config/*.* c:\inetpub\wwwroot\$Env:SITE_NAME\App_Config\Include; `
     mv C:\inetpub\wwwroot\sitecore\App_Config\Include\Examples\LiveMode.config.example C:\inetpub\wwwroot\sitecore\App_Config\Include\Examples\LiveMode.config
 
-ENTRYPOINT /Scripts/Watch-Directory.ps1 -Path C:\Workspace -Destination c:\inetpub\wwwroot\sitecore
+ENTRYPOINT /Boot.ps1

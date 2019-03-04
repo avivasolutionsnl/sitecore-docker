@@ -6,7 +6,7 @@ ARG COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-ADD files/ /Files/
+COPY files/ /Files/
 
 # Extract Marketing Automation, see InstallAutomationEngineModule SIF task
 RUN Expand-Archive -Force -Path "/Files/$Env:COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE" -DestinationPath C:\inetpub\wwwroot\xconnect; `
