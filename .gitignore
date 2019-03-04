@@ -8,8 +8,8 @@ logs
 tmp
 *.tmp
 *.log
-xp/license
-xc/license
+example/xp/license
+example/xc/license
 .vs/ProjectSettings.json
 .vs/slnx.sqlite
 

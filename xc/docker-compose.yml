@@ -13,6 +13,8 @@ services:
  sitecore:
   image: "${IMAGE_PREFIX}sitecore-intermediate:${TAG}"
   isolation: process
+  volumes:
+    - .\license:C:\license  
   depends_on:
     - xconnect
     - mssql
@@ -29,6 +31,8 @@ services:
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
   isolation: process
+  volumes:
+    - .\license:C:\license  
   depends_on:
     - mssql
     - solr
