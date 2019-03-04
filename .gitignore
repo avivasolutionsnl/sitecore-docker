@@ -10,6 +10,8 @@ tmp
 *.log
 example/xp/license
 example/xc/license
+xp/license
+xc/license
 .vs/ProjectSettings.json
 .vs/slnx.sqlite
 
