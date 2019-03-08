@@ -16,21 +16,26 @@ param(
 function Sync 
 {
     Foreach($destination in $Destinations) {
-        $dirty = $false
-        $raw = (robocopy $Path $destination /E /XX /MT:1 /NJH /NJS /FP /NDL /NP /NS /R:5 /W:1 /XD obj /XF *.user /XF *ncrunch* /XF *.cs)
-        $raw | ForEach-Object {
-            $line = $_.Trim().Replace("`r`n", "").Replace("`t", " ")
-            $dirty = ![string]::IsNullOrEmpty($line)
-    
+        Try {
+            $dirty = $false
+            $raw = (robocopy $Path $destination /E /XX /MT:1 /NJH /NJS /FP /NDL /NP /NS /R:5 /W:1 /XD obj /XF *.user /XF *ncrunch* /XF *.cs)
+            $raw | ForEach-Object {
+                $line = $_.Trim().Replace("`r`n", "").Replace("`t", " ")
+                $dirty = ![string]::IsNullOrEmpty($line)
+        
+                if ($dirty)
+                {
+                    Write-Host ("{0}: {1}" -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $line) -ForegroundColor DarkGray            
+                }
+            }
+        
             if ($dirty)
             {
-                Write-Host ("{0}: {1}" -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $line) -ForegroundColor DarkGray            
+                Write-Host ("{0}: Done syncing..." -f [DateTime]::Now.ToString("HH:mm:ss:fff")) -ForegroundColor Green
             }
-        }
-    
-        if ($dirty)
-        {
-            Write-Host ("{0}: Done syncing..." -f [DateTime]::Now.ToString("HH:mm:ss:fff")) -ForegroundColor Green
+        }catch {
+            $ErrorMessage = $_.Exception.Message
+            Write-Host ("{0}: The following error occured during sync: $ErrorMessage" -f [DateTime]::Now.ToString("HH:mm:ss:fff")) -ForegroundColor Red
         }
     }
 }

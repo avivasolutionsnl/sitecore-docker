@@ -49,11 +49,17 @@ function Sync
     
                 if($triggerReason -ne $null)
                 {
-                    New-Item -Path (Split-Path $targetPath) -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+                    try {
+                        New-Item -Path (Split-Path $targetPath) -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
                    
-                    Copy-Item -Path $sourcePath -Destination $targetPath -Force
-                   
-                    Write-Output ("{0}: {1, -9} -> {2, -9}" -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $triggerReason, ($sourcePath.Replace("$Path\", "")))
+                        Copy-Item -Path $sourcePath -Destination $targetPath -Force
+                       
+                        Write-Output ("{0}: {1, -9} -> {2, -9}" -f [DateTime]::Now.ToString("HH:mm:ss:fff"), $triggerReason, ($sourcePath.Replace("$Path\", "")))
+                    }
+                    catch {
+                        $ErrorMessage = $_.Exception.Message
+                        Write-Host ("{0}: The following error occured during sync: $ErrorMessage" -f [DateTime]::Now.ToString("HH:mm:ss:fff")) -ForegroundColor Red
+                    }
                 }
             }
         }
