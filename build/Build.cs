@@ -41,52 +41,58 @@ partial class Build : NukeBuild
     }
 
     // Install a Sitecore package using the given script file and the docker-compose.yml file in the current directory
-    private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "") {
+    private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "")
+    {
         AssertCleanDirectory("./data/mssql");
         AssertCleanDirectory("./data/solr");
 
-        DockerCompose($"{dockerComposeOptions} up -d");
+        try
+        {
+            DockerCompose($"{dockerComposeOptions} up -d");
 
-        // Install Commerce Connect package
-        var sitecoreContainerName = GetContainerName("sitecore");
-        DockerExec(x => x
-            .SetContainer(sitecoreContainerName)
-            .SetCommand("powershell")
-            .SetArgs(scriptFilename)
-            .SetInteractive(true)
-            .SetTty(true)
-        );
+            // Install Commerce Connect package
+            var sitecoreContainerName = GetContainerName("sitecore");
+            DockerExec(x => x
+                .SetContainer(sitecoreContainerName)
+                .SetCommand("powershell")
+                .SetArgs(scriptFilename)
+                .SetInteractive(true)
+                .SetTty(true)
+            );
 
-        DockerCompose("stop");
+            DockerCompose("stop");
 
-        // Give some time to really stop
-        Thread.Sleep(10000);
+            // Give some time to really stop
+            Thread.Sleep(10000);
 
-        // Persist changes to DB installation directory
-        DockerCompose($"{dockerComposeOptions} up -d mssql");
+            // Persist changes to DB installation directory
+            DockerCompose($"{dockerComposeOptions} up -d mssql");
 
-        var mssqlContainerName = GetContainerName("mssql");
-        DockerExec(x => x
-            .SetContainer(mssqlContainerName)
-            .SetCommand("powershell")
-            .SetArgs(@"C:\Persist-Databases.ps1")
-            .SetInteractive(true)
-            .SetTty(true)
-        );
+            var mssqlContainerName = GetContainerName("mssql");
+            DockerExec(x => x
+                .SetContainer(mssqlContainerName)
+                .SetCommand("powershell")
+                .SetArgs(@"C:\Persist-Databases.ps1")
+                .SetInteractive(true)
+                .SetTty(true)
+            );
 
-        DockerCompose("stop");
+            DockerCompose("stop");
 
-        // Commit changes
-        DockerCommit(x => x
-            .SetContainer(mssqlContainerName)
-            .SetRepository(mssqlTargetImageName));
+            // Commit changes
+            DockerCommit(x => x
+                .SetContainer(mssqlContainerName)
+                .SetRepository(mssqlTargetImageName));
 
-        DockerCommit(x => x
-            .SetContainer(sitecoreContainerName)
-            .SetRepository(sitecoreTargetImageName));
-
-        // Remove build artefacts
-        DockerCompose("down");
+            DockerCommit(x => x
+                .SetContainer(sitecoreContainerName)
+                .SetRepository(sitecoreTargetImageName));
+        }
+        finally
+        {
+            // Remove build artefacts
+            DockerCompose("down");
+        }
     }
 
     Target All => _ => _
