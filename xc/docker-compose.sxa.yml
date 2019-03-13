@@ -6,6 +6,7 @@ services:
     volumes:
       - .\sitecore\sxa:C:\sxa
       - ..\files:C:\files-mount
+      - .\license:C:\license
     environment:
       PSE_PACKAGE: ${PSE_PACKAGE}
       SXA_PACKAGE: ${SXA_PACKAGE}
