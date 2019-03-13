@@ -41,10 +41,10 @@ partial class Build : NukeBuild
     }
 
     // Install a Sitecore package using the given script file and the docker-compose.yml file in the current directory
+
     private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "")
     {
-        AssertCleanDirectory("./data/mssql");
-        AssertCleanDirectory("./data/solr");
+        DockerCompose($"{dockerComposeOptions} down");
 
         try
         {

@@ -282,4 +282,5 @@ EXPOSE 4000
 COPY xc/commerce/WatchDirectoryMultiple.ps1 /Scripts
 COPY xc/commerce/WatchDefaultDirectories.ps1 /Scripts
 
-ENTRYPOINT /Scripts/WatchDefaultDirectories.ps1
+ENTRYPOINT If ((Test-Path C:\Workspace) -eq $False) { New-Item -Type Directory c:\Workspace  }; `
+    /Scripts/WatchDefaultDirectories.ps1
