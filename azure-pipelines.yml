@@ -1,0 +1,12 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'Windows-2019'
+
+steps:
+- powershell: 
+    $password = ConvertTo-SecureString -String $storageAccountKey -AsPlainText -Force;
+    $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($storageAccountName)", $password;
+    New-PSDrive -Name D -PSProvider FileSystem -Root "\\sitecoredockertest.file.core.windows.net\test" -Credential $credential -Persist
+  displayName: 'Mount Files'
