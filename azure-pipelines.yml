@@ -8,7 +8,7 @@ steps:
 - powershell: |
     $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
     $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
-    New-PSDrive -Name D -PSProvider FileSystem -Root "\\sitecoredockertest.file.core.windows.net\test" -Credential $credential -Persist
+    New-PSDrive -Name Z -PSProvider FileSystem -Root "\\sitecoredockertest.file.core.windows.net\test" -Credential $credential -Persist
   env:
     storageAccountKey: $(storageAccountKey)
     storageAccountName: $(storageAccountName)
