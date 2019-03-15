@@ -14,5 +14,5 @@ steps:
     storageAccountName: $(storageAccountName)
   displayName: 'Mount Files'
 
-- powershell: nuke build base
+- powershell: build.ps1 build base
   displayName: 'Build Base images'
