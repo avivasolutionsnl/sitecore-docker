@@ -16,7 +16,7 @@ steps:
   displayName: 'Mount Files'
 
 - task: PowerShell@2
-  displayName: Run NUKE Build (Publish)
+  displayName: Run NUKE Build
   inputs:
     targetType: 'filePath'
     filePath: build.ps1
