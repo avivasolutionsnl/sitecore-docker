@@ -14,5 +14,11 @@ steps:
     storageAccountName: $(storageAccountName)
   displayName: 'Mount Files'
 
-- powershell: build.ps1 build base
-  displayName: 'Build Base images'
+- task: PowerShell@2
+  displayName: Run NUKE Build (Publish)
+  inputs:
+    targetType: 'filePath'
+    filePath: build.ps1
+    arguments: > 
+        Build
+        base 
