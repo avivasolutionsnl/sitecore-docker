@@ -14,4 +14,4 @@ steps:
     storageAccountName: $(storageAccountName)
   displayName: 'Mount Files'
 
-- powershell: ls D:\
+- powershell: ls Z:\
