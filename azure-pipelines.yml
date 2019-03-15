@@ -13,3 +13,5 @@ steps:
     storageAccountKey: $(storageAccountKey)
     storageAccountName: $(storageAccountName)
   displayName: 'Mount Files'
+
+- powershell: ls D:\
