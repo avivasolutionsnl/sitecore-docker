@@ -14,4 +14,5 @@ steps:
     storageAccountName: $(storageAccountName)
   displayName: 'Mount Files'
 
-- powershell: ls Z:\
+- powershell: nuke build base
+  displayName: 'Build Base images'
