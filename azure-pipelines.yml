@@ -20,5 +20,4 @@ steps:
     targetType: 'filePath'
     filePath: build.ps1
     arguments: > 
-        Build
-        base 
+        Base 
