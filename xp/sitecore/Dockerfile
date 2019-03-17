@@ -25,7 +25,7 @@ ARG SOLR_PORT=8983
 ARG SITECORE_CORE_PREFIX
 ARG SITECORE_PACKAGE
 
-COPY files/*.pfx /Files/
+COPY Files/*.pfx /Files/
 COPY dummylicense.xml /license/license.xml
 COPY xp/sitecore/Boot.ps1 ./
 COPY files/$SITECORE_PACKAGE /Files/
