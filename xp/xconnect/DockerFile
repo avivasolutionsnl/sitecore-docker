@@ -27,7 +27,7 @@ ARG XCONNECT_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"] 
 
-COPY files/*.pfx /Files/
+COPY Files/*.pfx /Files/
 COPY files/$XCONNECT_PACKAGE /Files/
 COPY dummylicense.xml /license/license.xml
 COPY xp/xconnect/Boot.ps1 ./
