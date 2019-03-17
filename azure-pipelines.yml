@@ -14,7 +14,7 @@ steps:
   env:
     storageAccountKey: $(storageAccountKey)
     storageAccountName: $(storageAccountName)
-  displayName: 'Mount Files'
+  displayName: 'Copy Files'
 
 - task: PowerShell@2
   displayName: Run NUKE Build
