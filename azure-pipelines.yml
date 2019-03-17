@@ -17,10 +17,13 @@ steps:
     storageAccountName: $(storageAccountName)
   displayName: 'Copy Files'
 
-- task: PowerShell@2
-  displayName: Run NUKE Build
-  inputs:
-    targetType: 'filePath'
-    filePath: build.ps1
-    arguments: > 
-        Xp 
+- powershell: ls ./Files
+  displayName: 'List files'
+
+#- task: PowerShell@2
+#  displayName: Run NUKE Build
+#  inputs:
+#    targetType: 'filePath'
+#    filePath: build.ps1
+#    arguments: > 
+#        Xp 
