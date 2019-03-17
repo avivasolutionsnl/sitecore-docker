@@ -17,6 +17,15 @@ steps:
     storageAccountName: $(storageAccountName)
   displayName: 'Copy Files'
 
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: Z:/
+    #contents: '**' 
+    targetFolder: Files
+    #cleanTargetFolder: false # Optional
+    #overWrite: false # Optional
+    #flattenFolders: false # Optional
+
 - powershell: ls ./Files/*
   displayName: 'List files'
 
