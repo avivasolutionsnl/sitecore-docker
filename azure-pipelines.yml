@@ -9,28 +9,24 @@ steps:
     $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
     $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
     New-PSDrive -Name Z -PSProvider FileSystem -Root "\\sitecoredockertest.file.core.windows.net\test" -Credential $credential -Persist;
-    ls Z:\
   env:
     storageAccountKey: $(storageAccountKey)
     storageAccountName: $(storageAccountName)
-  displayName: 'Copy Files'
+  displayName: 'Mount Files'
 
 - task: CopyFiles@2
   inputs:
-    sourceFolder: Z:/
-    #contents: '**' 
+    sourceFolder: Z:/ 
     targetFolder: Files
-    #cleanTargetFolder: false # Optional
-    #overWrite: false # Optional
-    #flattenFolders: false # Optional
-
+    cleanTargetFolder: true
+    
 - powershell: ls ./Files/*
   displayName: 'List files'
 
-#- task: PowerShell@2
-#  displayName: Run NUKE Build
-#  inputs:
-#    targetType: 'filePath'
-#    filePath: build.ps1
-#    arguments: > 
-#        Xp 
+- task: PowerShell@2
+  displayName: Run NUKE Build
+  inputs:
+    targetType: 'filePath'
+    filePath: build.ps1
+    arguments: > 
+        Xp 
