@@ -10,8 +10,6 @@ steps:
     $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
     New-PSDrive -Name Z -PSProvider FileSystem -Root "\\sitecoredockertest.file.core.windows.net\test" -Credential $credential -Persist;
     ls Z:\
-    Copy-Item -Path Z:\* -Destination ./Files
-    ls ./Files
   env:
     storageAccountKey: $(storageAccountKey)
     storageAccountName: $(storageAccountName)
