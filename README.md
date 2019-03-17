@@ -19,13 +19,13 @@ Hopefully this will help you to get up and running with Sitecore and Docker. By 
 As Sitecore does not distribute Docker images, the first step is to build the required Docker images.
 
 ## Pre-build steps
-For this you need to place the Sitecore installation files and a Sitecore license file in the `files` directory. Which files to use are defined in the build configuration files:
+For this you need to place the Sitecore installation files in the `files` directory. Which files to use are defined in the build configuration files:
 - [Base images build config](./build/Build.Base.cs)
 - [XP images build config](./build/Build.Xp.cs)
 - [XC images build config](./build/Build.Xc.cs)
 - [Overall build config](./build/Build.cs)
 
-Put the license.xml in xp/license/ for xp containers or in xc/license/ for xc containers. This license file is only used to install any Sitecore packages and will not end up in the docker images. The license file will be mounted during runtime. 
+Put the `license.xml` in `xp/license/` for xp containers or in `xc/license/` for xc containers. This license file is only used to install any Sitecore packages and will not end up in the docker images. The license file will be mounted during runtime. 
 
 The XP0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
 xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script (note that this requires an Administrator elevated powershell environment and you may need to set the correct execution policy, e.g. `PS> powershell.exe -ExecutionPolicy Unrestricted`).
