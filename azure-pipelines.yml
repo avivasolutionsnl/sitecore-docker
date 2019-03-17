@@ -20,8 +20,8 @@ steps:
     targetFolder: Files
     cleanTargetFolder: true
 
-- powershell: |
-    ./Generate-Certificates.ps1
+- powershell: | 
+    If (Test-Path ./Files/*.pfx) { ./Generate-Certificates.ps1 } Else { Write-Host "Re-using found certificates"; ls ./Files/*.pfx }
   displayName: 'Generate certificates'
 
 - task: PowerShell@2
