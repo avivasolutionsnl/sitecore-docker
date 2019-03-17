@@ -19,9 +19,6 @@ steps:
     sourceFolder: Z:/ 
     targetFolder: Files
     cleanTargetFolder: true
-    
-- powershell: ls ./Files/*
-  displayName: 'List files'
 
 - task: PowerShell@2
   displayName: Run NUKE Build
