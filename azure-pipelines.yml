@@ -20,6 +20,9 @@ steps:
     targetFolder: Files
     cleanTargetFolder: true
 
+- powershell: ./Generate-Certificates.ps1
+  displayName: 'Generate certificates'
+
 - task: PowerShell@2
   displayName: Run NUKE Build
   inputs:
