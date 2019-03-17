@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/joost0053/joost/_apis/build/status/joostmeijles.sitecore-docker)](https://dev.azure.com/joost0053/joost/_build/latest?definitionId=2)
+
 Run Sitecore 9 XP0 and XC using Docker for Windows.
 
 # Disclaimer
