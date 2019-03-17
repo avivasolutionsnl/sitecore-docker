@@ -20,13 +20,15 @@ steps:
     targetFolder: Files
     cleanTargetFolder: true
 
-- powershell: ./Generate-Certificates.ps1
+- powershell: |
+    ./Generate-Certificates.ps1;
+    ls ./Files/*
   displayName: 'Generate certificates'
 
-- task: PowerShell@2
-  displayName: Run NUKE Build
-  inputs:
-    targetType: 'filePath'
-    filePath: build.ps1
-    arguments: > 
-        Xp 
+#- task: PowerShell@2
+#  displayName: Run NUKE Build
+#  inputs:
+#    targetType: 'filePath'
+#    filePath: build.ps1
+#    arguments: > 
+#        Xp 
