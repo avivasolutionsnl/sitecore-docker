@@ -17,7 +17,7 @@ steps:
     storageAccountName: $(storageAccountName)
   displayName: 'Copy Files'
 
-- powershell: ls ./Files
+- powershell: ls ./Files/*
   displayName: 'List files'
 
 #- task: PowerShell@2
