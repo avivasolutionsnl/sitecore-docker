@@ -190,10 +190,6 @@ partial class Build : NukeBuild
 
             System.IO.Directory.SetCurrentDirectory("xp");
 
-            // Setup
-            System.IO.Directory.CreateDirectory(@"wwwroot/sitecore");
-            Powershell("../CreateLogDirs.ps1");
-
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("JSS_PACKAGE", $"{JSS_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XpImagePrefix}", EnvironmentVariableTarget.Process);
