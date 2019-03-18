@@ -18,7 +18,8 @@ partial class Build : NukeBuild
     [Parameter("Docker image prefix for Sitecore base")]
     readonly string BaseImagePrefix = "sitecore-base-";
 
-    private string BaseFullImageName(string name) => $"{RepoImagePrefix}{BaseImagePrefix}{name}:{BaseTag}";
+    private string BaseFullImageName(string name) => $"{RepoImagePrefix}{BaseImageName(name)}";
+    private string BaseImageName(string name) => $"{BaseImagePrefix}{name}:{BaseTag}";
     
     Target BaseOpenJdk => _ => _
         .Executes(() =>
@@ -26,7 +27,7 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("base/openjdk/Dockerfile")
-                .SetTag(BaseFullImageName("openjdk"))
+                .SetTag(BaseImageName("openjdk"))
             );
         });
 
@@ -36,7 +37,7 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("base/sitecore/Dockerfile")
-                .SetTag(BaseFullImageName("sitecore"))
+                .SetTag(BaseImageName("sitecore"))
             );
         });
 
@@ -44,12 +45,12 @@ partial class Build : NukeBuild
         .DependsOn(BaseSitecore)
         .Executes(() =>
         {
-            var baseImage = BaseFullImageName("sitecore");
+            var baseImage = BaseImageName("sitecore");
 
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("base/solr-builder/Dockerfile")
-                .SetTag(BaseFullImageName("solr-builder"))
+                .SetTag(BaseImageName("solr-builder"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}"
                 })
@@ -60,9 +61,21 @@ partial class Build : NukeBuild
         .DependsOn(BaseOpenJdk, BaseSitecore);
 
     Target PushBase => _ => _
+        .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .Executes(() => {
-            DockerPush(x => x.SetName(BaseFullImageName("openjdk")));
-            DockerPush(x => x.SetName(BaseFullImageName("sitecore")));
-            DockerPush(x => x.SetName(BaseFullImageName("solr-builder")));
+            PushBaseImage("openjdk");
+            PushBaseImage("sitecore");
+            PushBaseImage("solr-builder");
         });
+
+    private void PushBaseImage(string name)
+    {
+        var source = BaseImageName(name);
+        var target = BaseFullImageName(name);
+        DockerTasks.DockerImageTag(x => x
+        .SetSourceImage(source)
+        .SetTargetImage(target));
+
+        DockerTasks.DockerImagePush(x => x.SetName(target));
+    }
 }
