@@ -4,30 +4,35 @@ trigger:
 pool:
   vmImage: 'Windows-2019'
 
-steps:
-- powershell: |
-    $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
-    $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
-    New-PSDrive -Name Z -PSProvider FileSystem -Root "\\sitecoredockertest.file.core.windows.net\test" -Credential $credential -Persist;
-  env:
-    storageAccountKey: $(storageAccountKey)
-    storageAccountName: $(storageAccountName)
-  displayName: 'Mount Files'
+jobs:
+- job:
+    # Set timeout to maximum, ie. 6 hours
+    timeoutInMinutes: 0
+      
+    steps:
+    - powershell: |
+        $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
+        $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
+        New-PSDrive -Name Z -PSProvider FileSystem -Root "\\sitecoredockertest.file.core.windows.net\test" -Credential $credential -Persist;
+      env:
+        storageAccountKey: $(storageAccountKey)
+        storageAccountName: $(storageAccountName)
+      displayName: 'Mount Files'
 
-- task: CopyFiles@2
-  inputs:
-    sourceFolder: Z:/ 
-    targetFolder: Files
-    cleanTargetFolder: true
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: Z:/ 
+        targetFolder: Files
+        cleanTargetFolder: true
 
-- powershell: | 
-    If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
-  displayName: 'Generate certificates'
+    - powershell: | 
+        If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
+      displayName: 'Generate certificates'
 
-- task: PowerShell@2
-  displayName: Run NUKE Build
-  inputs:
-    targetType: 'filePath'
-    filePath: build.ps1
-    arguments: > 
-        Xp 
+    - task: PowerShell@2
+      displayName: Run NUKE Build
+      inputs:
+        targetType: 'filePath'
+        filePath: build.ps1
+        arguments: > 
+            Xp 
