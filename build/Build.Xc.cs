@@ -87,6 +87,8 @@ partial class Build : NukeBuild
     [Parameter("Commerce database prefix")]    
     readonly string COMMERCE_DB_PREFIX = "SitecoreCommerce9";
 
+    public AbsolutePath XcLicenseFile = RootDirectory / "xc" / "license" / "license.xml";
+
     Target XcCommerce => _ => _
         .Executes(() =>
         {
@@ -160,6 +162,7 @@ partial class Build : NukeBuild
         });
 
     Target XcSitecoreMssql => _ => _
+        .Requires(() => File.Exists(XcLicenseFile))
         .DependsOn(XcCommerce, XcMssqlIntermediate, XcSitecoreIntermediate, XcSolr, XcXconnect)
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xc");
@@ -215,6 +218,7 @@ partial class Build : NukeBuild
         });
 
     Target XcSitecoreMssqlSxa => _ => _
+        .Requires(() => File.Exists(XcLicenseFile))
         .DependsOn(XcSitecoreMssql, XcSolrSxa)
         .Executes(() => {
             var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";

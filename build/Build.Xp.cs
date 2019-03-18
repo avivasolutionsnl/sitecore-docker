@@ -50,6 +50,8 @@ partial class Build : NukeBuild
     [Parameter("Sitecore Solr core prefix")]
     readonly string SITECORE_SOLR_CORE_PREFIX = "sitecore";
 
+    public AbsolutePath XpLicenseFile = RootDirectory / "xp" / "license" / "license.xml";
+
     Target XpMssql => _ => _
         .Executes(() =>
         {
@@ -134,6 +136,7 @@ partial class Build : NukeBuild
         });
     
     Target XpSitecoreMssqlSxa => _ => _
+        .Requires(() => File.Exists(XpLicenseFile))
         .DependsOn(Xp)
         .Executes(() => {
             var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
