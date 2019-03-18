@@ -15,10 +15,7 @@ partial class Build : NukeBuild
     [Parameter("Docker image prefix for Sitecore base")]
     readonly string BaseImagePrefix = "sitecore-base-";
 
-    [Parameter("Docker image version tag for Sitecore base")]
-    readonly string BaseVersion = "1.0.0-ltsc2019";
-
-    private string BaseFullImageName(string name) => $"{RepoImagePrefix}{BaseImagePrefix}{name}:{BaseVersion}";
+    private string BaseFullImageName(string name) => $"{RepoImagePrefix}{BaseImagePrefix}{name}:{Tag}";
     
     Target BaseOpenJdk => _ => _
         .Executes(() =>

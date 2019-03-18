@@ -15,10 +15,7 @@ partial class Build : NukeBuild
     [Parameter("Docker image prefix for Sitecore XP")]
     public readonly string XpImagePrefix = "sitecore-xp-";
     
-    [Parameter("Docker image version tag for Sitecore XP")]
-    readonly string XpVersion = "9.0.2-ltsc2019";
-
-    private string XpFullImageName(string name) => $"{RepoImagePrefix}{XpImagePrefix}{name}:{XpVersion}";
+    private string XpFullImageName(string name) => $"{RepoImagePrefix}{XpImagePrefix}{name}:{Tag}";
 
     // Packages
     [Parameter("Sitecore XPO configuration package")]
@@ -144,7 +141,7 @@ partial class Build : NukeBuild
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XpImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XpVersion}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{SitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
                 @"C:\sxa\InstallSXA.ps1",
