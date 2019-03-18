@@ -261,11 +261,37 @@ partial class Build : NukeBuild
             );
         });
 
+   Target XcSitecoreMssqlJss => _ => _
+        .DependsOn(XcSitecoreMssql)
+        .Executes(() => {
+            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
+            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
+            
+            System.IO.Directory.SetCurrentDirectory("xc");
+
+            // Set env variables for docker-compose
+            Environment.SetEnvironmentVariable("JSS_PACKAGE", $"{JSS_PACKAGE}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XcVersion}", EnvironmentVariableTarget.Process);
+
+            InstallSitecorePackage(
+                @"C:\jss\InstallJSS.ps1",
+                XcFullImageName("sitecore-jss"), 
+                XcFullImageName("mssql-jss"),
+                "-f docker-compose.yml -f docker-compose.jss.yml"
+            );
+
+            System.IO.Directory.SetCurrentDirectory("..");
+        });        
+
     Target Xc => _ => _
         .DependsOn(XcCommerce, XcSitecoreMssql, XcSolr, XcXconnect);
 
     Target XcSxa => _ => _
         .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);
+
+    Target XcJss => _ => _
+        .DependsOn(Xc, XcSitecoreMssqlJss);        
 
     Target PushXc => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
