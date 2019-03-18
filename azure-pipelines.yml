@@ -1,51 +1,53 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'Windows-2019'
-
-steps:
-- powershell: |
-    $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
-    $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
-    New-PSDrive -Name Z -PSProvider FileSystem -Root "\\sitecoredockertest.file.core.windows.net\test" -Credential $credential -Persist;
-  env:
-    storageAccountKey: $(storageAccountKey)
-    storageAccountName: $(storageAccountName)
-  displayName: 'Mount Files'
-
-- task: CopyFiles@2
-  inputs:
-    sourceFolder: Z:/ 
-    targetFolder: Files
-    cleanTargetFolder: true
-
-- task: CopyFiles@2
-  displayName: 'Copy XC license'
-  inputs:
-    sourceFolder: Z:/
-    targetFolder: xc/license/
-    contents: license.xml
-    cleanTargetFolder: true
-
-- task: CopyFiles@2
-  displayName: 'Copy XP license'
-  inputs:
-    sourceFolder: Z:/
-    targetFolder: xp/license/
-    contents: license.xml
-    cleanTargetFolder: true
-
-- powershell: | 
-    If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
-  displayName: 'Generate certificates'
-
-- task: PowerShell@2
-  displayName: 'Run NUKE Build'
+jobs:
+- job: Build
+  pool:
+    vmImage: 'Windows-2019'
   # Use maximum timeout, ie. 6 hours 
   timeoutInMinutes: 0
-  inputs:
-    targetType: 'filePath'
-    filePath: build.ps1
-    arguments: > 
-        Xc
+
+  steps:
+  - powershell: |
+      $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
+      $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
+      New-PSDrive -Name Z -PSProvider FileSystem -Root "\\sitecoredockertest.file.core.windows.net\test" -Credential $credential -Persist;
+    env:
+      storageAccountKey: $(storageAccountKey)
+      storageAccountName: $(storageAccountName)
+    displayName: 'Mount Files'
+
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: Z:/ 
+      targetFolder: Files
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: 'Copy XC license'
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xc/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: 'Copy XP license'
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xp/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - powershell: | 
+      If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
+    displayName: 'Generate certificates'
+
+  - task: PowerShell@2
+    displayName: 'Run NUKE Build'
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: > 
+          Xc
