@@ -12,6 +12,10 @@ using Nuke.Common.Tooling;
 
 partial class Build : NukeBuild
 {
+    /// <summary>
+    /// A build version that will be appended to the image name.
+    /// Ignored if its empty
+    /// </summary>
     [Parameter("Docker image build version")]
     public readonly string BuildVersion = "";
 
