@@ -4,9 +4,6 @@ trigger:
 pool:
   vmImage: 'Windows-2019'
 
-# Use maximum timeout, ie. 6 hours
-timeoutInMinutes: 0
-
 steps:
 - powershell: |
     $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
@@ -45,6 +42,8 @@ steps:
 
 - task: PowerShell@2
   displayName: 'Run NUKE Build'
+  # Use maximum timeout, ie. 6 hours
+  timeoutInMinutes: 0
   inputs:
     targetType: 'filePath'
     filePath: build.ps1
