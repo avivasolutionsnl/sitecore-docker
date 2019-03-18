@@ -30,4 +30,4 @@ steps:
     targetType: 'filePath'
     filePath: build.ps1
     arguments: > 
-        Xp 
+        Xc
