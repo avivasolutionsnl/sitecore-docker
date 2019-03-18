@@ -1,0 +1,9 @@
+# Overlay file for JSS specific Docker images
+version: '2.4'
+
+services:
+  mssql:
+    image: "${IMAGE_PREFIX}mssql-jss:${TAG}"
+
+  sitecore:
+    image: "${IMAGE_PREFIX}sitecore-jss:${TAG}"
