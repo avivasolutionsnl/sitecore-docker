@@ -103,8 +103,8 @@ partial class Build : NukeBuild
     }
 
     Target All => _ => _
-        .DependsOn(Xp, XpSxa, Xc, XcSxa);
+        .DependsOn(Xp, XpSxa, XpJss, Xc, XcSxa, XcJss);
 
     Target Push => _ => _
-        .DependsOn(PushXp, PushXpSxa, PushXc, PushXcSxa);
+        .DependsOn(PushXp, PushXpSxa, PushXpJss, PushXc, PushXcSxa, PushXcJss);
 }
