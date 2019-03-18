@@ -311,6 +311,12 @@ partial class Build : NukeBuild
             PushXcImage("solr-sxa");
         });
 
+    Target PushXcJss => _ => _
+        .Executes(() => {
+            PushXcImage("mssql-jss");
+            PushXcImage("sitecore-jss");
+        });    
+
     private void PushXcImage(string name)
     {
         var source = XcImageName(name);
