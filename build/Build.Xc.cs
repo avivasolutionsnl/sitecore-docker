@@ -12,11 +12,14 @@ using Nuke.Common.Tooling;
 
 partial class Build : NukeBuild
 {
+    [Parameter("Docker image sitecore version")]
+    public readonly string XcSitecoreVersion = "9.0.3";
+    public string XcTag => string.IsNullOrEmpty(BuildVersion) ? XcSitecoreVersion : $"{XcSitecoreVersion}-{BuildVersion}";
     // Docker image naming
     [Parameter("Docker image prefix for Sitecore XC")]
     readonly string XcImagePrefix = "sitecore-xc-";
 
-    private string XcFullImageName(string name) => $"{RepoImagePrefix}{XcImagePrefix}{name}:{Tag}";
+    private string XcFullImageName(string name) => $"{RepoImagePrefix}{XcImagePrefix}{name}:{XcTag}";
 
     // Packages
     [Parameter("Sitecore Identity server package")]
@@ -162,7 +165,7 @@ partial class Build : NukeBuild
             System.IO.Directory.SetCurrentDirectory("xc");
 
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{SitecoreVersion}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XcTag}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
                 @"C:\Scripts\InstallCommercePackages.ps1", 
@@ -224,7 +227,7 @@ partial class Build : NukeBuild
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SCXA_PACKAGE", $"{SCXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{SitecoreVersion}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XcTag}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
                 @"C:\sxa\InstallSXA.ps1",

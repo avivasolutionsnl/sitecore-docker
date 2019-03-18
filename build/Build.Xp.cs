@@ -12,10 +12,14 @@ using Nuke.Common.Tooling;
 
 partial class Build : NukeBuild
 {
+    [Parameter("Docker image sitecore version")]
+    public readonly string XpSitecoreVersion = "9.0.2";
+    public string XpTag => string.IsNullOrEmpty(BuildVersion) ? XpSitecoreVersion : $"{XpSitecoreVersion}-{BuildVersion}";
+
     [Parameter("Docker image prefix for Sitecore XP")]
     public readonly string XpImagePrefix = "sitecore-xp-";
     
-    private string XpFullImageName(string name) => $"{RepoImagePrefix}{XpImagePrefix}{name}:{Tag}";
+    private string XpFullImageName(string name) => $"{RepoImagePrefix}{XpImagePrefix}{name}:{XpTag}";
 
     // Packages
     [Parameter("Sitecore XPO configuration package")]
@@ -141,7 +145,7 @@ partial class Build : NukeBuild
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XpImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{SitecoreVersion}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XpTag}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
                 @"C:\sxa\InstallSXA.ps1",

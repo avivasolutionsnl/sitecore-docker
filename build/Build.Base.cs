@@ -11,11 +11,14 @@ using Nuke.Common.Tooling;
 
 partial class Build : NukeBuild
 {
+    [Parameter("Docker image sitecore version")]
+    public readonly string BaseSitecoreVersion = "1.0.0";
+    public string BaseTag => string.IsNullOrEmpty(BuildVersion) ? BaseSitecoreVersion : $"{BaseSitecoreVersion}-{BuildVersion}";
     // Docker image naming
     [Parameter("Docker image prefix for Sitecore base")]
     readonly string BaseImagePrefix = "sitecore-base-";
 
-    private string BaseFullImageName(string name) => $"{RepoImagePrefix}{BaseImagePrefix}{name}:{Tag}";
+    private string BaseFullImageName(string name) => $"{RepoImagePrefix}{BaseImagePrefix}{name}:{BaseTag}";
     
     Target BaseOpenJdk => _ => _
         .Executes(() =>

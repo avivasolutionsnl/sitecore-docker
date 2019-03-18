@@ -12,12 +12,8 @@ using Nuke.Common.Tooling;
 
 partial class Build : NukeBuild
 {
-    [Parameter("Docker image sitecore version")]
-    public readonly string SitecoreVersion = "9.0.3";
     [Parameter("Docker image build version")]
     public readonly string BuildVersion = "";
-
-    public string Tag => string.IsNullOrEmpty(BuildVersion) ? SitecoreVersion : $"{SitecoreVersion}-{BuildVersion}";
 
     public static int Main () => Execute<Build>(x => x.All);
 
@@ -28,7 +24,7 @@ partial class Build : NukeBuild
 
     // Docker options
     [Parameter("Docker image repository prefix, e.g. my.docker-image.repo/")]
-    readonly string RepoImagePrefix = "avivasolutionsnl.azurecr.io/";
+    readonly string RepoImagePrefix = "";
 
     // Get the container created by docker-compose
     private string GetContainerName(string serviceName) {
