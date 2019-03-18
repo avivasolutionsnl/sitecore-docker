@@ -9,8 +9,6 @@ services:
     sa_password: ${SQL_SA_PASSWORD}
   volumes:
     - .\data\mssql:C:\Data
-  mem_limit: 4096m
-  cpu_count: 4
 
  sitecore:
   image: "${IMAGE_PREFIX}sitecore:${TAG}"
@@ -23,16 +21,12 @@ services:
     - xconnect
     - mssql
     - solr
-  mem_limit: 8192m
-  cpu_count: 6
 
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
   isolation: process
   volumes:
     - .\data\solr:C:\Data
-  mem_limit: 4096m
-  cpu_count: 4
 
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
@@ -43,5 +37,3 @@ services:
   depends_on:
     - mssql
     - solr
-  mem_limit: 2048m
-  cpu_count: 4

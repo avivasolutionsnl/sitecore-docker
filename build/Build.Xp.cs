@@ -12,13 +12,16 @@ using Nuke.Common.Tooling;
 
 partial class Build : NukeBuild
 {
+    [Parameter("Docker image sitecore version")]
+    public readonly string XpSitecoreVersion = "9.0.2";
+
     [Parameter("Docker image prefix for Sitecore XP")]
     public readonly string XpImagePrefix = "sitecore-xp-";
     
-    [Parameter("Docker image version tag for Sitecore XP")]
-    readonly string XpVersion = "9.0.2-ltsc2019";
-
-    private string XpFullImageName(string name) => $"{RepoImagePrefix}{XpImagePrefix}{name}:{XpVersion}";
+    private string XpFullImageName(string name) => string.IsNullOrEmpty(BuildVersion) ? 
+    $"{RepoImagePrefix}/{XpImageName(name)}" :
+    $"{RepoImagePrefix}/{XpImageName(name)}-{BuildVersion}";
+    private string XpImageName(string name) => $"{XpImagePrefix}{name}:{XpSitecoreVersion}";
 
     // Packages
     [Parameter("Sitecore XPO configuration package")]
@@ -49,13 +52,15 @@ partial class Build : NukeBuild
     [Parameter("Sitecore Solr core prefix")]
     readonly string SITECORE_SOLR_CORE_PREFIX = "sitecore";
 
+    public AbsolutePath XpLicenseFile = RootDirectory / "xp" / "license" / "license.xml";
+
     Target XpMssql => _ => _
         .Executes(() =>
         {
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/mssql/Dockerfile")
-                .SetTag(XpFullImageName("mssql"))
+                .SetTag(XpImageName("mssql"))
                 .SetMemory(4000000000) // 4GB, SQL needs some more memory
                 .SetBuildArg(new string[] {
                     $"DB_PREFIX={SQL_DB_PREFIX}",
@@ -70,12 +75,12 @@ partial class Build : NukeBuild
         .DependsOn(BaseSitecore)
         .Executes(() =>
         {
-            var baseImage = BaseFullImageName("sitecore");
+            var baseImage = BaseImageName("sitecore");
 
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/sitecore/Dockerfile")
-                .SetTag(XpFullImageName("sitecore"))
+                .SetTag(XpImageName("sitecore"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
                     $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
@@ -92,13 +97,13 @@ partial class Build : NukeBuild
         .DependsOn(BaseOpenJdk, BaseSolrBuilder)
         .Executes(() =>
         {
-            var baseImage = BaseFullImageName("openjdk");
-            var builderBaseImage = BaseFullImageName("solr-builder");
+            var baseImage = BaseImageName("openjdk");
+            var builderBaseImage = BaseImageName("solr-builder");
 
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/solr/Dockerfile")
-                .SetTag(XpFullImageName("solr"))
+                .SetTag(XpImageName("solr"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
                     $"BUILDER_BASE_IMAGE={builderBaseImage}",
@@ -113,12 +118,12 @@ partial class Build : NukeBuild
         .DependsOn(BaseSitecore)
         .Executes(() =>
         {
-            var baseImage = BaseFullImageName("sitecore");
+            var baseImage = BaseImageName("sitecore");
 
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/xconnect/Dockerfile")
-                .SetTag(XpFullImageName("xconnect"))
+                .SetTag(XpImageName("xconnect"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
                     $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
@@ -133,6 +138,7 @@ partial class Build : NukeBuild
         });
     
     Target XpSitecoreMssqlSxa => _ => _
+        .Requires(() => File.Exists(XpLicenseFile))
         .DependsOn(Xp)
         .Executes(() => {
             var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
@@ -144,12 +150,12 @@ partial class Build : NukeBuild
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XpImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XpVersion}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XpSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
                 @"C:\sxa\InstallSXA.ps1",
-                XpFullImageName("sitecore-sxa"),
-                XpFullImageName("mssql-sxa"),
+                XpImageName("sitecore-sxa"),
+                XpImageName("mssql-sxa"),
                 "-f docker-compose.yml -f docker-compose.sxa.yml"
             );
 
@@ -159,12 +165,12 @@ partial class Build : NukeBuild
     Target XpSolrSxa => _ => _
         .DependsOn(BaseSolrBuilder, XpSolr)
         .Executes(() => {
-            var baseImage = XpFullImageName("solr");
-            var builderBaseImage = BaseFullImageName("solr-builder");
+            var baseImage = XpImageName("solr");
+            var builderBaseImage = BaseImageName("solr-builder");
 
             DockerBuild(x => x
                 .SetPath("xp/solr/sxa")
-                .SetTag(XpFullImageName("solr-sxa"))
+                .SetTag(XpImageName("solr-sxa"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
                     $"BUILDER_BASE_IMAGE={builderBaseImage}",
@@ -180,17 +186,30 @@ partial class Build : NukeBuild
         .DependsOn(XpSitecoreMssqlSxa, XpSolrSxa);
 
     Target PushXp => _ => _
+        .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .Executes(() => {
-            DockerPush(x => x.SetName(XpFullImageName("mssql")));
-            DockerPush(x => x.SetName(XpFullImageName("sitecore")));
-            DockerPush(x => x.SetName(XpFullImageName("solr")));
-            DockerPush(x => x.SetName(XpFullImageName("xconnect")));
+            PushXpImage("mssql");
+            PushXpImage("sitecore");
+            PushXpImage("solr");
+            PushXpImage("xconnect");
         });
     
     Target PushXpSxa => _ => _
+        .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .Executes(() => {
-            DockerPush(x => x.SetName(XpFullImageName("mssql-sxa")));
-            DockerPush(x => x.SetName(XpFullImageName("sitecore-sxa")));
-            DockerPush(x => x.SetName(XpFullImageName("solr-sxa")));
+            PushXpImage("mssql-sxa");
+            PushXpImage("sitecore-sxa");
+            PushXpImage("solr-sxa");
         });
+
+    private void PushXpImage(string name)
+    {
+        var source = XpImageName(name);
+        var target = XpFullImageName(name);
+        DockerTasks.DockerImageTag(x => x
+        .SetSourceImage(source)
+        .SetTargetImage(target));
+
+        DockerTasks.DockerImagePush(x => x.SetName(target));
+    }
 }

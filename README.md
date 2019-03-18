@@ -78,11 +78,13 @@ Each Docker image (or set of images, e.g. `XP0` or `XC`) has a corresponding tar
 ### Push images
 To push the Docker images to your repository use the `push` build targets, e.g. to push all images:
 ```
-PS> nuke push
+PS> nuke Push --RepoImagePrefix <YourRepoNameHere>
 ```
 
-NB. To prefix the Docker images with your repository name change the `RepoImagePrefix`, `XpImagePrefix` and/or `XcImagePrefix` build setting parameters.
-
+The `BuildVersion` parameter may be used to optionally append a version to the image name:
+```
+PS> nuke Push --RepoImagePrefix <YourRepoNameHere> --BuildVersion <YourVersionHere>
+```
 
 # Run
 Docker compose is used to start up all required services. 
@@ -121,7 +123,6 @@ NB. these run-time parameters should match the used build parameters.
 ## DNS
 To set the Docker container service names as DNS names on your host edit your `hosts` file. 
 A convenient tool to automatically do this is [whales-names](https://github.com/gregolsky/whales-names).
-
 
 # Known issues
 Docker for Windows can be unstable at times, some troubleshooting tips are listed below.
