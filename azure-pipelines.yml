@@ -42,6 +42,8 @@ steps:
 
 - task: PowerShell@2
   displayName: 'Run NUKE Build'
+  # Use maximum timeout, ie. 6 hours
+  timeoutInMinutes: 0
   inputs:
     targetType: 'filePath'
     filePath: build.ps1
