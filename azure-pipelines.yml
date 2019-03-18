@@ -20,12 +20,28 @@ steps:
     targetFolder: Files
     cleanTargetFolder: true
 
+- task: CopyFiles@2
+  displayName: 'Copy XC license'
+  inputs:
+    sourceFolder: Z:/
+    targetFolder: xc/license/
+    contents: license.xml
+    cleanTargetFolder: true
+
+- task: CopyFiles@2
+  displayName: 'Copy XP license'
+  inputs:
+    sourceFolder: Z:/
+    targetFolder: xp/license/
+    contents: license.xml
+    cleanTargetFolder: true
+
 - powershell: | 
     If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
   displayName: 'Generate certificates'
 
 - task: PowerShell@2
-  displayName: Run NUKE Build
+  displayName: 'Run NUKE Build'
   inputs:
     targetType: 'filePath'
     filePath: build.ps1
