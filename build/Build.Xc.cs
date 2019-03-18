@@ -14,13 +14,14 @@ partial class Build : NukeBuild
 {
     [Parameter("Docker image sitecore version")]
     public readonly string XcSitecoreVersion = "9.0.3";
-    public string XcTag => string.IsNullOrEmpty(BuildVersion) ? XcSitecoreVersion : $"{XcSitecoreVersion}-{BuildVersion}";
     // Docker image naming
     [Parameter("Docker image prefix for Sitecore XC")]
     readonly string XcImagePrefix = "sitecore-xc-";
 
-    private string XcFullImageName(string name) => $"{RepoImagePrefix}{XcImageName(name)}";
-    private string XcImageName(string name) => $"{XcImagePrefix}{name}:{XcTag}";
+    private string XcFullImageName(string name) => string.IsNullOrEmpty(BuildVersion) ? 
+    $"{RepoImagePrefix}/{XcImageName(name)}" : 
+    $"{RepoImagePrefix}/{XcImageName(name)}-{BuildVersion}";
+    private string XcImageName(string name) => $"{XcImagePrefix}{name}:{XcSitecoreVersion}";
 
     // Packages
     [Parameter("Sitecore Identity server package")]
@@ -169,7 +170,7 @@ partial class Build : NukeBuild
             System.IO.Directory.SetCurrentDirectory("xc");
 
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XcTag}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
                 @"C:\Scripts\InstallCommercePackages.ps1", 
@@ -232,7 +233,7 @@ partial class Build : NukeBuild
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SCXA_PACKAGE", $"{SCXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XcTag}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
                 @"C:\sxa\InstallSXA.ps1",

@@ -13,13 +13,14 @@ partial class Build : NukeBuild
 {
     [Parameter("Docker image sitecore version")]
     public readonly string BaseSitecoreVersion = "1.0.0";
-    public string BaseTag => string.IsNullOrEmpty(BuildVersion) ? BaseSitecoreVersion : $"{BaseSitecoreVersion}-{BuildVersion}";
     // Docker image naming
     [Parameter("Docker image prefix for Sitecore base")]
     readonly string BaseImagePrefix = "sitecore-base-";
 
-    private string BaseFullImageName(string name) => $"{RepoImagePrefix}{BaseImageName(name)}";
-    private string BaseImageName(string name) => $"{BaseImagePrefix}{name}:{BaseTag}";
+    private string BaseFullImageName(string name) => string.IsNullOrEmpty(BuildVersion) ? 
+    $"{RepoImagePrefix}/{BaseImageName(name)}" : 
+    $"{RepoImagePrefix}/{BaseImageName(name)}-{BuildVersion}";
+    private string BaseImageName(string name) => $"{BaseImagePrefix}{name}:{BaseSitecoreVersion}";
     
     Target BaseOpenJdk => _ => _
         .Executes(() =>
