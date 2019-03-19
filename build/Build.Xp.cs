@@ -58,6 +58,8 @@ partial class Build : NukeBuild
     public AbsolutePath XpLicenseFile = RootDirectory / "xp" / "license" / "license.xml";
 
     Target XpMssql => _ => _
+        .Requires(() => File.Exists(Files / SITECORE_PACKAGE))
+        .Requires(() => File.Exists(Files / XCONNECT_PACKAGE))
         .Executes(() =>
         {
             DockerBuild(x => x
@@ -75,6 +77,8 @@ partial class Build : NukeBuild
         });
 
     Target XpSitecore => _ => _
+        .Requires(() => File.Exists(Files / SITECORE_PACKAGE))
+        .Requires(() => File.Exists(Files / CONFIG_PACKAGE))
         .DependsOn(BaseSitecore)
         .Executes(() =>
         {
@@ -97,6 +101,7 @@ partial class Build : NukeBuild
         });
     
     Target XpSolr => _ => _
+        .Requires(() => File.Exists(Files / XCONNECT_PACKAGE))
         .DependsOn(BaseOpenJdk, BaseSolrBuilder)
         .Executes(() =>
         {
@@ -118,6 +123,8 @@ partial class Build : NukeBuild
         });
 
     Target XpXconnect => _ => _
+        .Requires(() => File.Exists(Files / XCONNECT_PACKAGE))
+        .Requires(() => File.Exists(Files / CONFIG_PACKAGE))
         .DependsOn(BaseSitecore)
         .Executes(() =>
         {
@@ -142,11 +149,11 @@ partial class Build : NukeBuild
     
     Target XpSitecoreMssqlSxa => _ => _
         .Requires(() => File.Exists(XpLicenseFile))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / PSE_PACKAGE))
+        .Requires(() => File.Exists(Files / SXA_PACKAGE))
         .DependsOn(Xp)
         .Executes(() => {
-            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
-            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
-
             System.IO.Directory.SetCurrentDirectory("xp");
 
             // Set env variables for docker-compose
@@ -183,11 +190,10 @@ partial class Build : NukeBuild
         });
 
     Target XpSitecoreMssqlJss => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / JSS_PACKAGE))
         .DependsOn(Xp)
         .Executes(() => {
-            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
-            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
-
             System.IO.Directory.SetCurrentDirectory("xp");
 
             // Set env variables for docker-compose
