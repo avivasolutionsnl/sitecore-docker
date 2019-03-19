@@ -169,7 +169,7 @@ partial class Build : NukeBuild
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xc");
 
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
@@ -232,7 +232,7 @@ partial class Build : NukeBuild
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SCXA_PACKAGE", $"{SCXA_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
@@ -271,13 +271,13 @@ partial class Build : NukeBuild
 
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("JSS_PACKAGE", $"{JSS_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XcVersion}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
                 @"C:\jss\InstallJSS.ps1",
-                XcFullImageName("sitecore-jss"), 
-                XcFullImageName("mssql-jss"),
+                XcImageName("sitecore-jss"), 
+                XcImageName("mssql-jss"),
                 "-f docker-compose.yml -f docker-compose.jss.yml"
             );
 
@@ -312,6 +312,7 @@ partial class Build : NukeBuild
         });
 
     Target PushXcJss => _ => _
+        .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .Executes(() => {
             PushXcImage("mssql-jss");
             PushXcImage("sitecore-jss");
