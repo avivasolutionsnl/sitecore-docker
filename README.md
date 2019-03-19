@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/joost0053/joost/_apis/build/status/joostmeijles.sitecore-docker)](https://dev.azure.com/joost0053/joost/_build/latest?definitionId=2)
+[![Build Status](https://dev.azure.com/avivasolutions-public/sitecore-docker/_apis/build/status/avivasolutionsnl.sitecore-docker?branchName=master)](https://dev.azure.com/avivasolutions-public/sitecore-docker/_build/latest?definitionId=1&branchName=master)
 
 Run Sitecore 9 XP0 and XC using Docker for Windows.
 
