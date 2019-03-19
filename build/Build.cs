@@ -78,8 +78,6 @@ partial class Build : NukeBuild
                 .SetContainer(mssqlContainerName)
                 .SetCommand("powershell")
                 .SetArgs(@"C:\Persist-Databases.ps1")
-                .SetInteractive(true)
-                .SetTty(true)
             );
 
             DockerCompose("stop");
