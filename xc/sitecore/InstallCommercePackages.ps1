@@ -73,6 +73,9 @@ Function InitializeCommerceServices {
 
 Copy-Item -Path /Files/CommerceSIF/SiteUtilityPages -Destination c:\\inetpub\\wwwroot\\sitecore\\SiteUtilityPages -Force -Recurse
 
+# Enlarge timeout to 7200 seconds
+((Get-Content -path C:/Files/CommerceSIF/Modules/SitecoreUtilityTasks/SitecoreUtilityTasks.psm1 -Raw) -replace '720','7200') | Set-Content -Path C:/Files/CommerceSIF/Modules/SitecoreUtilityTasks/SitecoreUtilityTasks.psm1
+
 Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/Connect/Connect.json' `
      -ModuleFullPath '/Files/SitecoreCommerceConnectCore/package.zip' `
      -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
