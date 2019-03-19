@@ -152,7 +152,7 @@ partial class Build : NukeBuild
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XpImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XpImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XpSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
@@ -192,13 +192,13 @@ partial class Build : NukeBuild
 
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("JSS_PACKAGE", $"{JSS_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XpImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XpVersion}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XpImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XpSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
                 @"C:\jss\InstallJSS.ps1",
-                XpFullImageName("sitecore-jss"),
-                XpFullImageName("mssql-jss"),
+                XpImageName("sitecore-jss"),
+                XpImageName("mssql-jss"),
                 "-f docker-compose.yml -f docker-compose.build-jss.yml"
             );
 
@@ -232,6 +232,7 @@ partial class Build : NukeBuild
         });
 
     Target PushXpJss => _ => _
+        .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .Executes(() => {
             PushXpImage("mssql-jss");
             PushXpImage("sitecore-jss");
