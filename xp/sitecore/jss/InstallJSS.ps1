@@ -9,6 +9,8 @@ $filesPath = "/files-mount"
 # Copy utilities to install packages (this is taken from Sitecore Commerce SIF)
 Copy-Item -Path $env:INSTALL_TEMP/SiteUtilityPages -Destination c:\\inetpub\\wwwroot\\sitecore -Force -Recurse
 
-# Install PSE and SXA packages
+# Install JSS packages
 Install-SitecoreConfiguration -Path '/jss/install-jss.json' `
-    -JSSPackageFullPath "$filesPath/$env:JSS_PACKAGE"
+    -JSSPackageFullPath "$filesPath/$env:JSS_PACKAGE" `
+    -TransformFolderPath 'c:\jss' `
+    -SitePhysicalPath 'c:\inetpub\wwwroot\sitecore'
