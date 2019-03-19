@@ -63,8 +63,6 @@ partial class Build : NukeBuild
                 .SetContainer(sitecoreContainerName)
                 .SetCommand("powershell")
                 .SetArgs(scriptFilename)
-                .SetInteractive(true)
-                .SetTty(true)
             );
 
             DockerCompose("stop");
