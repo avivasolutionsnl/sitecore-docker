@@ -1,0 +1,12 @@
+# Overlay file for Aviva Solutions SXA specific Docker image names
+version: '2.4'
+
+services:
+  commerce:
+    image: "${IMAGE_PREFIX}commerce:${TAG}"
+
+  mssql:
+    image: "${IMAGE_PREFIX}mssql-jss:${TAG}"
+
+  sitecore:
+    image: "${IMAGE_PREFIX}sitecore-jss:${TAG}"

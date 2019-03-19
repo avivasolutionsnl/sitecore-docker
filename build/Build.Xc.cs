@@ -92,6 +92,12 @@ partial class Build : NukeBuild
     public AbsolutePath XcLicenseFile = RootDirectory / "xc" / "license" / "license.xml";
 
     Target XcCommerce => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_SDK_PACKAGE))
+        .Requires(() => File.Exists(Files / SITECORE_BIZFX_PACKAGE))
+        .Requires(() => File.Exists(Files / SITECORE_IDENTITY_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / PLUMBER_FILE_NAME))
         .Executes(() =>
         {
             DockerBuild(x => x
@@ -119,6 +125,7 @@ partial class Build : NukeBuild
         });
 
     Target XcMssqlIntermediate => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SDK_PACKAGE))
         .DependsOn(XpMssql)
         .Executes(() =>
         {
@@ -138,6 +145,13 @@ partial class Build : NukeBuild
         });
 
     Target XcSitecoreIntermediate => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_MA_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XPROFILES_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XANALYTICS_PACKAGE))
         .DependsOn(XpSitecore)
         .Executes(() =>
         {
@@ -169,7 +183,7 @@ partial class Build : NukeBuild
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xc");
 
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
@@ -183,6 +197,7 @@ partial class Build : NukeBuild
         });
     
     Target XcSolr => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .DependsOn(BaseSolrBuilder, XpSolr)
         .Executes(() =>
         {
@@ -203,6 +218,7 @@ partial class Build : NukeBuild
         });
 
     Target XcXconnect => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE))
         .DependsOn(XpXconnect)
         .Executes(() =>
         {
@@ -221,18 +237,16 @@ partial class Build : NukeBuild
 
     Target XcSitecoreMssqlSxa => _ => _
         .Requires(() => File.Exists(XcLicenseFile))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .DependsOn(XcSitecoreMssql, XcSolrSxa)
         .Executes(() => {
-            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
-            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
-            
             System.IO.Directory.SetCurrentDirectory("xc");
 
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SCXA_PACKAGE", $"{SCXA_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XcImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
@@ -261,11 +275,35 @@ partial class Build : NukeBuild
             );
         });
 
+   Target XcSitecoreMssqlJss => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .DependsOn(XcSitecoreMssql)
+        .Executes(() => {
+            System.IO.Directory.SetCurrentDirectory("xc");
+
+            // Set env variables for docker-compose
+            Environment.SetEnvironmentVariable("JSS_PACKAGE", $"{JSS_PACKAGE}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
+
+            InstallSitecorePackage(
+                @"C:\jss\InstallJSS.ps1",
+                XcImageName("sitecore-jss"), 
+                XcImageName("mssql-jss"),
+                "-f docker-compose.yml -f docker-compose.jss.yml"
+            );
+
+            System.IO.Directory.SetCurrentDirectory("..");
+        });        
+
     Target Xc => _ => _
         .DependsOn(XcCommerce, XcSitecoreMssql, XcSolr, XcXconnect);
 
     Target XcSxa => _ => _
         .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);
+
+    Target XcJss => _ => _
+        .DependsOn(Xc, XcSitecoreMssqlJss);        
 
     Target PushXc => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
@@ -284,6 +322,13 @@ partial class Build : NukeBuild
             PushXcImage("sitecore-sxa");
             PushXcImage("solr-sxa");
         });
+
+    Target PushXcJss => _ => _
+        .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
+        .Executes(() => {
+            PushXcImage("mssql-jss");
+            PushXcImage("sitecore-jss");
+        });    
 
     private void PushXcImage(string name)
     {

@@ -30,7 +30,7 @@ Put the `license.xml` in `xp/license/` for xp containers or in `xc/license/` for
 The XP0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
 xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script (note that this requires an Administrator elevated powershell environment and you may need to set the correct execution policy, e.g. `PS> powershell.exe -ExecutionPolicy Unrestricted`).
 
-> SXA is installed using Commerce SIF. Therefore building SXA images requires you have the Commerce SIF package availabled in the `Files` directory.
+> SXA and JSS are installed using Commerce SIF. Therefore building those images requires you have the Commerce SIF package availabled in the `Files` directory.
 
 ## Build
 Build all images using:
@@ -53,6 +53,9 @@ The build results in the following Docker images:
     - `sitecore-xp-sitecore-sxa`
     - `sitecore-xp-solr-sxa`
     - `sitecore-xp-mssql-sxa`
+- XP0 with JSS installed
+    - `sitecore-xp-sitecore-jss`
+    - `sitecore-xp-mssql-jss`
 
 - XC
     - `sitecore-xc-commerce`: ASP.NET
@@ -66,6 +69,9 @@ The build results in the following Docker images:
     - `sitecore-xc-sitecore-sxa`
     - `sitecore-xc-solr-sxa`
     - `sitecore-xc-mssql-sxa`
+- XC with JSS installed
+    - `sitecore-xc-sitecore-jss`
+    - `sitecore-xc-mssql-jss`
 
 All images are contain a version tag that corresponds to the Sitecore commercial version number e.g. `xp-sitecore-sitecore:9.0.2`.
 
@@ -109,6 +115,11 @@ PS> docker-compose up
 or to start Sitecore with SXA:
 ```
 PS> docker-compose -f docker-compose.yml -f docker-compose.sxa.yml up
+```
+
+or to start Sitecore with JSS:
+```
+PS> docker-compose -f docker-compose.yml -f docker-compose.jss.yml up
 ```
 
 Run-time parameters can be modified using the `.env` file:

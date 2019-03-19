@@ -37,6 +37,9 @@ partial class Build : NukeBuild
     
     [Parameter("SXA package")]
     readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.0.zip";
+        
+    [Parameter("JSS package")]
+    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.0 11.0.0 rev. 181031.zip";
 
     // Build configuration parameters
     [Parameter("SQL password")]
@@ -55,6 +58,8 @@ partial class Build : NukeBuild
     public AbsolutePath XpLicenseFile = RootDirectory / "xp" / "license" / "license.xml";
 
     Target XpMssql => _ => _
+        .Requires(() => File.Exists(Files / SITECORE_PACKAGE))
+        .Requires(() => File.Exists(Files / XCONNECT_PACKAGE))
         .Executes(() =>
         {
             DockerBuild(x => x
@@ -72,6 +77,8 @@ partial class Build : NukeBuild
         });
 
     Target XpSitecore => _ => _
+        .Requires(() => File.Exists(Files / SITECORE_PACKAGE))
+        .Requires(() => File.Exists(Files / CONFIG_PACKAGE))
         .DependsOn(BaseSitecore)
         .Executes(() =>
         {
@@ -94,6 +101,7 @@ partial class Build : NukeBuild
         });
     
     Target XpSolr => _ => _
+        .Requires(() => File.Exists(Files / XCONNECT_PACKAGE))
         .DependsOn(BaseOpenJdk, BaseSolrBuilder)
         .Executes(() =>
         {
@@ -115,6 +123,8 @@ partial class Build : NukeBuild
         });
 
     Target XpXconnect => _ => _
+        .Requires(() => File.Exists(Files / XCONNECT_PACKAGE))
+        .Requires(() => File.Exists(Files / CONFIG_PACKAGE))
         .DependsOn(BaseSitecore)
         .Executes(() =>
         {
@@ -139,17 +149,17 @@ partial class Build : NukeBuild
     
     Target XpSitecoreMssqlSxa => _ => _
         .Requires(() => File.Exists(XpLicenseFile))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / PSE_PACKAGE))
+        .Requires(() => File.Exists(Files / SXA_PACKAGE))
         .DependsOn(Xp)
         .Executes(() => {
-            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
-            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
-
             System.IO.Directory.SetCurrentDirectory("xp");
 
             // Set env variables for docker-compose
             Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{RepoImagePrefix}{XpImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XpImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XpSitecoreVersion}", EnvironmentVariableTarget.Process);
 
             InstallSitecorePackage(
@@ -179,11 +189,36 @@ partial class Build : NukeBuild
             );
         });
 
+    Target XpSitecoreMssqlJss => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / JSS_PACKAGE))
+        .DependsOn(Xp)
+        .Executes(() => {
+            System.IO.Directory.SetCurrentDirectory("xp");
+
+            // Set env variables for docker-compose
+            Environment.SetEnvironmentVariable("JSS_PACKAGE", $"{JSS_PACKAGE}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XpImagePrefix}", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("TAG", $"{XpSitecoreVersion}", EnvironmentVariableTarget.Process);
+
+            InstallSitecorePackage(
+                @"C:\jss\InstallJSS.ps1",
+                XpImageName("sitecore-jss"),
+                XpImageName("mssql-jss"),
+                "-f docker-compose.yml -f docker-compose.build-jss.yml"
+            );
+
+            System.IO.Directory.SetCurrentDirectory("..");
+        });        
+
     Target Xp => _ => _
         .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect);
 
     Target XpSxa => _ => _
         .DependsOn(XpSitecoreMssqlSxa, XpSolrSxa);
+
+    Target XpJss => _ => _
+        .DependsOn(XpSitecoreMssqlJss);
 
     Target PushXp => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
@@ -201,6 +236,13 @@ partial class Build : NukeBuild
             PushXpImage("sitecore-sxa");
             PushXpImage("solr-sxa");
         });
+
+    Target PushXpJss => _ => _
+        .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
+        .Executes(() => {
+            PushXpImage("mssql-jss");
+            PushXpImage("sitecore-jss");
+        });     
 
     private void PushXpImage(string name)
     {
