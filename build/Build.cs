@@ -26,6 +26,8 @@ partial class Build : NukeBuild
 
     [PathExecutable] readonly Tool Powershell;
 
+    private static readonly AbsolutePath Files = RootDirectory / "Files";
+
     // Docker options
     [Parameter("Docker image repository prefix, e.g. my.docker-image.repo/")]
     readonly string RepoImagePrefix = "";

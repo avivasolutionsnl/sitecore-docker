@@ -92,6 +92,12 @@ partial class Build : NukeBuild
     public AbsolutePath XcLicenseFile = RootDirectory / "xc" / "license" / "license.xml";
 
     Target XcCommerce => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_SDK_PACKAGE))
+        .Requires(() => File.Exists(Files / SITECORE_BIZFX_PACKAGE))
+        .Requires(() => File.Exists(Files / SITECORE_IDENTITY_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / PLUMBER_FILE_NAME))
         .Executes(() =>
         {
             DockerBuild(x => x
@@ -119,6 +125,7 @@ partial class Build : NukeBuild
         });
 
     Target XcMssqlIntermediate => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SDK_PACKAGE))
         .DependsOn(XpMssql)
         .Executes(() =>
         {
@@ -138,6 +145,13 @@ partial class Build : NukeBuild
         });
 
     Target XcSitecoreIntermediate => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_MA_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XPROFILES_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XANALYTICS_PACKAGE))
         .DependsOn(XpSitecore)
         .Executes(() =>
         {
@@ -183,6 +197,7 @@ partial class Build : NukeBuild
         });
     
     Target XcSolr => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .DependsOn(BaseSolrBuilder, XpSolr)
         .Executes(() =>
         {
@@ -203,6 +218,7 @@ partial class Build : NukeBuild
         });
 
     Target XcXconnect => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE))
         .DependsOn(XpXconnect)
         .Executes(() =>
         {
@@ -221,11 +237,9 @@ partial class Build : NukeBuild
 
     Target XcSitecoreMssqlSxa => _ => _
         .Requires(() => File.Exists(XcLicenseFile))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .DependsOn(XcSitecoreMssql, XcSolrSxa)
         .Executes(() => {
-            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
-            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
-            
             System.IO.Directory.SetCurrentDirectory("xc");
 
             // Set env variables for docker-compose
@@ -262,11 +276,9 @@ partial class Build : NukeBuild
         });
 
    Target XcSitecoreMssqlJss => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .DependsOn(XcSitecoreMssql)
         .Executes(() => {
-            var sifPackageFile = $"./Files/{COMMERCE_SIF_PACKAGE}";
-            ControlFlow.Assert(File.Exists(sifPackageFile), "Cannot find {sifPackageFile}");
-            
             System.IO.Directory.SetCurrentDirectory("xc");
 
             // Set env variables for docker-compose
