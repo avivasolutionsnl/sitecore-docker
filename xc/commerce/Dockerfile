@@ -74,7 +74,7 @@ RUN /Scripts/Install-SIF.ps1
 
 # Configure
 RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce/Modules'); `
-    $solrUrl = 'https://solr:{0}/solr' -f $Env:SOLR_PORT; `
+    $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     $engineZip = '/Files/{0}' -f $Env:COMMERCE_ENGINE_PACKAGE; `
     Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/CommerceEngine/CommerceEngine.Deploy.json' `
     -CommerceServicesDbServer $Env:SQL_SERVER `
