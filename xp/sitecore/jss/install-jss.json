@@ -24,6 +24,16 @@
       "Type": "string",
       "Description": "The utility pages base url.",
       "DefaultValue": "http://sitecore/SiteUtilityPages"
+    },
+    "TransformFolderPath": {
+      "Type": "string",
+      "Description": "The path of the file used to transform the web.config.",
+      "DefaultValue": "."
+    },
+    "SitePhysicalPath": {
+      "Type": "string",
+      "Description": "The physical path of the sitecore site.",
+      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore"
     }
   },
   "Modules": [ "SitecoreUtilityTasks" ],
@@ -43,6 +53,13 @@
         "PackageFullPath": "[parameter('JSSPackageFullPath')]",
         "PackagesDirDst": "[parameter('PackagesDirDst')]",
         "BaseUrl": "[parameter('BaseUrl')]"
+      }
+    },
+    "Transform-WebConfig": {
+      "Type": "TransformXmlDoc",
+      "Params": {
+          "RootDirectoryPath": "[parameter('SitePhysicalPath')]",
+          "XdtDirectory": "[parameter('TransformFolderPath')]"
       }
     }
   }
