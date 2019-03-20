@@ -65,8 +65,6 @@ partial class Build : NukeBuild
                 .SetContainer(sitecoreContainerName)
                 .SetCommand("powershell")
                 .SetArgs(scriptFilename)
-                .SetInteractive(true)
-                .SetTty(true)
             );
 
             DockerCompose("stop");
@@ -82,8 +80,6 @@ partial class Build : NukeBuild
                 .SetContainer(mssqlContainerName)
                 .SetCommand("powershell")
                 .SetArgs(@"C:\Persist-Databases.ps1")
-                .SetInteractive(true)
-                .SetTty(true)
             );
 
             DockerCompose("stop");

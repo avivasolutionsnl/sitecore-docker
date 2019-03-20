@@ -1,14 +1,54 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
 
-pool:
-  vmImage: 'Ubuntu-16.04'
+jobs:
+- job: Build
+  pool:
+    vmImage: 'Windows-2019'
+  # Use maximum timeout, ie. 6 hours 
+  timeoutInMinutes: 0
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Test'
+  steps:
+  - powershell: |
+      $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
+      $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
+      New-PSDrive -Name Z -PSProvider FileSystem -Root $env:storageAccountLocation -Credential $credential -Persist;
+    env:
+      storageAccountKey: $(storageAccountKey)
+      storageAccountName: $(storageAccountName)
+      storageAccountLocation: $(storageAccountLocation)
+    displayName: 'Mount Files'
+
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: Z:/ 
+      targetFolder: Files
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: 'Copy XC license'
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xc/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: 'Copy XP license'
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xp/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - powershell: | 
+      If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
+    displayName: 'Generate certificates'
+
+  - task: PowerShell@2
+    displayName: 'Run NUKE Build'
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: > 
+          Xc
