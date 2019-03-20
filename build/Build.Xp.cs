@@ -189,10 +189,24 @@ partial class Build : NukeBuild
             );
         });
 
+    Target XpSitecoreJss => _ => _
+        .DependsOn(XpSitecore)
+        .Executes(() => {
+            var baseImage = XpImageName("sitecore");
+
+            DockerBuild(x => x
+                .SetPath("xp/sitecore/jss")
+                .SetTag(XpImageName("sitecore-jss"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}"
+                })
+            );
+        });        
+
     Target XpSitecoreMssqlJss => _ => _
         .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .Requires(() => File.Exists(Files / JSS_PACKAGE))
-        .DependsOn(Xp)
+        .DependsOn(Xp, XpSitecoreJss)
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xp");
 
@@ -205,7 +219,7 @@ partial class Build : NukeBuild
                 @"C:\jss\InstallJSS.ps1",
                 XpImageName("sitecore-jss"),
                 XpImageName("mssql-jss"),
-                "-f docker-compose.yml -f docker-compose.build-jss.yml"
+                "-f docker-compose.yml -f docker-compose.jss.yml"
             );
 
             System.IO.Directory.SetCurrentDirectory("..");
