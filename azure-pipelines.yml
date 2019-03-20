@@ -51,4 +51,4 @@ jobs:
       targetType: 'filePath'
       filePath: build.ps1
       arguments: > 
-          Xc
+          All
