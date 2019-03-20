@@ -2,7 +2,7 @@ version: '2.4'
 
 services:
   sitecore:
-    image: "${IMAGE_PREFIX}sitecore:${TAG}"
+    image: "${IMAGE_PREFIX}sitecore-jss:${TAG}"
     volumes:
       - ..\xp\sitecore\jss:C:\jss
       - ..\files:C:\files-mount
