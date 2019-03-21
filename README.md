@@ -112,6 +112,11 @@ To start Sitecore;
 PS> docker-compose up
 ```
 
+If you are using xc then you also have to install the root certificate:
+```
+PS> .\InstallRootCertificate.ps1
+```
+
 or to start Sitecore with SXA:
 ```
 PS> docker-compose -f docker-compose.yml -f docker-compose.sxa.yml up
