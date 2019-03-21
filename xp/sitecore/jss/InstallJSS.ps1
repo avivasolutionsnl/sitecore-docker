@@ -9,6 +9,9 @@ $filesPath = "/files-mount"
 # Copy utilities to install packages (this is taken from Sitecore Commerce SIF)
 Copy-Item -Path $env:INSTALL_TEMP/SiteUtilityPages -Destination c:\\inetpub\\wwwroot\\sitecore -Force -Recurse
 
+# Copy custom version of InstallModules.aspx. The normal one does not create accounts, which results in a missing JssImport user 
+Copy-Item -Path /jss/InstallModules.aspx -Destination c:\\inetpub\\wwwroot\\sitecore\\SiteUtilityPages -Force 
+
 # Install JSS packages
 Install-SitecoreConfiguration -Path '/jss/install-jss.json' `
     -JSSPackageFullPath "$filesPath/$env:JSS_PACKAGE" `
