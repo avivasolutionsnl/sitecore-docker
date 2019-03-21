@@ -18,7 +18,7 @@
     "PackagesDirDst": {
       "Type": "string",
       "Description": "The path to packages directory.",
-      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\sitecore\\admin\\Packages\\"
+      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\App_Data\\packages"
     },
     "BaseUrl": {
       "Type": "string",
@@ -48,10 +48,10 @@
       }
     },
     "InstallPSEPackage": {
-      "Type": "InstallPackage",
+      "Type": "InstallModule",
       "Params": {
-        "PackageFullPath": "[parameter('JSSPackageFullPath')]",
-        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "ModuleFullPath": "[parameter('JSSPackageFullPath')]",
+        "ModulesDirDst": "[parameter('PackagesDirDst')]",
         "BaseUrl": "[parameter('BaseUrl')]"
       }
     },
