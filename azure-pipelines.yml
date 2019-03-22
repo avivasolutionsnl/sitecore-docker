@@ -46,9 +46,21 @@ jobs:
     displayName: 'Generate certificates'
 
   - task: PowerShell@2
-    displayName: 'Run NUKE Build'
+    displayName: 'Build images'
     inputs:
       targetType: 'filePath'
       filePath: build.ps1
       arguments: > 
           Xc
+  
+  - powershell: |
+      $gitTag=(git describe --exact-match)
+      If ($gitTag) { 
+        $buildVersion=$gitTag.Substring($gitTag.IndexOf("-")+1);
+        Write-Host "Pushing build Docker images to $(DockerRepoImagePrefix) with as build version $gitTag";
+        build.ps1 PushXp --RepoImagePrefix $(DockerRepoImagePrefix) --BuildVersion $buildVersion;
+        build.ps1 PushXc --RepoImagePrefix $(DockerRepoImagePrefix) --BuildVersion $buildVersion
+      } Else { 
+        Write-Host "Not pushing Docker images as there is no Git tag, i.e. Github release associated on the current commit" 
+      }
+    displayName: '(Optionally) Push images'
