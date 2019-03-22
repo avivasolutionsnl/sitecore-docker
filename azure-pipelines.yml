@@ -53,7 +53,7 @@ jobs:
   #     arguments: > 
   #         Xc
   
-  - powershell: Write-Host $env:dockerPwd | docker login -u $env:dockerId --password-stdin "$env:dockerId.azurecr.io"
+  - powershell: echo $env:dockerPwd | docker login -u $env:dockerId --password-stdin "$env:dockerId.azurecr.io"
     displayName: Docker login
     env:
       dockerId: $(dockerId)
