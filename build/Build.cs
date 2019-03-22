@@ -47,7 +47,7 @@ partial class Build : NukeBuild
             var outputs = Nuke.Common.Tools.Git.GitTasks.Git("describe --exact-match --tags", logOutput: false);
 
             if (outputs.Any()) {
-                return outputs.Select(x => x.Text).Single();
+                return outputs.Single().Text;
             }
         } catch {
             // no tag found
