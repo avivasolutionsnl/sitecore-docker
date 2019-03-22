@@ -127,6 +127,6 @@ partial class Build : NukeBuild
         .DependsOn(Xp, XpSxa, XpJss, Xc, XcSxa, XcJss);
 
     Target Push => _ => _
-        .OnlyWhen(() => HasGitTag() || ForcePush)
+        .OnlyWhenStatic(() => HasGitTag() || ForcePush)
         .DependsOn(PushXp, PushXpSxa, PushXpJss, PushXc, PushXcSxa, PushXcJss);
 }
