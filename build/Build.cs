@@ -10,7 +10,6 @@ using static Nuke.Docker.DockerTasks;
 using static Nuke.Common.Tools.Git.GitTasks;
 using Nuke.Docker;
 using Nuke.Common.Tooling;
-using Nuke.Common.Git;
 
 partial class Build : NukeBuild
 {
