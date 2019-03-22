@@ -9,41 +9,41 @@ jobs:
   timeoutInMinutes: 0
 
   steps:
-  - powershell: |
-      $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
-      $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
-      New-PSDrive -Name Z -PSProvider FileSystem -Root "$env:storageAccountLocation" -Credential $credential -Persist;
-    env:
-      storageAccountKey: $(storageAccountKey)
-      storageAccountName: $(storageAccountName)
-      storageAccountLocation: $(storageAccountLocation)
-    displayName: Mount Files
+  # - powershell: |
+  #     $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
+  #     $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
+  #     New-PSDrive -Name Z -PSProvider FileSystem -Root "$env:storageAccountLocation" -Credential $credential -Persist;
+  #   env:
+  #     storageAccountKey: $(storageAccountKey)
+  #     storageAccountName: $(storageAccountName)
+  #     storageAccountLocation: $(storageAccountLocation)
+  #   displayName: Mount Files
 
-  - task: CopyFiles@2
-    inputs:
-      sourceFolder: Z:/ 
-      targetFolder: Files
-      cleanTargetFolder: true
+  # - task: CopyFiles@2
+  #   inputs:
+  #     sourceFolder: Z:/ 
+  #     targetFolder: Files
+  #     cleanTargetFolder: true
 
-  - task: CopyFiles@2
-    displayName: Copy XC license
-    inputs:
-      sourceFolder: Z:/
-      targetFolder: xc/license/
-      contents: license.xml
-      cleanTargetFolder: true
+  # - task: CopyFiles@2
+  #   displayName: Copy XC license
+  #   inputs:
+  #     sourceFolder: Z:/
+  #     targetFolder: xc/license/
+  #     contents: license.xml
+  #     cleanTargetFolder: true
 
-  - task: CopyFiles@2
-    displayName: Copy XP license
-    inputs:
-      sourceFolder: Z:/
-      targetFolder: xp/license/
-      contents: license.xml
-      cleanTargetFolder: true
+  # - task: CopyFiles@2
+  #   displayName: Copy XP license
+  #   inputs:
+  #     sourceFolder: Z:/
+  #     targetFolder: xp/license/
+  #     contents: license.xml
+  #     cleanTargetFolder: true
 
-  - powershell: | 
-      If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
-    displayName: Generate certificates
+  # - powershell: | 
+  #     If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
+  #   displayName: Generate certificates
 
   # - task: PowerShell@2
   #   displayName: Build images
@@ -53,8 +53,11 @@ jobs:
   #     arguments: > 
   #         Xc
   
-  - powershell: echo $(dockerPwd) | docker login -u $(dockerId) --password-stdin $(dockerId).azurecr.io
+  - powershell: Write-Host $env:dockerPwd | docker login -u $env:dockerId --password-stdin "$env:dockerId.azurecr.io"
     displayName: Docker login
+    env:
+      - dockerId: $(dockerId)
+      - dockerPwd: $(dockerPwd)
 
   - task: PowerShell@2
     displayName: (Optionally) Push images
