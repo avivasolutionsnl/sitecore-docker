@@ -7,6 +7,7 @@ using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Docker.DockerTasks;
+using static Nuke.Common.Tools.Git.GitTasks;
 using Nuke.Docker;
 using Nuke.Common.Tooling;
 using Nuke.Common.Git;
@@ -44,7 +45,7 @@ partial class Build : NukeBuild
     // returns null if not tagged
     private static string GetCurrentGitTag() {
         try {
-            var outputs = Nuke.Common.Tools.Git.GitTasks.Git("describe --exact-match --tags", logOutput: false);
+            var outputs = Git("describe --exact-match --tags", logOutput: false);
 
             if (outputs.Any()) {
                 return outputs.Single().Text;
