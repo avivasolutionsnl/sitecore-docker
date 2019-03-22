@@ -45,15 +45,15 @@ jobs:
       If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
     displayName: Generate certificates
 
-  - task: PowerShell@2
-    displayName: Build images
-    inputs:
-      targetType: 'filePath'
-      filePath: build.ps1
-      arguments: > 
-          Xc
+  # - task: PowerShell@2
+  #   displayName: Build images
+  #   inputs:
+  #     targetType: 'filePath'
+  #     filePath: build.ps1
+  #     arguments: > 
+  #         Xc
   
-  - powershell: docker login -u $(dockerId) -p $(dockerPwd) $(dockerId).azurecr.io
+  - powershell: echo $(dockerPwd) | docker login -u $(dockerId) --password-stdin $(dockerId).azurecr.io
     displayName: Docker login
 
   - task: PowerShell@2
