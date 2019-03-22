@@ -52,12 +52,12 @@ jobs:
   #     filePath: build.ps1
   #     arguments: > 
   #         Xc
-  
-  - powershell: echo $env:dockerPwd | docker login -u $env:dockerId --password-stdin "$env:dockerId.azurecr.io"
+
+  - powershell: echo $env:PWD | docker login -u $env:ID --password-stdin "$env:ID.azurecr.io"
     displayName: Docker login
     env:
-      dockerId: $(dockerId)
-      dockerPwd: $(dockerPwd)
+      ID: $(dockerId)
+      PWD: $(dockerPwd)
 
   - task: PowerShell@2
     displayName: (Optionally) Push images
