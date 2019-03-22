@@ -4,7 +4,7 @@ trigger:
 jobs:
 - job: Build
   pool:
-    vmImage: 'Windows-2019'
+    vmImage: Windows-2019
   # Use maximum timeout, ie. 6 hours 
   timeoutInMinutes: 0
 
@@ -17,7 +17,7 @@ jobs:
       storageAccountKey: $(storageAccountKey)
       storageAccountName: $(storageAccountName)
       storageAccountLocation: $(storageAccountLocation)
-    displayName: 'Mount Files'
+    displayName: Mount Files
 
   - task: CopyFiles@2
     inputs:
@@ -26,7 +26,7 @@ jobs:
       cleanTargetFolder: true
 
   - task: CopyFiles@2
-    displayName: 'Copy XC license'
+    displayName: Copy XC license
     inputs:
       sourceFolder: Z:/
       targetFolder: xc/license/
@@ -34,7 +34,7 @@ jobs:
       cleanTargetFolder: true
 
   - task: CopyFiles@2
-    displayName: 'Copy XP license'
+    displayName: Copy XP license
     inputs:
       sourceFolder: Z:/
       targetFolder: xp/license/
@@ -43,24 +43,24 @@ jobs:
 
   - powershell: | 
       If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
-    displayName: 'Generate certificates'
+    displayName: Generate certificates
 
   - task: PowerShell@2
-    displayName: 'Build images'
+    displayName: Build images
     inputs:
       targetType: 'filePath'
       filePath: build.ps1
       arguments: > 
           Xc
   
-  - powershell: |
-      $gitTag=(git describe --exact-match)
-      If ($gitTag) { 
-        $buildVersion=$gitTag.Substring($gitTag.IndexOf("-")+1);
-        Write-Host "Pushing build Docker images to $(DockerRepoImagePrefix) with as build version $gitTag";
-        build.ps1 PushXp --RepoImagePrefix $(DockerRepoImagePrefix) --BuildVersion $buildVersion;
-        build.ps1 PushXc --RepoImagePrefix $(DockerRepoImagePrefix) --BuildVersion $buildVersion
-      } Else { 
-        Write-Host "Not pushing Docker images as there is no Git tag, i.e. Github release associated on the current commit" 
-      }
-    displayName: '(Optionally) Push images'
+  - powershell: docker login -u $(dockerId) -p $(dockerPwd) $(dockerId).azurecr.io
+    displayName: Docker login
+
+  - task: PowerShell@2
+    displayName: (Optionally) Push images
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: > 
+          PushXp
+          PushXc

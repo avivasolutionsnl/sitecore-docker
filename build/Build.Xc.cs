@@ -307,6 +307,7 @@ partial class Build : NukeBuild
 
     Target PushXc => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
+        .OnlyWhen(() => HasGitTag() || ForcePush)
         .Executes(() => {
             PushXcImage("commerce");
             PushXcImage("mssql");
@@ -317,6 +318,7 @@ partial class Build : NukeBuild
     
     Target PushXcSxa => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
+        .OnlyWhen(() => HasGitTag() || ForcePush)
         .Executes(() => {
             PushXcImage("mssql-sxa");
             PushXcImage("sitecore-sxa");
@@ -325,6 +327,7 @@ partial class Build : NukeBuild
 
     Target PushXcJss => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
+        .OnlyWhen(() => HasGitTag() || ForcePush)
         .Executes(() => {
             PushXcImage("mssql-jss");
             PushXcImage("sitecore-jss");
