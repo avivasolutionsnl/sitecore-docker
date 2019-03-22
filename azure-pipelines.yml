@@ -63,7 +63,7 @@ jobs:
     displayName: Container registry login
     inputs:
       command: login
-      containerregistrytype: Container Registry
+      containerregistrytype: dockerregistry
       azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
       azureContainerRegistry: $(azureContainerRegistry)
 
