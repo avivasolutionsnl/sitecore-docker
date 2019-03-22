@@ -28,8 +28,6 @@ partial class Build : NukeBuild
     // Tools
     [PathExecutable(name: "docker-compose")] readonly Tool DockerCompose;
 
-    [PathExecutable] readonly Tool Git;
-
     private static readonly AbsolutePath Files = RootDirectory / "Files";
 
     // Docker options
