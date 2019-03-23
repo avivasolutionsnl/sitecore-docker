@@ -63,7 +63,7 @@ partial class Build : NukeBuild
 
     Target PushBase => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
-        .OnlyWhenStatic(() => HasGitTag() || ForcePush)
+        .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .Executes(() => {
             PushBaseImage("openjdk");
             PushBaseImage("sitecore");

@@ -53,6 +53,7 @@ partial class Build : NukeBuild
             // no tag found
         }
         
+        Console.WriteLine("No Git tag found for current commit");
         return null;
     }
 
@@ -126,6 +127,6 @@ partial class Build : NukeBuild
         .DependsOn(Xp, XpSxa, XpJss, Xc, XcSxa, XcJss);
 
     Target Push => _ => _
-        .OnlyWhenStatic(() => HasGitTag() || ForcePush)
+        .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .DependsOn(PushXp, PushXpSxa, PushXpJss, PushXc, PushXcSxa, PushXcJss);
 }
