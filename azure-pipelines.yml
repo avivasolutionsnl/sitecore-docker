@@ -53,19 +53,21 @@ jobs:
   #     arguments: > 
   #         Xc
 
-  # - powershell: echo $env:PWD | docker login -u $env:ID --password-stdin "$env:ID.azurecr.io"
-  #   displayName: Docker login
-  #   env:
-  #     ID: $(dockerId)
-  #     PWD: $(dockerPwd)
+  - powershell: |
+      "test" | echo
+      $env:PWD | docker login -u $env:ID --password-stdin "$env:ID.azurecr.io"
+    displayName: Docker login
+    env:
+      ID: $(dockerId)
+      PWD: $(dockerPwd)
 
-  - task: Docker@1
-    displayName: Container registry login
-    inputs:
-      command: login
-      containerregistrytype: dockerregistry
-      azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
-      azureContainerRegistry: $(azureContainerRegistry)
+  # - task: Docker@1
+  #   displayName: Container registry login
+  #   inputs:
+  #     command: login
+  #     containerregistrytype: dockerregistry
+  #     azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+  #     azureContainerRegistry: $(azureContainerRegistry)
 
   - task: PowerShell@2
     displayName: (Optionally) Push images
