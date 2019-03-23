@@ -4,7 +4,7 @@ trigger:
 jobs:
 - job: Build
   pool:
-    vmImage: 'Windows-2019'
+    vmImage: Windows-2019
   # Use maximum timeout, ie. 6 hours 
   timeoutInMinutes: 0
 
@@ -12,12 +12,12 @@ jobs:
   - powershell: |
       $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
       $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
-      New-PSDrive -Name Z -PSProvider FileSystem -Root $env:storageAccountLocation -Credential $credential -Persist;
+      New-PSDrive -Name Z -PSProvider FileSystem -Root "$env:storageAccountLocation" -Credential $credential -Persist;
     env:
       storageAccountKey: $(storageAccountKey)
       storageAccountName: $(storageAccountName)
       storageAccountLocation: $(storageAccountLocation)
-    displayName: 'Mount Files'
+    displayName: Mount Files
 
   - task: CopyFiles@2
     inputs:
@@ -26,7 +26,7 @@ jobs:
       cleanTargetFolder: true
 
   - task: CopyFiles@2
-    displayName: 'Copy XC license'
+    displayName: Copy XC license
     inputs:
       sourceFolder: Z:/
       targetFolder: xc/license/
@@ -34,7 +34,7 @@ jobs:
       cleanTargetFolder: true
 
   - task: CopyFiles@2
-    displayName: 'Copy XP license'
+    displayName: Copy XP license
     inputs:
       sourceFolder: Z:/
       targetFolder: xp/license/
@@ -43,12 +43,25 @@ jobs:
 
   - powershell: | 
       If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
-    displayName: 'Generate certificates'
+    displayName: Generate certificates
 
   - task: PowerShell@2
-    displayName: 'Run NUKE Build'
+    displayName: Build images
     inputs:
       targetType: 'filePath'
       filePath: build.ps1
       arguments: > 
           Xc
+
+  - script: docker login -u $(dockerId) -p $(dockerPwd) "$(dockerId).azurecr.io"
+    displayName: Docker login
+
+  - task: PowerShell@2
+    displayName: (Optionally) Push images
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: > 
+          PushXp
+          PushXc
+          --RepoImagePrefix $(dockerId)

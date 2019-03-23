@@ -84,15 +84,20 @@ Each Docker image (or set of images, e.g. `XP0` or `XC`) has a corresponding tar
 
 
 ### Push images
-To push the Docker images to your repository use the `push` build targets, e.g. to push all images:
+> Before pushing a Docker image you should have a Git tag associated with the current commit. If you don't have a Git tag associated the `push` target will be skipped. You can overwrite this behavior by using the `--ForcePush` build parameter.
+
+To push the Docker images to your repository use the `push` build targets. e.g. to push all images:
 ```
-PS> nuke Push --RepoImagePrefix <YourRepoNameHere>
+PS> nuke push --RepoImagePrefix <YourRepoNameHere>
 ```
 
-The `BuildVersion` parameter may be used to optionally append a version to the image name:
+The `BuildVersion` parameter value is automatically determined from the associated Git tag. Git tags should have one of the following formats: `<sitecore version>-<build version>` or `<build version>`.
+
+Optionally you can specify the build version manually:
 ```
-PS> nuke Push --RepoImagePrefix <YourRepoNameHere> --BuildVersion <YourVersionHere>
+PS> nuke push --RepoImagePrefix <YourRepoNameHere> --BuildVersion <YourVersionHere>
 ```
+
 
 # Run
 Docker compose is used to start up all required services. 
