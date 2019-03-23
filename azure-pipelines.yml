@@ -53,13 +53,8 @@ jobs:
   #     arguments: > 
   #         Xc
 
-  - powershell: |
-      "test" | echo
-      docker login -u $env:DOCKER_ID -p $env:DOCKER_PWD "$env:DOCKER_ID.azurecr.io"
+  - script: docker login -u $(dockerId) -p $(dockerPwd) "$(dockerId).azurecr.io"
     displayName: Docker login
-    env:
-      DOCKER_ID: $(dockerId)
-      DOCKER_PWD: $(dockerPwd)
 
   # - task: Docker@1
   #   displayName: Container registry login
