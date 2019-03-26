@@ -156,6 +156,10 @@ Sometimes the internal Docker DNS is malfunctioning and containers (e.g. mssql) 
 ## Clean up network hosting
 In case it's no longer possible to create networks and docker network commands don't work give this a try: https://github.com/MicrosoftDocs/Virtualization-Documentation/tree/live/windows-server-container-tools/CleanupContainerHostNetworking
 
+## No internet connection inside Docker container
+Sometimes it can occur that the Docker container has no internet access due to Windows network configuration. See following link for solving this:
+https://github.com/docker/for-win/issues/1166#issuecomment-425696267
+
 ## Clean Docker install
 In case nothing else helps, perform a clean Docker install using the following steps:
 - Uninstall Docker
