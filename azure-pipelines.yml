@@ -47,7 +47,7 @@ jobs:
       cleanTargetFolder: true
 
   - powershell: | 
-      If (Test-Path ./Files/*.pfx) { Write-Host "Re-using found certificates"; ls ./Files/*.pfx } Else { ./Generate-Certificates.ps1 }
+      If (Test-Path ./files/*.pfx) { Write-Host "Re-using found certificates"; ls ./files/*.pfx } Else { ./Generate-Certificates.ps1 }
     displayName: Generate certificates
 
   - task: PowerShell@2
