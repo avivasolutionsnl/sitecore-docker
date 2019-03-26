@@ -27,7 +27,7 @@ jobs:
   - task: CopyFiles@2
     inputs:
       sourceFolder: Z:/ 
-      targetFolder: Files
+      targetFolder: files
       cleanTargetFolder: true
 
   - task: CopyFiles@2

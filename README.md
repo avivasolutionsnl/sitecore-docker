@@ -30,7 +30,7 @@ Put the `license.xml` in `xp/license/` for xp containers or in `xc/license/` for
 The XP0 Sitecore topology requires SSL between the services, for this we need self signed certificates for the 
 xConnect and SOLR roles. You can generate these by running the `./Generate-Certificates.ps1` script (note that this requires an Administrator elevated powershell environment and you may need to set the correct execution policy, e.g. `PS> powershell.exe -ExecutionPolicy Unrestricted`).
 
-> SXA and JSS are installed using Commerce SIF. Therefore building those images requires you have the Commerce SIF package availabled in the `Files` directory.
+> SXA and JSS are installed using Commerce SIF. Therefore building those images requires you have the Commerce SIF package availabled in the `files` directory.
 
 ## Build
 Build all images using:
