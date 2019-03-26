@@ -49,7 +49,7 @@ WORKDIR /Files
 # Copy required files
 COPY scripts /Scripts
 
-COPY Files/*.pfx /Files/
+COPY files/*.pfx /Files/
 COPY --from=prepare /Files/Sitecore.Commerce.SDK /Files/Sitecore.Commerce.SDK/
 COPY --from=prepare /Files/SIF.Sitecore.Commerce /Files/SIF.Sitecore.Commerce/
 COPY --from=prepare /Files/Sitecore.BizFX /Files/Sitecore.BizFX/

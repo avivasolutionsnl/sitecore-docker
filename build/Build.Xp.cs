@@ -65,6 +65,7 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/mssql/Dockerfile")
+                .SetIsolation("process")
                 .SetTag(XpImageName("mssql"))
                 .SetMemory(4000000000) // 4GB, SQL needs some more memory
                 .SetBuildArg(new string[] {
@@ -87,6 +88,7 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/sitecore/Dockerfile")
+                .SetIsolation("process")
                 .SetTag(XpImageName("sitecore"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
@@ -111,6 +113,7 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/solr/Dockerfile")
+                .SetIsolation("process")
                 .SetTag(XpImageName("solr"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
@@ -133,6 +136,7 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xp/xconnect/Dockerfile")
+                .SetIsolation("process")
                 .SetTag(XpImageName("xconnect"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
@@ -180,6 +184,7 @@ partial class Build : NukeBuild
 
             DockerBuild(x => x
                 .SetPath("xp/solr/sxa")
+                .SetIsolation("process")
                 .SetTag(XpImageName("solr-sxa"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
@@ -196,6 +201,7 @@ partial class Build : NukeBuild
 
             DockerBuild(x => x
                 .SetPath("xp/sitecore/jss")
+                .SetIsolation("process")
                 .SetTag(XpImageName("sitecore-jss"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}"
