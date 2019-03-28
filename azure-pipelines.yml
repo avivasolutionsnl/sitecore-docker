@@ -14,6 +14,13 @@ jobs:
   timeoutInMinutes: 0
 
   steps:
+  - task: Docker@1
+    displayName: Container registry login
+    inputs:
+      command: login
+      azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+      azureContainerRegistry: $(azureContainerRegistry)
+    
   - powershell: |
       $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
       $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
@@ -57,9 +64,6 @@ jobs:
       filePath: build.ps1
       arguments: > 
           Xc
-
-  - script: docker login -u $(dockerId) -p $(dockerPwd) "$(dockerId).azurecr.io"
-    displayName: Docker login
 
   - task: PowerShell@2
     displayName: (Optionally) Push images
