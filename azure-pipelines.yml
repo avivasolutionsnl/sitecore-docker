@@ -7,7 +7,7 @@ trigger:
     - '*'
 
 jobs:
-- job: Build
+- job: Build XP & XC
   pool:
     vmImage: Windows-2019
   # Use maximum timeout, ie. 6 hours 
@@ -73,4 +73,143 @@ jobs:
       arguments: > 
           PushXp
           PushXc
+          --RepoImagePrefix $(dockerId)
+
+- job: Build XP SXA & XC SXA
+  pool:
+    vmImage: Windows-2019
+  # Use maximum timeout, ie. 6 hours 
+  timeoutInMinutes: 0
+
+  steps:
+  - task: Docker@1
+    displayName: Container registry login
+    inputs:
+      command: login
+      azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+      azureContainerRegistry: $(azureContainerRegistry)
+    
+  - powershell: |
+      $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
+      $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
+      New-PSDrive -Name Z -PSProvider FileSystem -Root "$env:storageAccountLocation" -Credential $credential -Persist;
+    env:
+      storageAccountKey: $(storageAccountKey)
+      storageAccountName: $(storageAccountName)
+      storageAccountLocation: $(storageAccountLocation)
+    displayName: Mount Files
+
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: Z:/ 
+      targetFolder: files
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: Copy XC license
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xc/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: Copy XP license
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xp/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - powershell: | 
+      If (Test-Path ./files/*.pfx) { Write-Host "Re-using found certificates"; ls ./files/*.pfx } Else { ./Generate-Certificates.ps1 }
+    displayName: Generate certificates
+
+  - task: PowerShell@2
+    displayName: Build images
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: > 
+          XpSxa
+          XcSxa
+
+  - task: PowerShell@2
+    displayName: (Optionally) Push images
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: > 
+          PushXpSxa
+          PushXcSxa
+          --RepoImagePrefix $(dockerId)
+
+
+- job: Build XP JSS & XC JSS
+  pool:
+    vmImage: Windows-2019
+  # Use maximum timeout, ie. 6 hours 
+  timeoutInMinutes: 0
+
+  steps:
+  - task: Docker@1
+    displayName: Container registry login
+    inputs:
+      command: login
+      azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+      azureContainerRegistry: $(azureContainerRegistry)
+    
+  - powershell: |
+      $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
+      $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
+      New-PSDrive -Name Z -PSProvider FileSystem -Root "$env:storageAccountLocation" -Credential $credential -Persist;
+    env:
+      storageAccountKey: $(storageAccountKey)
+      storageAccountName: $(storageAccountName)
+      storageAccountLocation: $(storageAccountLocation)
+    displayName: Mount Files
+
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: Z:/ 
+      targetFolder: files
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: Copy XC license
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xc/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: Copy XP license
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xp/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - powershell: | 
+      If (Test-Path ./files/*.pfx) { Write-Host "Re-using found certificates"; ls ./files/*.pfx } Else { ./Generate-Certificates.ps1 }
+    displayName: Generate certificates
+
+  - task: PowerShell@2
+    displayName: Build images
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: > 
+          XpJss
+          XcJss
+
+  - task: PowerShell@2
+    displayName: (Optionally) Push images
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: > 
+          PushXpJss
+          PushXcJss
           --RepoImagePrefix $(dockerId)
