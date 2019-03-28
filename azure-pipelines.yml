@@ -7,7 +7,7 @@ trigger:
     - '*'
 
 jobs:
-- job: Build XP and XC
+- job: Build_XP_and_XC
   pool:
     vmImage: Windows-2019
   # Use maximum timeout, ie. 6 hours 
@@ -75,7 +75,7 @@ jobs:
           PushXc
           --RepoImagePrefix $(dockerId)
 
-- job: Build XP SXA and XC SXA
+- job: Build_XP_SXA_and_XC_SXA
   pool:
     vmImage: Windows-2019
   # Use maximum timeout, ie. 6 hours 
@@ -145,7 +145,7 @@ jobs:
           --RepoImagePrefix $(dockerId)
 
 
-- job: Build XP JSS and XC JSS
+- job: Build_XP_JSS_and_XC_JSS
   pool:
     vmImage: Windows-2019
   # Use maximum timeout, ie. 6 hours 
