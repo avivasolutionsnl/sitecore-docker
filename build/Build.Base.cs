@@ -53,7 +53,6 @@ partial class Build : NukeBuild
             var baseImage = BaseImageName("sitecore");
 
             DockerBuild(x => x
-                .SetPull(true)
                 .SetPath(".")
                 .SetFile("base/solr-builder/Dockerfile")
                 .SetIsolation("process")
