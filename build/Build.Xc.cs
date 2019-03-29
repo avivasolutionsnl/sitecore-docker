@@ -101,6 +101,7 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             DockerBuild(x => x
+                .SetPull(true)
                 .SetPath(".")
                 .SetFile("xc/commerce/Dockerfile")
                 .SetIsolation("process")
