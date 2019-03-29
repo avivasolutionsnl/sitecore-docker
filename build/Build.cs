@@ -34,6 +34,9 @@ partial class Build : NukeBuild
     [Parameter("Docker image repository prefix, e.g. my.docker-image.repo/")]
     readonly string RepoImagePrefix = "";
 
+    // Silence docker-compose output, otherwise non-error output is written to stderr
+    private static readonly string DockerComposeSilenceOptions = "--log-level CRITICAL --no-ansi";
+
     // Get the container created by docker-compose
     private string GetContainerName(string serviceName) {
         var dirName = new System.IO.DirectoryInfo(System.IO.Directory.GetCurrentDirectory()).Name;
@@ -76,11 +79,11 @@ partial class Build : NukeBuild
 
     private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "")
     {
-        DockerCompose($"{dockerComposeOptions} down");
+        DockerCompose($"{dockerComposeOptions} {DockerComposeSilenceOptions} down");
 
         try
         {
-            DockerCompose($"{dockerComposeOptions} up -d");
+            DockerCompose($"{dockerComposeOptions} {DockerComposeSilenceOptions} up -d");
 
             // Install Commerce Connect package
             var sitecoreContainerName = GetContainerName("sitecore");
@@ -90,10 +93,10 @@ partial class Build : NukeBuild
                 .SetArgs(scriptFilename)
             );
 
-            DockerCompose("stop");
+            DockerCompose("{DockerComposeSilenceOptions} stop");
 
             // Persist changes to DB installation directory
-            DockerCompose($"{dockerComposeOptions} up -d mssql");
+            DockerCompose($"{dockerComposeOptions} {DockerComposeSilenceOptions} up -d mssql");
 
             // Give time to complete attaching databases
             Thread.Sleep(10000);
@@ -105,7 +108,7 @@ partial class Build : NukeBuild
                 .SetArgs(@"C:\Persist-Databases.ps1")
             );
 
-            DockerCompose("stop");
+            DockerCompose("{DockerComposeSilenceOptions} stop");
 
             // Commit changes
             DockerCommit(x => x
@@ -119,7 +122,7 @@ partial class Build : NukeBuild
         finally
         {
             // Remove build artefacts
-            DockerCompose("down");
+            DockerCompose("{DockerComposeSilenceOptions} down");
         }
     }
 
