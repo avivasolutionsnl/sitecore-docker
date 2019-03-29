@@ -15,6 +15,9 @@ Copy-Item -Path $env:INSTALL_TEMP/SiteUtilityPages -Destination c:\\inetpub\\www
 # Copy custom version of InstallModules.aspx. The normal one does not create accounts, which results in a missing JssImport user 
 Copy-Item -Path /jss/InstallModules.aspx -Destination c:\\inetpub\\wwwroot\\sitecore\\SiteUtilityPages -Force 
 
+# Enlarge timeout to 7200 seconds
+((Get-Content -path $env:INSTALL_TEMP/Modules/SitecoreUtilityTasks/SitecoreUtilityTasks.psm1 -Raw) -replace '720','7200') | Set-Content -Path $env:INSTALL_TEMP/Modules/SitecoreUtilityTasks/SitecoreUtilityTasks.psm1
+
 # Install JSS packages
 Install-SitecoreConfiguration -Path '/jss/install-jss.json' `
     -JSSPackageFullPath "$filesPath/$env:JSS_PACKAGE" `
