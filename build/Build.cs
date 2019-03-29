@@ -93,7 +93,7 @@ partial class Build : NukeBuild
                 .SetArgs(scriptFilename)
             );
 
-            DockerCompose("{DockerComposeSilenceOptions} stop");
+            DockerCompose($"{DockerComposeSilenceOptions} stop");
 
             // Persist changes to DB installation directory
             DockerCompose($"{dockerComposeOptions} {DockerComposeSilenceOptions} up -d mssql");
@@ -108,7 +108,7 @@ partial class Build : NukeBuild
                 .SetArgs(@"C:\Persist-Databases.ps1")
             );
 
-            DockerCompose("{DockerComposeSilenceOptions} stop");
+            DockerCompose($"{DockerComposeSilenceOptions} stop");
 
             // Commit changes
             DockerCommit(x => x
@@ -122,7 +122,7 @@ partial class Build : NukeBuild
         finally
         {
             // Remove build artefacts
-            DockerCompose("{DockerComposeSilenceOptions} down");
+            DockerCompose($"{DockerComposeSilenceOptions} down");
         }
     }
 
