@@ -101,6 +101,7 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             DockerBuild(x => x
+                .SetPull(true)
                 .SetPath(".")
                 .SetFile("xc/commerce/Dockerfile")
                 .SetIsolation("process")
@@ -133,6 +134,7 @@ partial class Build : NukeBuild
             var baseImage = XpImageName("mssql");
 
             DockerBuild(x => x
+                .SetPull(true)
                 .SetPath(".")
                 .SetFile("xc/mssql/Dockerfile")
                 .SetIsolation("process")
@@ -160,6 +162,7 @@ partial class Build : NukeBuild
             var baseImage = XpImageName("sitecore");
 
             DockerBuild(x => x
+                .SetPull(true)
                 .SetPath(".")
                 .SetFile("xc/sitecore/Dockerfile")
                 .SetIsolation("process")
@@ -208,6 +211,7 @@ partial class Build : NukeBuild
             var builderBaseImage = BaseImageName("solr-builder");
 
             DockerBuild(x => x
+                .SetPull(true)
                 .SetPath(".")
                 .SetFile("xc/solr/Dockerfile")
                 .SetIsolation("process")
@@ -229,6 +233,7 @@ partial class Build : NukeBuild
             var baseImage = XpImageName("xconnect");
 
             DockerBuild(x => x
+                .SetPull(true)
                 .SetPath(".")
                 .SetFile("xc/xconnect/Dockerfile")
                 .SetIsolation("process")
@@ -271,6 +276,7 @@ partial class Build : NukeBuild
             var builderBaseImage = BaseImageName("solr-builder");
 
             DockerBuild(x => x
+                .SetPull(true)
                 .SetPath("xc/solr/sxa")
                 .SetIsolation("process")
                 .SetTag(XcImageName("solr-sxa"))
