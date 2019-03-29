@@ -1,0 +1,69 @@
+parameters:
+  name: ''
+  buildTargets: 'All'
+  pushTargets: 'All'
+
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: Windows-2019
+  # Use maximum timeout, ie. 6 hours 
+  timeoutInMinutes: 0
+
+  steps:
+  - powershell: |
+      $password = ConvertTo-SecureString -String $env:storageAccountKey -AsPlainText -Force;
+      $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "AZURE\$($env:storageAccountName)", $password;
+      New-PSDrive -Name Z -PSProvider FileSystem -Root "$env:storageAccountLocation" -Credential $credential -Persist;
+    env:
+      storageAccountKey: $(storageAccountKey)
+      storageAccountName: $(storageAccountName)
+      storageAccountLocation: $(storageAccountLocation)
+    displayName: Mount Files
+
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: Z:/ 
+      targetFolder: files
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: Copy XC license
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xc/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - task: CopyFiles@2
+    displayName: Copy XP license
+    inputs:
+      sourceFolder: Z:/
+      targetFolder: xp/license/
+      contents: license.xml
+      cleanTargetFolder: true
+
+  - powershell: | 
+      If (Test-Path ./files/*.pfx) { Write-Host "Re-using found certificates"; ls ./files/*.pfx } Else { ./Generate-Certificates.ps1 }
+    displayName: Generate certificates
+
+  - task: PowerShell@2
+    displayName: Build images
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: ${{ parameters.buildTargets }}
+
+  - task: Docker@1
+    displayName: Container registry login
+    inputs:
+      command: login
+      azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+      azureContainerRegistry: $(azureContainerRegistry)
+
+  - task: PowerShell@2
+    displayName: (Optionally) Push images
+    inputs:
+      targetType: 'filePath'
+      filePath: build.ps1
+      arguments: --RepoImagePrefix $(dockerId) ${{ parameters.pushTargets }}
