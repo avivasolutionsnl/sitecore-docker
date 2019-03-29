@@ -2,16 +2,10 @@ version: '2.4'
 
 services:
   sitecore:
-    image: "${IMAGE_PREFIX}sitecore-jss:${TAG}"
+    image: "${IMAGE_PREFIX}sitecore:${TAG}"
     volumes:
       - ..\xp\sitecore\jss:C:\jss
       - ..\files:C:\files-mount
       - .\license:C:\license
     environment:
       JSS_PACKAGE: ${JSS_PACKAGE}
-
-  mssql:
-    image: "${IMAGE_PREFIX}mssql:${TAG}"
-
-  solr:
-    image: "${IMAGE_PREFIX}solr:${TAG}"

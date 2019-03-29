@@ -1,5 +1,8 @@
 $filesPath = "/files-mount"
 
+# Install NodeJS
+choco install -y nodejs --version 11.10.0
+
 # Extract Commerce SIF
 & (Join-Path $env:INSTALL_TEMP "Extract-Commerce-Sif-SiteUtilities.ps1") -FromPath $filesPath -ToPath $env:INSTALL_TEMP;
 
