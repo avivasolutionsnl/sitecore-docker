@@ -194,25 +194,10 @@ partial class Build : NukeBuild
             );
         });
 
-    Target XpSitecoreJss => _ => _
-        .DependsOn(XpSitecore)
-        .Executes(() => {
-            var baseImage = XpImageName("sitecore");
-
-            DockerBuild(x => x
-                .SetPath("xp/sitecore/jss")
-                .SetIsolation("process")
-                .SetTag(XpImageName("sitecore-jss"))
-                .SetBuildArg(new string[] {
-                    $"BASE_IMAGE={baseImage}"
-                })
-            );
-        });        
-
     Target XpSitecoreMssqlJss => _ => _
         .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .Requires(() => File.Exists(Files / JSS_PACKAGE))
-        .DependsOn(Xp, XpSitecoreJss)
+        .DependsOn(Xp)
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xp");
 

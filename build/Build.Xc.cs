@@ -283,7 +283,7 @@ partial class Build : NukeBuild
 
    Target XcSitecoreMssqlJss => _ => _
         .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
-        .DependsOn(XcSitecoreMssql)
+        .DependsOn(Xc)
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xc");
 
