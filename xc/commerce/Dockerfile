@@ -116,29 +116,29 @@ RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';
 # Update these to match the host name
 RUN $certificates = Get-ChildItem -Path 'cert:\localmachine\my' -DnsName 'DO_NOT_TRUST_SitecoreRootCert'; `
     $rootCert = $certificates[0]; `
-    $certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname 'commerce' -Signer $rootcert -KeyExportPolicy Exportable -Provider 'Microsoft Enhanced RSA and AES Cryptographic Provider'; `
+    $certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname 'commerce, *.aviva, *.local' -Signer $rootcert -KeyExportPolicy Exportable -Provider 'Microsoft Enhanced RSA and AES Cryptographic Provider'; `
     Get-WebBinding -Name 'CommerceOps_Sc9' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'CommerceOps_Sc9' -HostHeader $Env:HOST_NAME -Protocol 'https' -SslFlags 1 -Port 5015; `
+    New-WebBinding -Name 'CommerceOps_Sc9' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5015; `
     $binding = Get-WebBinding -Name 'CommerceOps_Sc9' -Protocol 'https'; `
     $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `
     Get-WebBinding -Name 'CommerceShops_Sc9' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'CommerceShops_Sc9' -HostHeader $Env:HOST_NAME -Protocol 'https' -SslFlags 1 -Port 5005; `
+    New-WebBinding -Name 'CommerceShops_Sc9' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5005; `
     $binding = Get-WebBinding -Name 'CommerceShops_Sc9' -Protocol 'https'; `
     $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `
     Get-WebBinding -Name 'CommerceAuthoring_Sc9' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'CommerceAuthoring_Sc9' -HostHeader $Env:HOST_NAME -Protocol 'https' -SslFlags 1 -Port 5000; `
+    New-WebBinding -Name 'CommerceAuthoring_Sc9' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5000; `
     $binding = Get-WebBinding -Name 'CommerceAuthoring_Sc9' -Protocol 'https'; `
     $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `    
     Get-WebBinding -Name 'CommerceMinions_Sc9' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'CommerceMinions_Sc9' -HostHeader $Env:HOST_NAME -Protocol 'https' -SslFlags 1 -Port 5010; `
+    New-WebBinding -Name 'CommerceMinions_Sc9' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5010; `
     $binding = Get-WebBinding -Name 'CommerceMinions_Sc9' -Protocol 'https'; `
-    $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `        
+    $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `
     Get-WebBinding -Name 'SitecoreBizFx' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'SitecoreBizFx' -HostHeader $Env:HOST_NAME -Protocol 'https' -SslFlags 1 -Port 4200; `
+    New-WebBinding -Name 'SitecoreBizFx' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 4200; `
     $binding = Get-WebBinding -Name 'SitecoreBizFx' -Protocol 'https'; `
     $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `        
     Get-WebBinding -Name 'SitecoreIdentityServer' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'SitecoreIdentityServer' -HostHeader $Env:HOST_NAME -Protocol 'https' -SslFlags 1 -Port 5050; `
+    New-WebBinding -Name 'SitecoreIdentityServer' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5050; `
     $binding = Get-WebBinding -Name 'SitecoreIdentityServer' -Protocol 'https'; `
     $binding.AddSslCertificate($certificate.GetCertHashString(), 'My');
 
@@ -240,7 +240,7 @@ RUN $pathToAppSettings  = $(Join-Path -Path c:\inetpub\wwwroot\SitecoreIdentityS
 # Install plumber
 RUN Expand-Archive -Path "/Files/$Env:PLUMBER_FILE_NAME" -DestinationPath 'c:\\inetpub\\plumber'; `
     Import-Module -Name WebAdministration; `
-    $iisApp = New-Item IIS:\Sites\Plumber -bindings @{protocol='http';bindingInformation='*:4000:' + $Env:HOST_NAME} -physicalPath 'c:\inetpub\plumber'; `
+    $iisApp = New-Item IIS:\Sites\Plumber -bindings @{protocol='http';bindingInformation='*:4000:*'} -physicalPath 'c:\inetpub\plumber'; `
     $pathToJson = $(Join-Path -Path 'C:\\inetpub\\plumber' -ChildPath "static\\config.json"); `
     $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json; `
     $originalJson.EngineUri = ('https://{0}:5000' -f $Env:HOST_NAME); `
