@@ -66,4 +66,4 @@ jobs:
     inputs:
       targetType: 'filePath'
       filePath: build.ps1
-      arguments: --RepoImagePrefix $(dockerId) ${{ parameters.pushTargets }}
+      arguments: ${{ parameters.pushTargets }} --RepoImagePrefix $(dockerId)
