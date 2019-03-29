@@ -29,6 +29,12 @@ jobs:
 
 - template: azure-build-image.yml
   parameters:
-    name: XpXcJss
-    buildTargets: XpJss XcJss
-    pushTargets: PushXpJss PushXcJss
+    name: XpJss
+    buildTargets: XpJss
+    pushTargets: PushXpJss
+
+- template: azure-build-image.yml
+  parameters:
+    name: XcJss
+    buildTargets: XcJss
+    pushTargets: PushXcJss
