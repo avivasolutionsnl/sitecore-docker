@@ -55,8 +55,6 @@ RUN New-Item -Path 'C:/tools' -ItemType Directory | Out-Null; `
 RUN mkdir -p $env:DATA_PATH; `
      & (Join-Path $env:INSTALL_PATH "Extract-Databases.ps1") -Path $env:INSTALL_PATH; `
      & (Join-Path $env:INSTALL_PATH "Extract-ShardTool.ps1") -Path $env:INSTALL_PATH; `
-     Start-Service MSSQLSERVER; `
-     (Get-Service MSSQLSERVER).WaitForStatus('Running'); `
      & (Join-Path $env:INSTALL_PATH "Install-Databases.ps1") -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH -DatabasePrefix $Env:DB_PREFIX; ` 
      & (Join-Path $env:INSTALL_PATH "Install-Shards.ps1") -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH -DatabasePrefix $Env:DB_PREFIX; `
      Get-ChildItem -Path $env:INSTALL_PATH -Exclude "*.mdf", "*.ldf" | Remove-Item -Force;
