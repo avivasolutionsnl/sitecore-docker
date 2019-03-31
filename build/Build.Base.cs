@@ -26,7 +26,6 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             DockerBuild(x => x
-                .SetPull(true)
                 .SetPath(".")               
                 .SetFile("base/openjdk/Dockerfile")
                 .SetIsolation("process")
@@ -38,7 +37,6 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             DockerBuild(x => x
-                .SetPull(true)
                 .SetPath(".")
                 .SetFile("base/sitecore/Dockerfile")
                 .SetIsolation("process")
