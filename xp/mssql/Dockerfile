@@ -53,19 +53,10 @@ RUN New-Item -Path 'C:/tools' -ItemType Directory | Out-Null; `
     & nuget install Microsoft.Data.Tools.Msbuild -Version 10.0.61710.120 -OutputDirectory c:/tools
     
 RUN mkdir -p $env:DATA_PATH; `
-     echo $env:DATA_PATH; `
-     echo "A"; `
      & (Join-Path $env:INSTALL_PATH "Extract-Databases.ps1") -Path $env:INSTALL_PATH; `
-     echo $env:INSTALL_PATH; `
-     echo "B"; `
      & (Join-Path $env:INSTALL_PATH "Extract-ShardTool.ps1") -Path $env:INSTALL_PATH; `
-     echo "C"; `
-     echo $env:DATA_PATH; `
-     echo $env:DB_PREFIX; `
      & (Join-Path $env:INSTALL_PATH "Install-Databases.ps1") -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH -DatabasePrefix $Env:DB_PREFIX; ` 
-     echo "D"; `
      & (Join-Path $env:INSTALL_PATH "Install-Shards.ps1") -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH -DatabasePrefix $Env:DB_PREFIX; `
-     echo "E"; `
      Get-ChildItem -Path $env:INSTALL_PATH -Exclude "*.mdf", "*.ldf" | Remove-Item -Force;
 
 COPY xp/mssql/Boot.ps1 .
