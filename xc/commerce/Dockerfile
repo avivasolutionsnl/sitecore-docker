@@ -17,7 +17,13 @@ COPY scripts /Scripts
 # Expand installation files
 RUN Expand-Archive -Force -Path "/Files/$Env:COMMERCE_SDK_PACKAGE" -DestinationPath '/Files/Sitecore.Commerce.SDK'; `
     Expand-Archive -Force -Path "/Files/$Env:COMMERCE_SIF_PACKAGE" -DestinationPath '/Files/SIF.Sitecore.Commerce'; `
-    Expand-Archive -Force -Path "/Files/$Env:SITECORE_BIZFX_PACKAGE" -DestinationPath '/Files/Sitecore.BizFX'; 
+    Expand-Archive -Force -Path "/Files/$Env:SITECORE_BIZFX_PACKAGE" -DestinationPath '/Files/Sitecore.BizFX';
+
+# Remove the long retry in DeployCommerceContent.psm1
+RUN (Get-Content -path 'C:/Files/SIF.Sitecore.Commerce/Modules/DeployCommerceContent/DeployCommerceContent.psm1' -Raw) | Foreach-Object { `
+    $_ -replace '-lt 30', '-lt 1' `
+       -replace 'Start-Sleep -Seconds 10', '' `
+    } | Set-Content 'C:/Files/SIF.Sitecore.Commerce/Modules/DeployCommerceContent/DeployCommerceContent.psm1'
 
 # Stage 1: create actual image
 FROM mcr.microsoft.com/dotnet/framework/aspnet:4.7.2-windowsservercore-ltsc2019
