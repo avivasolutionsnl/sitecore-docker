@@ -8,6 +8,7 @@ using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Docker.DockerTasks;
 using static Nuke.Common.Tools.Git.GitTasks;
+using static DockerComposeTasks;
 using Nuke.Docker;
 using Nuke.Common.Tooling;
 
@@ -24,9 +25,6 @@ partial class Build : NukeBuild
     public readonly bool ForcePush = false;
 
     public static int Main () => Execute<Build>(x => x.All);
-
-    // Tools
-    [PathExecutable(name: "docker-compose")] readonly Tool DockerCompose;
 
     private static readonly AbsolutePath Files = RootDirectory / "Files";
 

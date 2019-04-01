@@ -9,7 +9,8 @@
     <NoWarn>CS0649;CS0169</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Nuke.Common" Version="0.15" />
+    <PackageReference Include="Nuke.CodeGeneration" Version="0.18.0" />
+    <PackageReference Include="Nuke.Common" Version="0.18.0" />
     <PackageReference Include="Nuke.Docker" Version="0.2.2" />
   </ItemGroup>
   <ItemGroup>
