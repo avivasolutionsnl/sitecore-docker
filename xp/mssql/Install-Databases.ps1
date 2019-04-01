@@ -11,7 +11,7 @@ param(
     [string]$DatabasePrefix
 )
 
-# Make SQL server is running
+# Make sure SQL server is running
 Start-Service MSSQLSERVER;
 (Get-Service MSSQLSERVER).WaitForStatus('Running');
 

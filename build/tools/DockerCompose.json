@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nuke-build/common/develop/source/Nuke.CodeGeneration/schema.json",
+  "name": "DockerCompose",
+  "officialUrl": "https://docs.docker.com/compose/",
+  "pathExecutable": "docker-compose",
+  "customLogger": true
+}

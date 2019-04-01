@@ -11,6 +11,10 @@ param(
     [string]$DatabasePrefix
 )
 
+# Make sure SQL server is running
+Start-Service MSSQLSERVER;
+(Get-Service MSSQLSERVER).WaitForStatus('Running');
+
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.SMO") | Out-Null
 
 $server = New-Object Microsoft.SqlServer.Management.Smo.Server($env:COMPUTERNAME)
