@@ -18,6 +18,10 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
 # Runtime image
 FROM mcr.microsoft.com/windows/nanoserver:1809 as final
 
+# Run under admin user as by default nanoserver starts with ContainerUser iso ContainerAdministrator
+# See https://techcommunity.microsoft.com/t5/Windows-Server-Insiders/nanoserver-insider-image-has-non-admin-user-as-default/td-p/110290
+USER ContainerAdministrator
+
 COPY --from=builder /ojdkbuild /ojdkbuild
 
 ENV JAVA_HOME C:\\ojdkbuild
