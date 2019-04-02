@@ -11,9 +11,9 @@ trigger:
 jobs:
 - template: azure-build-image.yml
   parameters:
-    name: XpXc
+    name: BaseXpXc
     buildTargets: Xc
-    pushTargets: PushXp PushXc
+    pushTargets: PushBase PushXp PushXc
 
 - template: azure-build-image.yml
   parameters:
