@@ -77,8 +77,7 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
         "CreateShard0ApplicationDatabaseUserSqlCmd", "CreateShard1ApplicationDatabaseUserSqlCmd", "ConfigureSolrSchemas", "StartServices", "InstallServices"; `
     Install-SitecoreConfiguration -Path 'c:/Files/Config/register-services.json' -Sitename $Env:SITE_NAME; `
     Install-SitecoreConfiguration -Path 'c:/Files/Config/custom-settings.json' -Sitename $Env:SITE_NAME; `
-    Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs; `
-    net localgroup "Performance Monitor Users" $Env:SITE_NAME /add
+    Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs;
 
 EXPOSE 443
 
