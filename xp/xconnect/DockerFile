@@ -41,7 +41,8 @@ ENV SITE_NAME=${SITE_NAME}
 ENV SIF_CONFIG="c:\\Files\\Config\\xconnect-xp0.json"
 
 # Trust Self signed certificates & import XConnect certificate
-RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_SSL_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
+RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_SSL_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_SSL_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
@@ -76,7 +77,7 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
         "CreateShard0ApplicationDatabaseUserSqlCmd", "CreateShard1ApplicationDatabaseUserSqlCmd", "ConfigureSolrSchemas", "StartServices", "InstallServices"; `
     Install-SitecoreConfiguration -Path 'c:/Files/Config/register-services.json' -Sitename $Env:SITE_NAME; `
     Install-SitecoreConfiguration -Path 'c:/Files/Config/custom-settings.json' -Sitename $Env:SITE_NAME; `
-    Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs
+    Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs;
 
 EXPOSE 443
 
