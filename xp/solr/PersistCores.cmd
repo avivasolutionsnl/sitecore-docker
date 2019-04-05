@@ -16,14 +16,16 @@ IF "%2"=="" (
 ECHO INSTALL_PATH=%INSTALL_PATH%
 ECHO DATA_PATH=%DATA_PATH%
 
-IF EXIST "%DATA_PATH%\solr.xml" (
-    ECHO "### Existing Sitecore solr cores found in '%DATA_PATH%'..."
-    SET HAS_DATA="true"
+FOR /D %%d IN ("%DATA_PATH%\*") DO (
+	IF EXIST "%%d\core.properties" (
+		SET HAS_DATA="true"
+	)
 )
 
 IF %HAS_DATA%=="false" (
     ECHO "### Cannot persist cores. No Sitecore Solr cores found in '%DATA_PATH%'"    
 ) ELSE (
+    ECHO "### Existing Sitecore solr cores found in '%DATA_PATH%'..."
     ECHO "### Persisting cores from '%DATA_PATH%'" 
     XCOPY %DATA_PATH% %INSTALL_PATH% /E /Y
 )

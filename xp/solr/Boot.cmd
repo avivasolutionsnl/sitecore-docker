@@ -10,18 +10,17 @@ ECHO SOLR_PORT=%SOLR_PORT%
 ECHO INSTALL_PATH=%INSTALL_PATH%
 ECHO DATA_PATH=%DATA_PATH%
 
-IF EXIST "%DATA_PATH%\sc_*" (
-    IF EXIST "%DATA_PATH%\solr.xml" (
-        ECHO "### Existing Sitecore solr cores found in '%DATA_PATH%'..."
-
-        SET HAS_DATA="true"
-    )
+FOR /D %%d IN ("%DATA_PATH%\*") DO (
+	IF EXIST "%%d\core.properties" (
+		SET HAS_DATA="true"
+	)
 )
 
 IF %HAS_DATA%=="false" (
     ECHO "### No Sitecore Solr cores found in '%DATA_PATH%', seeding clean cores from '%INSTALL_PATH%'..."
-
     XCOPY %INSTALL_PATH% %DATA_PATH% /E
+) ELSE (
+    ECHO "### Existing Sitecore solr cores found in '%DATA_PATH%'..."
 )
 
 ECHO "### Preparing Solr cores..."
