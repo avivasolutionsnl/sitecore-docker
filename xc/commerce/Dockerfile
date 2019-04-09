@@ -122,7 +122,7 @@ RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';
 # Update these to match the host name
 RUN $certificates = Get-ChildItem -Path 'cert:\localmachine\my' -DnsName 'DO_NOT_TRUST_SitecoreRootCert'; `
     $rootCert = $certificates[0]; `
-    $certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname commerce, *.aviva, *.local -Signer $rootcert -KeyExportPolicy Exportable -Provider 'Microsoft Enhanced RSA and AES Cryptographic Provider'; `
+    $certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname commerce, *.aviva, *.local, *.localhost -Signer $rootcert -KeyExportPolicy Exportable -Provider 'Microsoft Enhanced RSA and AES Cryptographic Provider'; `
     Get-WebBinding -Name 'CommerceOps_Sc9' -Protocol 'https' | Remove-WebBinding; `
     New-WebBinding -Name 'CommerceOps_Sc9' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5015; `
     $binding = Get-WebBinding -Name 'CommerceOps_Sc9' -Protocol 'https'; `
