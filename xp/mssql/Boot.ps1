@@ -37,9 +37,11 @@ Get-ChildItem -Path $DataPath -Filter "*.mdf" | ForEach-Object {
     try {
         Invoke-Sqlcmd -Query $sqlcmd
     } catch {
+        $ErrorMessage = $_.Exception.Message
+        Write-Host "The following error occurred while attaching $databaseName : $ErrorMessage"
         Write-Host "### Repairing '$databaseName'..."
-
-        $repairCmd = "ALTER DATABASE $databaseName SET EMERGENCY; GO DBCC CHECKDB ($databaseName, REPAIR_ALLOW_DATA_LOSS) WITH NO_INFOMSGS; GO";
+        
+        $repairCmd = "ALTER DATABASE $databaseName SET EMERGENCY; DBCC CHECKDB ($databaseName, REPAIR_ALLOW_DATA_LOSS) WITH NO_INFOMSGS";
         Invoke-Sqlcmd -Query $repairCmd
     }
 }
