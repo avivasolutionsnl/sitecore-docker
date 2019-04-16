@@ -4,6 +4,8 @@ Param(
 )
 
 $pathToConfigJson = $(Join-Path -Path $folder -ChildPath wwwroot\config.json);
+$content = Get-Content $pathToConfigJson -raw
+Write-Host $content
 $json = Get-Content $pathToConfigJson -raw | ConvertFrom-Json; 
 
 $sitecoreIdentityServerUrl = 'http://{0}:5050' -f $hostName; 

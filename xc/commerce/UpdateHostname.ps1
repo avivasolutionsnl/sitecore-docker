@@ -10,7 +10,6 @@ $ProgressPreference = 'SilentlyContinue'
 #Modify the certificate for the binding
 $certificates = Get-ChildItem -Path 'cert:\localmachine\my' -DnsName 'DO_NOT_TRUST_SitecoreRootCert';
 $hostnames = [string[]]@(
-    ("commerce"),
     ("$hostname")
 )
 
@@ -28,13 +27,22 @@ $updateBindingCertifcate = "$PSScriptRoot/UpdateBindingCertificate.ps1"
 & $updateBindingCertifcate -certificate $certificate -bindingName 'SitecoreBizFx' -port 4200
 & $updateBindingCertifcate -certificate $certificate -bindingName 'SitecoreIdentityServer' -port 5050
 
+$baseUrl = "https://$hostname"
+$identityServerUrl = $baseUrl + ":5050"
+$engineServerUrl = $baseUrl + ":5000"
+$bizFxUrl = $baseUrl + ":4200"
+$urls = @(
+    ($bizFxUrl),
+    ($bizFxUrl + "/?")
+)
 #Patch the bizfx config
-$bizFxUrl = "https://$hostname" + ":5000"
 $pathToBizfxConfig = "C:\inetpub\wwwroot\SitecoreBizFx\assets\config.json"
-Write-Host "Patching $pathToBizfxConfig with $bizFxUrl"
+Write-Host "Patching $pathToBizfxConfig with $commerceUrl"
 
 $json = Get-Content $pathToBizfxConfig -raw | ConvertFrom-Json; 
 $json.BizFxUri = $bizFxUrl
+$json.IdentityServerUri = $identityServerUrl
+$json.EngineUri = $engineServerUrl
 $json | ConvertTo-Json | set-content $pathToBizfxConfig
 
 $json = ConvertTo-Json $json -Depth 100
@@ -43,17 +51,16 @@ Write-Host "Done patching $pathToBizfxConfig!" -ForegroundColor Green
 
 #Patch the sitecore identity server config
 $pathToIdentityServerConfig = "C:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot\appsettings.json"
-$urls = @(
-    ("https://commerce" + ":4200"),
-    ("https://$hostname" + ":4200")
-)
+
 Write-Host "Patching $pathToIdentityServerConfig with $urls"
 
 $json = Get-Content $pathToIdentityServerConfig -raw | ConvertFrom-Json; 
 foreach ($p in $json.AppSettings.Clients) {
-    $p.RedirectUris = $urls
-    $p.PostLogoutRedirectUris = $urls
-    $p.AllowedCorsOrigins = $urls
+    if($p.ClientId -eq "CommerceBusinessTools"){
+        $p.RedirectUris = $urls
+        $p.PostLogoutRedirectUris = $urls
+        $p.AllowedCorsOrigins = $urls
+    }
 }
 
 $json = ConvertTo-Json $json -Depth 100
@@ -65,5 +72,17 @@ $pathToCommerceEngineConfig = "C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\
 Write-Host "Patching $pathToCommerceEngineConfig with $urls"
 $json = Get-Content $pathToCommerceEngineConfig -raw | ConvertFrom-Json;
 $json.AppSettings.AllowedOrigins = $urls
+$json.AppSettings.SitecoreIdentityServerUrl = $identityServerUrl
+$json = ConvertTo-Json $json -Depth 100
 Set-Content $pathToCommerceEngineConfig -Value $json -Encoding UTF8
 Write-Host "Done patching $pathToCommerceEngineConfig!" -ForegroundColor Green
+
+#Patch the commerce ops config
+$pathToCommerceOpsConfig = "C:\inetpub\wwwroot\CommerceOps_Sc9\wwwroot\config.json"
+Write-Host "Patching $pathToCommerceOpsConfig with $urls"
+$json = Get-Content $pathToCommerceOpsConfig -raw | ConvertFrom-Json;
+$json.AppSettings.AllowedOrigins = $urls
+$json.AppSettings.SitecoreIdentityServerUrl = $identityServerUrl
+$json = ConvertTo-Json $json -Depth 100
+Set-Content $pathToCommerceOpsConfig -Value $json -Encoding UTF8
+Write-Host "Done patching $pathToCommerceOpsConfig!" -ForegroundColor Green
