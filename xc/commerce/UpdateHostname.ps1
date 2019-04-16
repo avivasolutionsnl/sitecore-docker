@@ -29,7 +29,7 @@ $updateBindingCertifcate = "$PSScriptRoot/UpdateBindingCertificate.ps1"
 & $updateBindingCertifcate -certificate $certificate -bindingName 'SitecoreIdentityServer' -port 5050
 
 #Patch the bizfx config
-$bizFxUrl = "https://$hostname:5000"
+$bizFxUrl = "https://$hostname" + ":5000"
 $pathToBizfxConfig = "C:\inetpub\wwwroot\SitecoreBizFx\assets\config.json"
 Write-Host "Patching $pathToBizfxConfig with $bizFxUrl"
 
@@ -59,3 +59,11 @@ foreach ($p in $json.AppSettings.Clients) {
 $json = ConvertTo-Json $json -Depth 100
 Set-Content $pathToIdentityServerConfig -Value $json -Encoding UTF8
 Write-Host "Done patching $pathToIdentityServerConfig!" -ForegroundColor Green
+
+#Patch the commerce engine config
+$pathToCommerceEngineConfig = "C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\config.json"
+Write-Host "Patching $pathToCommerceEngineConfig with $urls"
+$json = Get-Content $pathToCommerceEngineConfig -raw | ConvertFrom-Json;
+$json.AppSettings.AllowedOrigins = $urls
+Set-Content $pathToCommerceEngineConfig -Value $json -Encoding UTF8
+Write-Host "Done patching $pathToCommerceEngineConfig!" -ForegroundColor Green

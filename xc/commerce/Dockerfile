@@ -120,33 +120,9 @@ RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';
 
 # The Commerce SSL bindings are created with DNS localhost in a harcoded way
 # Update these to match the host name
-RUN $certificates = Get-ChildItem -Path 'cert:\localmachine\my' -DnsName 'DO_NOT_TRUST_SitecoreRootCert'; `
-    $rootCert = $certificates[0]; `
-    $certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname commerce, *.aviva, *.local, *.localhost -Signer $rootcert -KeyExportPolicy Exportable -Provider 'Microsoft Enhanced RSA and AES Cryptographic Provider'; `
-    Get-WebBinding -Name 'CommerceOps_Sc9' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'CommerceOps_Sc9' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5015; `
-    $binding = Get-WebBinding -Name 'CommerceOps_Sc9' -Protocol 'https'; `
-    $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `
-    Get-WebBinding -Name 'CommerceShops_Sc9' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'CommerceShops_Sc9' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5005; `
-    $binding = Get-WebBinding -Name 'CommerceShops_Sc9' -Protocol 'https'; `
-    $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `
-    Get-WebBinding -Name 'CommerceAuthoring_Sc9' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'CommerceAuthoring_Sc9' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5000; `
-    $binding = Get-WebBinding -Name 'CommerceAuthoring_Sc9' -Protocol 'https'; `
-    $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `    
-    Get-WebBinding -Name 'CommerceMinions_Sc9' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'CommerceMinions_Sc9' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5010; `
-    $binding = Get-WebBinding -Name 'CommerceMinions_Sc9' -Protocol 'https'; `
-    $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `
-    Get-WebBinding -Name 'SitecoreBizFx' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'SitecoreBizFx' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 4200; `
-    $binding = Get-WebBinding -Name 'SitecoreBizFx' -Protocol 'https'; `
-    $binding.AddSslCertificate($certificate.GetCertHashString(), 'My'); `        
-    Get-WebBinding -Name 'SitecoreIdentityServer' -Protocol 'https' | Remove-WebBinding; `
-    New-WebBinding -Name 'SitecoreIdentityServer' -HostHeader '*' -IPAddress * -Protocol 'https' -Port 5050; `
-    $binding = Get-WebBinding -Name 'SitecoreIdentityServer' -Protocol 'https'; `
-    $binding.AddSslCertificate($certificate.GetCertHashString(), 'My');
+COPY xc/commerce/UpdateHostname.ps1 /Scripts
+COPY xc/commerce/UpdateBindingCertificate.ps1 /Scripts
+RUN /Scripts/UpdateHostname.ps1
 
 COPY xc/commerce/UpdateConnectionString.ps1 /Scripts
 
