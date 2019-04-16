@@ -7,6 +7,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
+#Modify the certificate for the binding
 $certificates = Get-ChildItem -Path 'cert:\localmachine\my' -DnsName 'DO_NOT_TRUST_SitecoreRootCert';
 $hostnames = [string[]]@(
     ("commerce"),
@@ -27,6 +28,7 @@ $updateBindingCertifcate = "$PSScriptRoot/UpdateBindingCertificate.ps1"
 & $updateBindingCertifcate -certificate $certificate -bindingName 'SitecoreBizFx' -port 4200
 & $updateBindingCertifcate -certificate $certificate -bindingName 'SitecoreIdentityServer' -port 5050
 
+#Patch the bizfx config
 $bizFxUrl = "https://$hostname:5000"
 $pathToBizfxConfig = "C:\inetpub\wwwroot\SitecoreBizFx\assets\config.json"
 Write-Host "Patching $pathToBizfxConfig with $bizFxUrl"
@@ -39,7 +41,7 @@ $json = ConvertTo-Json $json -Depth 100
 Set-Content $pathToBizfxConfig -Value $json -Encoding UTF8
 Write-Host "Done patching $pathToBizfxConfig!" -ForegroundColor Green
 
-
+#Patch the sitecore identity server config
 $pathToIdentityServerConfig = "C:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot\appsettings.json"
 $urls = @(
     ("https://commerce" + ":4200"),
