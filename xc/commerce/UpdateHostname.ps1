@@ -35,6 +35,11 @@ $urls = @(
     ($bizFxUrl),
     ($bizFxUrl + "/?")
 )
+$allowedOrigins = @(
+    "http://sitecore",
+    ($bizFxUrl),
+    ($bizFxUrl + "/?")
+)
 #Patch the bizfx config
 $pathToBizfxConfig = "C:\inetpub\wwwroot\SitecoreBizFx\assets\config.json"
 Write-Host "Patching $pathToBizfxConfig with $commerceUrl"
