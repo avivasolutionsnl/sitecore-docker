@@ -19,7 +19,3 @@ if($null -eq $binding){
 Write-Host "Updating the certificate for binding $bindingName with port $port"
 $binding.AddSslCertificate($certificate.GetCertHashString(), 'My');
 Write-Host "Succesfully updated the binding certificate!" -ForegroundColor Green
-
-function UpdateCertificate([X509Certificate]$certificate, [string]$bindingName, [uint32]$port){
-
-}
