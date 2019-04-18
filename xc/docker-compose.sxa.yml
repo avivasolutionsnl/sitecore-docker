@@ -3,6 +3,10 @@ version: '2.4'
 services:
   sitecore:
     image: "${IMAGE_PREFIX}sitecore:${TAG}"
+    networks:
+      exampleNetwork:
+        aliases:
+          - sitecore.local
     volumes:
       - .\sitecore\sxa:C:\sxa
       - ..\files:C:\files-mount

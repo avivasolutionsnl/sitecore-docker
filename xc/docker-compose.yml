@@ -4,6 +4,8 @@ services:
  mssql:
   image: "${IMAGE_PREFIX}mssql-intermediate:${TAG}"
   isolation: process
+  networks:
+    - exampleNetwork 
   environment:
     ACCEPT_EULA: "Y"
     sa_password: ${SQL_SA_PASSWORD}
@@ -11,6 +13,10 @@ services:
  sitecore:
   image: "${IMAGE_PREFIX}sitecore-intermediate:${TAG}"
   isolation: process
+  networks:
+    exampleNetwork:
+      aliases:
+        - sitecore.local
   volumes:
     - .\license:C:\license  
   depends_on:
@@ -21,10 +27,16 @@ services:
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
   isolation: process
+  networks:
+    exampleNetwork:
+      aliases:
+        - solr.local
 
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
   isolation: process
+  networks:
+    - exampleNetwork 
   volumes:
     - .\license:C:\license  
   depends_on:
@@ -34,8 +46,17 @@ services:
  commerce:
   image: "${IMAGE_PREFIX}commerce:${TAG}"
   isolation: process
+  networks:
+    exampleNetwork:
+      aliases:
+        - commerce.local
   depends_on:
     - xconnect
     - mssql
     - solr
     - sitecore
+
+networks:
+  exampleNetwork:
+    external:
+      name: nat

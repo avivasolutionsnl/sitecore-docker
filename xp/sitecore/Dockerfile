@@ -53,7 +53,7 @@ RUN $config = Get-Content $Env:SIF_CONFIG | Where-Object { $_ -notmatch '^\s*\/\
     $config.Tasks.InstallWDP.Params.Arguments | Add-Member -Name 'Skip' -Value @(@{'ObjectName' = 'dbDacFx'}, @{'ObjectName' = 'dbFullSql'}) -MemberType NoteProperty; `
     ConvertTo-Json $config -Depth 50 | Set-Content -Path $Env:SIF_CONFIG
 
-RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
+RUN $solrUrl = 'http://solr.local:{0}/solr' -f $Env:SOLR_PORT; `
     Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -Package c:/Files/$Env:SITECORE_PACKAGE `
     -LicenseFile "c:/license/license.xml" `
