@@ -4,6 +4,10 @@ services:
  commerce:
   image: "${IMAGE_PREFIX}commerce:${TAG}"
   isolation: process
+  networks:
+    exampleNetwork:
+      aliases:
+        - commerce.local
   volumes:
     - .\logs\commerce\CommerceAuthoring_Sc9:C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\logs
     - .\logs\commerce\CommerceMinions_Sc9:C:\inetpub\wwwroot\CommerceMinions_Sc9\wwwroot\logs
@@ -20,6 +24,8 @@ services:
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
   isolation: process
+  networks:
+    - exampleNetwork 
   environment:
     ACCEPT_EULA: "Y"
     sa_password: ${SQL_SA_PASSWORD}
@@ -29,6 +35,12 @@ services:
  sitecore:
   image: "${IMAGE_PREFIX}sitecore:${TAG}"
   isolation: process
+  networks:
+    exampleNetwork:
+      aliases:
+        - sitecore.local
+  networks:
+    - exampleNetwork 
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
@@ -41,15 +53,28 @@ services:
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
   isolation: process
+  networks:
+    exampleNetwork:
+      aliases:
+        - solr.local
+  networks:
+    - exampleNetwork 
   volumes:
     - .\data\solr:C:\Data
   
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
   isolation: process
+  networks:
+    - exampleNetwork 
   volumes:
     - .\logs\xconnect:C:\inetpub\wwwroot\xconnect\App_data\Logs
     - .\license:C:\license    
   depends_on:
     - mssql
     - solr
+
+networks:
+  exampleNetwork:
+    external:
+      name: nat

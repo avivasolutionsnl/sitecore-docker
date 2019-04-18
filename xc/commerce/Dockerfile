@@ -118,12 +118,6 @@ RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';
     -SitecoreCoreDbName "${$Env:SQL_DB_PREFIX}_Core" `
     -UserAccount @{ Domain = $Env:COMPUTERNAME; UserName = 'commerceuser'; Password = 'Pa$$w0rd' }    
 
-# The Commerce SSL bindings are created with DNS localhost in a harcoded way
-# Update these to match the host name
-COPY xc/commerce/UpdateHostname.ps1 /Scripts
-COPY xc/commerce/UpdateBindingCertificate.ps1 /Scripts
-RUN /Scripts/UpdateHostname.ps1
-
 COPY xc/commerce/UpdateConnectionString.ps1 /Scripts
 
 RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
@@ -156,30 +150,6 @@ RUN $pathToAppSettings  = $(Join-Path -Path c:\inetpub\wwwroot\SitecoreIdentityS
     $json = ConvertTo-Json $json -Depth 100; `
     Set-Content $pathToAppSettings -Value $json -Encoding UTF8;
 
-RUN $hostFileName = 'c:\\windows\\system32\\drivers\\etc\\hosts'; '\"`r`n127.0.0.1`t$Env:HOST_NAME\"' | Add-Content $hostFileName
-
-COPY xc/commerce/UpdateIdentityServerUrl.ps1 /Scripts
-
-RUN /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
-    -hostName $Env:HOST_NAME; `
-    /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceMinions_Sc9 `
-    -hostName $Env:HOST_NAME; `
-    /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
-    -hostName $Env:HOST_NAME; `
-    /Scripts/UpdateIdentityServerUrl.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
-    -hostName $Env:HOST_NAME;
-
-COPY xc/commerce/UpdateSitecoreUrl.ps1 /Scripts
-
-RUN /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
-    -hostName $Env:SITECORE_HOSTNAME; `
-    /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceMinions_Sc9 `
-    -hostName $Env:SITECORE_HOSTNAME; `
-    /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
-    -hostName $Env:SITECORE_HOSTNAME; `
-    /Scripts/UpdateSitecoreUrl.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
-    -hostName $Env:SITECORE_HOSTNAME
-
 # Set the certificate details of the certificate sitecore will connect with
 RUN $CommerceServicesPathCollection = @('C:\\inetpub\\wwwroot\\CommerceAuthoring_Sc9', 'C:\\inetpub\\wwwroot\\CommerceMinions_Sc9', `
                                        'C:\\inetpub\\wwwroot\\CommerceOps_Sc9', 'C:\\inetpub\\wwwroot\\CommerceShops_Sc9'); `
@@ -191,8 +161,6 @@ RUN $CommerceServicesPathCollection = @('C:\\inetpub\\wwwroot\\CommerceAuthoring
         $certificateNode = $originalJson.Certificates.Certificates[0]; `
 		$certificateNode.Thumbprint = $cert.Thumbprint; `
         $appSettingsNode = $originalJson.AppSettings; `
-        $appSettingsNode.SitecoreIdentityServerUrl = 'https://commerce:5050'; `
-        $appSettingsNode.AllowedOrigins = @('https://commerce:4200','http://commerce:4200','http://sitecore'); `
         $appSettingsNode.AntiForgeryEnabled = $False; `
 		$originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson; `
     } 
@@ -200,24 +168,9 @@ RUN $CommerceServicesPathCollection = @('C:\\inetpub\\wwwroot\\CommerceAuthoring
 # Configure the business tools
 RUN $pathToJson = $(Join-Path -Path 'C:\\inetpub\\wwwroot\\SitecoreBizFx' -ChildPath "assets\\config.json"); `
     $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json; `
-    $originalJson.EnvironmentName = $Env:ENVIRONMENT_NAME; `
-    $originalJson.EngineUri = ('https://{0}:5000' -f $Env:HOST_NAME); `
-    $originalJson.IdentityServerUri = ('https://{0}:5050' -f $Env:HOST_NAME); `
-    $originalJson.BizFxUri = ('https://{0}:4200' -f $Env:HOST_NAME); `
+    $originalJson.EnvironmentName = $Env:ENVIRONMENT_NAME; ``
     $originalJson.ShopName = $Env:SHOP_NAME; `
     $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson;
-
-# Configure the business tools with the correct settings in Identity server
-RUN $pathToAppSettings  = $(Join-Path -Path c:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot -ChildPath "appsettings.json"); `
-    $json = Get-Content $pathToAppSettings -raw | ConvertFrom-Json; `
-    $json.AppSettings.Clients[0].RedirectUris[0] = ('https://{0}:4200' -f $Env:HOST_NAME); `
-    $json.AppSettings.Clients[0].RedirectUris[1] = ('https://{0}:4200/?' -f $Env:HOST_NAME); `
-    $json.AppSettings.Clients[0].PostLogoutRedirectUris[0] = ('https://{0}:4200' -f $Env:HOST_NAME); `
-    $json.AppSettings.Clients[0].PostLogoutRedirectUris[1] = ('https://{0}:4200/?' -f $Env:HOST_NAME); `
-    $json.AppSettings.Clients[0].AllowedCorsOrigins[0] = ('https://{0}:4200/' -f $Env:HOST_NAME); `
-    $json.AppSettings.Clients[0].AllowedCorsOrigins[1] = ('https://{0}:4200' -f $Env:HOST_NAME); `         
-    $json = ConvertTo-Json $json -Depth 100; `
-    Set-Content $pathToAppSettings -Value $json -Encoding UTF8;
 
 # Install plumber
 RUN Expand-Archive -Path "/Files/$Env:PLUMBER_FILE_NAME" -DestinationPath 'c:\\inetpub\\plumber'; `
@@ -248,21 +201,13 @@ RUN Expand-Archive -Path "/Files/$Env:PLUMBER_FILE_NAME" -DestinationPath 'c:\\i
     $json.AppSettings.Clients += $client; `
     $json = ConvertTo-Json $json -Depth 100; `
     Set-Content $pathToAppSettings -Value $json -Encoding UTF8; `
-    $CommerceServicesPathCollection = @('C:\\inetpub\\wwwroot\\CommerceAuthoring_Sc9', 'C:\\inetpub\\wwwroot\\CommerceMinions_Sc9', `
-                                       'C:\\inetpub\\wwwroot\\CommerceOps_Sc9', 'C:\\inetpub\\wwwroot\\CommerceShops_Sc9'); `
-    foreach($path in $CommerceServicesPathCollection) { `
-        $pathToJson = $(Join-Path -Path $path -ChildPath "wwwroot\config.json"); `
-        $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json; `
-        $appSettingsNode = $originalJson.AppSettings; `
-        $appSettingsNode.AllowedOrigins += ('http://{0}:4000' -f $Env:HOST_NAME); `
-		$originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson; `    
-    }
 
 # Expose Plumber port
 EXPOSE 4000
 
 COPY xc/commerce/WatchDirectoryMultiple.ps1 /Scripts
 COPY xc/commerce/WatchDefaultDirectories.ps1 /Scripts
+COPY xc/commerce/UpdateHostname.ps1 /Scripts
+COPY xc/commerce/Boot.ps1 C:/
 
-ENTRYPOINT If ((Test-Path C:\Workspace) -eq $False) { New-Item -Type Directory c:\Workspace  }; `
-    /Scripts/WatchDefaultDirectories.ps1
+ENTRYPOINT /Boot.ps1

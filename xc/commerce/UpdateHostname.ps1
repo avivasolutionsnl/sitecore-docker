@@ -1,7 +1,7 @@
 #Requires -RunAsAdministrator
 
 param(
-    [String]$hostname = "commerce.localhost"
+    [String]$commerceHostname = "commerce.local"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -60,9 +60,11 @@ function UpdateIdentityServerConfig {
         [Parameter(Mandatory = $true)]
         [string[]]$urls,
         [Parameter(Mandatory = $true)]
-        [string[]]$allowedOrigins
+        [string[]]$bizFxAllowedOrigins,
+        [Parameter(Mandatory = $true)]
+        [string[]]$plumberAllowedOrigins
     )
-    Write-Host "Patching $configPath with $allowedOrigins"
+    Write-Host "Patching $configPath with $bizFxAllowedOrigins"
 
     $json = Get-Content $configPath -raw | ConvertFrom-Json; 
     foreach ($p in $json.AppSettings.Clients) {
@@ -70,6 +72,11 @@ function UpdateIdentityServerConfig {
             $p.RedirectUris = $urls
             $p.PostLogoutRedirectUris = $urls
             $p.AllowedCorsOrigins = $allowedOrigins
+        }
+        if($p.ClientId -eq "Plumber"){
+            $p.RedirectUris = $plumberAllowedOrigins
+            $p.PostLogoutRedirectUris = $plumberAllowedOrigins
+            $p.AllowedCorsOrigins = $plumberAllowedOrigins
         }
     }
 
@@ -97,15 +104,16 @@ Function UpdateCommerceConfig() {
     Write-Host "Done patching $configPath!" -ForegroundColor Green
 }
 
-#Modify the certificate for the binding
-[X509Certificate[]]$certificates = Get-ChildItem -Path 'cert:\localmachine\my' -DnsName 'DO_NOT_TRUST_SitecoreRootCert';
-$hostnames = [string[]]@(
-    ("$hostname")
-)
+#Update the hostfile with the new hostnames
+Write-Host "Updating hostfile with hostname $commerceHostname"
+$hostFileName = 'c:\\windows\\system32\\drivers\\etc\\hosts'; '\"`r`n127.0.0.1`t$commerceHostname\"' | Add-Content $hostFileName
+Write-Host "Succesfully updated hostfile!" -ForegroundColor Green
 
+#Modify the certificate with the new hostnames
+[X509Certificate[]]$certificates = Get-ChildItem -Path 'cert:\localmachine\my' -DnsName 'DO_NOT_TRUST_SitecoreRootCert';
 [X509Certificate]$rootCert = $certificates[0];
-Write-Host "Creating a new certificate with hostnames $hostnames"
-[X509Certificate]$certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $hostnames -Signer $rootcert -KeyExportPolicy Exportable -Provider 'Microsoft Enhanced RSA and AES Cryptographic Provider';
+Write-Host "Creating a new certificate with hostnames $commerceHostname"
+[X509Certificate]$certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $commerceHostname -Signer $rootcert -KeyExportPolicy Exportable -Provider 'Microsoft Enhanced RSA and AES Cryptographic Provider';
 Write-Host "Succesfully created the certificate!. Updating bindings..." -ForegroundColor Green
 
 UpdateBindingCertificate -certificate $certificate -bindingName 'CommerceOps_Sc9' -port 5015
@@ -115,7 +123,8 @@ UpdateBindingCertificate -certificate $certificate -bindingName 'CommerceMinions
 UpdateBindingCertificate -certificate $certificate -bindingName 'SitecoreBizFx' -port 4200
 UpdateBindingCertificate -certificate $certificate -bindingName 'SitecoreIdentityServer' -port 5050
 
-[string]$baseUrl = "https://$hostname"
+#Modify the config with the new hostnames
+[string]$baseUrl = "https://$commerceHostname"
 [string]$identityServerUrl = $baseUrl + ":5050"
 [string]$engineServerUrl = $baseUrl + ":5000"
 [string]$bizFxUrl = $baseUrl + ":4200"
@@ -131,8 +140,13 @@ $allowedOrigins = [string[]]@(
     $plumberUrl
 )
 
+$plumberAllowedOrigins = [string[]]@(
+    ($plumberUrl),
+    ($plumberUrl + "/?")
+)
+
 UpdateBizFxConfig -configPath "C:\inetpub\wwwroot\SitecoreBizFx\assets\config.json" -bizFxUrl $bizFxUrl -identityServerUrl $identityServerUrl -engineServerUrl $engineServerUrl
-UpdateIdentityServerConfig -configPath "C:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot\appsettings.json" -urls $urls -allowedOrigins $allowedOrigins
+UpdateIdentityServerConfig -configPath "C:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot\appsettings.json" -urls $urls -bizFxAllowedOrigins $allowedOrigins -plumberAllowedOrigins $plumberAllowedOrigins
 
 UpdateCommerceConfig -configPath "C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\config.json" -allowedOrigins $allowedOrigins -identityServerUrl $identityServerUrl
 UpdateCommerceConfig -configPath "C:\inetpub\wwwroot\CommerceOps_Sc9\wwwroot\config.json" -allowedOrigins $allowedOrigins -identityServerUrl $identityServerUrl
