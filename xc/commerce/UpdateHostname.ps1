@@ -2,7 +2,9 @@
 
 param(
     [Parameter(Mandatory=$true)]
-    [String]$commerceHostname
+    [String]$commerceHostname,
+    [Parameter(Mandatory=$true)]
+    [String]$sitecoreHostname
 )
 
 $ErrorActionPreference = 'Stop'
@@ -41,11 +43,14 @@ Function UpdateBizFxConfig {
         [Parameter(Mandatory = $true)]
         [string]$engineServerUrl
     )
-    Write-Host "Patching $configPath with $commerceUrl"
 
+    Write-Host "Patching $configPath"
     $json = Get-Content $configPath -raw | ConvertFrom-Json; 
+    Write-Host "Patching BizFxUri with $commerceUrl"
     $json.BizFxUri = $bizFxUrl
+    Write-Host "Patching IdentityServerUri with $identityServerUrl"
     $json.IdentityServerUri = $identityServerUrl
+    Write-Host "Patching EngineUri with $engineServerUrl"
     $json.EngineUri = $engineServerUrl
     $json | ConvertTo-Json | set-content $configPath
 
@@ -59,25 +64,32 @@ Function UpdateIdentityServerConfig {
         [Parameter(Mandatory = $true)]
         [string]$configPath, 
         [Parameter(Mandatory = $true)]
-        [string[]]$urls,
+        [string[]]$redirectUrls,
         [Parameter(Mandatory = $true)]
         [string[]]$bizFxAllowedOrigins,
         [Parameter(Mandatory = $true)]
         [string[]]$plumberAllowedOrigins
     )
-    Write-Host "Patching $configPath with $bizFxAllowedOrigins"
 
+    Write-Host "Patching $configPath"
     $json = Get-Content $configPath -raw | ConvertFrom-Json; 
     foreach ($p in $json.AppSettings.Clients) {
         if ($p.ClientId -eq "CommerceBusinessTools") {
-            $p.RedirectUris = $urls
-            $p.PostLogoutRedirectUris = $urls
-            $p.AllowedCorsOrigins = $allowedOrigins
+            Write-Host "Patching CommerceBusinessTools"
+            Write-Host "Patching RedirectUris and PostLogoutRedirectUris with $redirectUrls"
+            $p.RedirectUris = $redirectUrls
+            $p.PostLogoutRedirectUris = $redirectUrls
+            Write-Host "Patching CommerceBusinessTools.AllowedCorsOrigins with $bizFxAllowedOrigins"
+            $p.AllowedCorsOrigins = $bizFxAllowedOrigins
+            Write-Host "Done patching CommerceBusinessTools!" -ForegroundColor Green
         }
         if($p.ClientId -eq "Plumber"){
+            Write-Host "Patching Plumber"
+            Write-Host "Patching RedirectUris, PostLogoutRedirectUris and AllowedCorsOrigins with $plumberAllowedOrigins"
             $p.RedirectUris = $plumberAllowedOrigins
             $p.PostLogoutRedirectUris = $plumberAllowedOrigins
             $p.AllowedCorsOrigins = $plumberAllowedOrigins
+            Write-Host "Done patching Plumber!" -ForegroundColor Green
         }
     }
 
@@ -96,9 +108,11 @@ Function UpdateCommerceConfig() {
         [string]$identityServerUrl
     )
 
-    Write-Host "Patching $configPath with $allowedOrigins"
+    Write-Host "Patching $configPath"
     $json = Get-Content $configPath -raw | ConvertFrom-Json;
+    Write-Host "Patching AllowedOrigin with $allowedOrigins"
     $json.AppSettings.AllowedOrigins = $allowedOrigins
+    Write-Host "Patching SitecoreIdentityServerUrl with $identityServerUrl"
     $json.AppSettings.SitecoreIdentityServerUrl = $identityServerUrl
     $json = ConvertTo-Json $json -Depth 100
     Set-Content $configPath -Value $json -Encoding UTF8
@@ -124,18 +138,18 @@ UpdateBindingCertificate -certificate $certificate -bindingName 'CommerceMinions
 UpdateBindingCertificate -certificate $certificate -bindingName 'SitecoreBizFx' -port 4200
 UpdateBindingCertificate -certificate $certificate -bindingName 'SitecoreIdentityServer' -port 5050
 
-#Modify the config with the new hostnames
+#Prepare some variables to be passed as arguments 
 [string]$baseUrl = "https://$commerceHostname"
 [string]$identityServerUrl = $baseUrl + ":5050"
 [string]$engineServerUrl = $baseUrl + ":5000"
 [string]$bizFxUrl = $baseUrl + ":4200"
 [string]$plumberUrl = $baseUrl + ":4000"
-$urls = [string[]]@(
+$redirectUrls = [string[]]@(
     ($bizFxUrl),
     ($bizFxUrl + "/?")
 )
 $allowedOrigins = [string[]]@(
-    "http://sitecore",
+    "http://$sitecoreHostname",
     ($bizFxUrl),
     ($bizFxUrl + "/?"),
     $plumberUrl
@@ -146,8 +160,9 @@ $plumberAllowedOrigins = [string[]]@(
     ($plumberUrl + "/?")
 )
 
+#Modify the commerce config with the new hostnames
 UpdateBizFxConfig -configPath "C:\inetpub\wwwroot\SitecoreBizFx\assets\config.json" -bizFxUrl $bizFxUrl -identityServerUrl $identityServerUrl -engineServerUrl $engineServerUrl
-UpdateIdentityServerConfig -configPath "C:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot\appsettings.json" -urls $urls -bizFxAllowedOrigins $allowedOrigins -plumberAllowedOrigins $plumberAllowedOrigins
+UpdateIdentityServerConfig -configPath "C:\inetpub\wwwroot\SitecoreIdentityServer\wwwroot\appsettings.json" -redirectUrls $redirectUrls -bizFxAllowedOrigins $allowedOrigins -plumberAllowedOrigins $plumberAllowedOrigins
 
 UpdateCommerceConfig -configPath "C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\config.json" -allowedOrigins $allowedOrigins -identityServerUrl $identityServerUrl
 UpdateCommerceConfig -configPath "C:\inetpub\wwwroot\CommerceOps_Sc9\wwwroot\config.json" -allowedOrigins $allowedOrigins -identityServerUrl $identityServerUrl

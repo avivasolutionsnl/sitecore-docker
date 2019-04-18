@@ -211,4 +211,4 @@ COPY xc/commerce/UpdateHostname.ps1 /Scripts
 COPY xc/commerce/Boot.ps1 C:/
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]
-CMD [ "-hostname commerce.local" ]
+CMD [ "-commerceHostname commerce.local -sitecoreHostname sitecore.local" ]
