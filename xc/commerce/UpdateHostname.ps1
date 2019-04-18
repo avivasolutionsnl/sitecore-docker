@@ -30,7 +30,7 @@ Function UpdateBindingCertificate() {
     Write-Host "Succesfully updated the binding certificate!" -ForegroundColor Green
 }
 
-function UpdateBizFxConfig {
+Function UpdateBizFxConfig {
     param (
         [Parameter(Mandatory = $true)]
         [string]$configPath, 
@@ -54,7 +54,7 @@ function UpdateBizFxConfig {
     Write-Host "Done patching $configPath!" -ForegroundColor Green
 }
 
-function UpdateIdentityServerConfig {
+Function UpdateIdentityServerConfig {
     param (
         [Parameter(Mandatory = $true)]
         [string]$configPath, 
