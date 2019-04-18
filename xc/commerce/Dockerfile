@@ -168,7 +168,7 @@ RUN $CommerceServicesPathCollection = @('C:\\inetpub\\wwwroot\\CommerceAuthoring
 # Configure the business tools
 RUN $pathToJson = $(Join-Path -Path 'C:\\inetpub\\wwwroot\\SitecoreBizFx' -ChildPath "assets\\config.json"); `
     $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json; `
-    $originalJson.EnvironmentName = $Env:ENVIRONMENT_NAME; ``
+    $originalJson.EnvironmentName = $Env:ENVIRONMENT_NAME; `
     $originalJson.ShopName = $Env:SHOP_NAME; `
     $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson;
 
