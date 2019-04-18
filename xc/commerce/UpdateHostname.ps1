@@ -1,7 +1,8 @@
 #Requires -RunAsAdministrator
 
 param(
-    [String]$commerceHostname = "commerce.local"
+    [Parameter(Mandatory=$true)]
+    [String]$commerceHostname
 )
 
 $ErrorActionPreference = 'Stop'

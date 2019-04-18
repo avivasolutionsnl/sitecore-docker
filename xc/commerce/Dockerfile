@@ -210,4 +210,5 @@ COPY xc/commerce/WatchDefaultDirectories.ps1 /Scripts
 COPY xc/commerce/UpdateHostname.ps1 /Scripts
 COPY xc/commerce/Boot.ps1 C:/
 
-ENTRYPOINT /Boot.ps1
+ENTRYPOINT ["powershell", "C:/Boot.ps1"]
+CMD [ "-hostname commerce.local" ]
