@@ -39,8 +39,6 @@ services:
     exampleNetwork:
       aliases:
         - sitecore.local
-  networks:
-    - exampleNetwork 
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
@@ -57,8 +55,6 @@ services:
     exampleNetwork:
       aliases:
         - solr.local
-  networks:
-    - exampleNetwork 
   volumes:
     - .\data\solr:C:\Data
   

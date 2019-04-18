@@ -200,7 +200,7 @@ RUN Expand-Archive -Path "/Files/$Env:PLUMBER_FILE_NAME" -DestinationPath 'c:\\i
     $client.AllowedCorsOrigins = @(('http://{0}:4000' -f $Env:HOST_NAME), ('http://{0}:4000' -f $Env:HOST_NAME)); `
     $json.AppSettings.Clients += $client; `
     $json = ConvertTo-Json $json -Depth 100; `
-    Set-Content $pathToAppSettings -Value $json -Encoding UTF8; `
+    Set-Content $pathToAppSettings -Value $json -Encoding UTF8
 
 # Expose Plumber port
 EXPOSE 4000
