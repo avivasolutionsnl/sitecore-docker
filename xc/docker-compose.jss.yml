@@ -4,9 +4,7 @@ services:
   sitecore:
     image: "${IMAGE_PREFIX}sitecore:${TAG}"
     networks:
-      exampleNetwork:
-        aliases:
-          - sitecore.local
+      - exampleNetwork 
     volumes:
       - ..\xp\sitecore\jss:C:\jss
       - ..\files:C:\files-mount

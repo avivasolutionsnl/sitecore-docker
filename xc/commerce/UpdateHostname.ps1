@@ -110,9 +110,9 @@ Function UpdateCommerceConfig() {
 
     Write-Host "Patching $configPath"
     $json = Get-Content $configPath -raw | ConvertFrom-Json;
-    Write-Host "Patching AllowedOrigin with $allowedOrigins"
+    Write-Host "Patching AppSettings.AllowedOrigin with $allowedOrigins"
     $json.AppSettings.AllowedOrigins = $allowedOrigins
-    Write-Host "Patching SitecoreIdentityServerUrl with $identityServerUrl"
+    Write-Host "Patching AppSettings.SitecoreIdentityServerUrl with $identityServerUrl"
     $json.AppSettings.SitecoreIdentityServerUrl = $identityServerUrl
     $json = ConvertTo-Json $json -Depth 100
     Set-Content $configPath -Value $json -Encoding UTF8
