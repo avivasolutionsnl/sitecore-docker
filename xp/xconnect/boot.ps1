@@ -5,10 +5,15 @@ if(Test-Path $licenseFile)
     Copy-Item -Path $licenseFile -Destination "C:/inetpub/wwwroot/xconnect/App_Data"
     Copy-Item -Path $licenseFile -Destination "C:/inetpub/wwwroot/xconnect/App_Data/jobs/continuous/AutomationEngine/App_Data"
     Copy-Item -Path $licenseFile -Destination "C:/inetpub/wwwroot/xconnect/App_Data/jobs/continuous/IndexWorker/App_Data"
+
+    Write-Host "Starting the xconnect services"
+    Start-Service "xconnect-IndexWorker"
+    Start-Service "xconnect-MarketingAutomationService"
+    Write-Host "Succesfully started the xconnect services" -ForegroundColor Green
 }
 else
 {
-    Write-Host "No license file found. Please put in a license.xml file in the /license folder"
+    Write-Host "No license file found. Please put in a license.xml file in the /license folder. The container will now exit." -ForegroundColor Red
     exit
 }
 C:\ServiceMonitor.exe w3svc
