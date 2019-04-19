@@ -7,7 +7,7 @@ Param(
     $defaultShopName = 'CommerceEngineDefaultStorefront',
     $sitecoreUserName = 'sitecore\admin',
     $sitecorePassword = 'b',
-    $sitecoreUrl = "http://sitecore.local"
+    $sitecoreUrl = "http://sitecore"
 )
 
 Function GetIdServerToken {

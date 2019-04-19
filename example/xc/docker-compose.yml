@@ -36,9 +36,7 @@ services:
   image: "${IMAGE_PREFIX}sitecore:${TAG}"
   isolation: process
   networks:
-    exampleNetwork:
-      aliases:
-        - sitecore.local
+    - exampleNetwork 
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
@@ -52,9 +50,7 @@ services:
   image: "${IMAGE_PREFIX}solr:${TAG}"
   isolation: process
   networks:
-    exampleNetwork:
-      aliases:
-        - solr.local
+    - exampleNetwork 
   volumes:
     - .\data\solr:C:\Data
   

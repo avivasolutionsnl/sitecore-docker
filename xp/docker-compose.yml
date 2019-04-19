@@ -14,9 +14,7 @@ services:
   image: "${IMAGE_PREFIX}sitecore:${TAG}"
   isolation: process
   networks:
-    exampleNetwork:
-      aliases:
-        - sitecore.local
+    - exampleNetwork 
   volumes:
     - .\license:C:\license
   depends_on:
@@ -28,9 +26,7 @@ services:
   image: "${IMAGE_PREFIX}solr:${TAG}"
   isolation: process
   networks:
-    exampleNetwork:
-      aliases:
-        - solr.local
+    - exampleNetwork 
 
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
