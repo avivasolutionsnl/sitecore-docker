@@ -79,6 +79,10 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     Install-SitecoreConfiguration -Path 'c:/Files/Config/custom-settings.json' -Sitename $Env:SITE_NAME; `
     Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs;
 
+# Starting these automatically may lead to race conditions so we start them from the boot script
+RUN Set-Service -Name "xconnect-IndexWorker" -StartupType "Manual"
+RUN Set-Service -Name "xconnect-MarketingAutomationService" -StartupType "Manual"
+
 EXPOSE 443
 
 ENTRYPOINT /Boot.ps1
