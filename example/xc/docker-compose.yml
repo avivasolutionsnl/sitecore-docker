@@ -4,10 +4,11 @@ services:
  commerce:
   image: "${IMAGE_PREFIX}commerce:${TAG}"
   isolation: process
+  command: -commerceHostname ${COMMERCE_HOST_NAME} -sitecoreHostname ${SITECORE_HOST_NAME}
   networks:
     exampleNetwork:
       aliases:
-        - commerce.local
+        - ${COMMERCE_HOST_NAME}
   volumes:
     - .\logs\commerce\CommerceAuthoring_Sc9:C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\logs
     - .\logs\commerce\CommerceMinions_Sc9:C:\inetpub\wwwroot\CommerceMinions_Sc9\wwwroot\logs
@@ -34,9 +35,12 @@ services:
   
  sitecore:
   image: "${IMAGE_PREFIX}sitecore:${TAG}"
+  command: -commerceHostname ${COMMERCE_HOST_NAME}
   isolation: process
   networks:
-    - exampleNetwork 
+    exampleNetwork:
+      aliases:
+        - ${SITECORE_HOST_NAME}
   volumes:
     - .\logs\sitecore:c:\inetpub\wwwroot\${SITECORE_SITE_NAME}\App_Data\logs
     - .\wwwroot\sitecore:C:\Workspace
