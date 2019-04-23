@@ -56,5 +56,8 @@ RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_P
 # See: https://sitecore.stackexchange.com/questions/11523/index-sitecore-marketingdefinitions-master-was-not-found-exception-in-sitecore
 COPY xc/sitecore/Sitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config /inetpub/wwwroot/sitecore/App_Config/Include/zSitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config
 
-ENTRYPOINT If ((Test-Path C:\Workspace) -eq $False) { New-Item -Type Directory c:\Workspace  }; `
-    /Scripts/Watch-Directory.ps1 -Path C:\Workspace -Destination c:\inetpub\wwwroot\sitecore
+COPY xc/sitecore/UpdateHostname.ps1 /Scripts
+COPY xc/sitecore/Boot.ps1 C:/
+
+ENTRYPOINT ["powershell", "C:/Boot.ps1"]
+CMD [ "-commerceHostname commerce.local" ]
