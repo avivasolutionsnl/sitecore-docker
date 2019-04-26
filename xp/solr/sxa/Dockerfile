@@ -14,6 +14,7 @@ RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
     -SolrUrl "http://localhost:8983/solr" `
     -SolrRoot "c:/solr" `
     -SolrService "void" `
+    -BaseConfig "basic_configs" `
     -CorePrefix $env:SITECORE_CORE_PREFIX `
     -Skip "StopSolr", "StartSolr"; `
    Get-Process -Name "java" | Stop-Process -Force;
