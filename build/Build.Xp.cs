@@ -147,7 +147,8 @@ partial class Build : NukeBuild
                     $"BUILDER_BASE_IMAGE={builderBaseImage}",
                     $"XCONNECT_CORE_PREFIX={XCONNECT_SOLR_CORE_PREFIX}",
                     $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}",
-                    $"XCONNECT_PACKAGE={XCONNECT_PACKAGE}"
+                    $"XCONNECT_PACKAGE={XCONNECT_PACKAGE}",
+                    $"CONFIG_PACKAGE={CONFIG_PACKAGE}"                    
                 })
             );
         });
