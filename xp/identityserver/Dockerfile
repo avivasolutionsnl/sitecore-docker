@@ -57,3 +57,8 @@ RUN Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -PasswordRecoveryUrl http://$Env:SITE_NAME `
     -AllowedCorsOrigins http://$Env:SITECORE_SITE_NAME `
     -ClientSecret "SIF-Default"
+
+COPY xp/identityserver/Boot.ps1 C:/
+
+ENTRYPOINT ["powershell", "C:/Boot.ps1"]
+CMD [ "-sitecoreHostname sitecore" ]

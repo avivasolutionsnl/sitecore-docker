@@ -4,6 +4,7 @@ services:
 
  identity:
   image: "${IMAGE_PREFIX}identity:${TAG}"
+  command: -sitecoreHostname ${SITECORE_HOST_NAME}
   isolation: process
   networks:
     - exampleNetwork   
