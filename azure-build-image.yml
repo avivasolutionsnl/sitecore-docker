@@ -18,7 +18,7 @@ jobs:
     env:
       storageAccountKey: $(storageAccountKey)
       storageAccountName: $(storageAccountName)
-      storageAccountLocation: https://sitecoredocker.file.core.windows.net/files/9.1.1
+      storageAccountLocation: $(storageAccountLocation)/files/9.1.1
     displayName: Mount Files
 
   - task: CopyFiles@2
