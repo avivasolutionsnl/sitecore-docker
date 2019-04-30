@@ -33,7 +33,7 @@ jobs:
     inputs:
       sourceFolder: Z:/xc/9.1.0 
       targetFolder: files
-      cleanTargetFolder: true
+      cleanTargetFolder: false
 
   - task: CopyFiles@2
     displayName: Copy XC license
