@@ -21,20 +21,20 @@ jobs:
       storageAccountLocation: $(storageAccountLocation)/files/9.1.1
     displayName: Mount Files
 
-- task: CopyFiles@2
-  displayName: Copy XP files
-  inputs:
-    sourceFolder: Z:/xp/9.1.1
-    targetFolder: files
-    cleanTargetFolder: true
-
-- task: CopyFiles@2
-  displayName: Copy XC files
-  inputs:
-    sourceFolder: Z:/xc/9.1.0
-    targetFolder: files
-    cleanTargetFolder: false
-
+  - task: CopyFiles@2
+    displayName: Copy XP files
+    inputs:
+      sourceFolder: Z:/xp/9.1.1
+      targetFolder: files
+      cleanTargetFolder: true
+  
+  - task: CopyFiles@2
+    displayName: Copy XC files
+    inputs:
+      sourceFolder: Z:/xc/9.1.0
+      targetFolder: files
+      cleanTargetFolder: false
+  
   - task: CopyFiles@2
     displayName: Copy XC license
     inputs:
