@@ -181,7 +181,6 @@ partial class Build : NukeBuild
     
     Target XpSitecoreMssqlSxa => _ => _
         .Requires(() => File.Exists(XpLicenseFile))
-        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .Requires(() => File.Exists(Files / PSE_PACKAGE))
         .Requires(() => File.Exists(Files / SXA_PACKAGE))
         .DependsOn(Xp)
