@@ -18,7 +18,7 @@ jobs:
     env:
       storageAccountKey: $(storageAccountKey)
       storageAccountName: $(storageAccountName)
-      storageAccountLocation: $(storageAccountLocation)/files/9.1.1
+      storageAccountLocation: $(storageAccountLocation)
     displayName: Mount Files
 
   - task: CopyFiles@2
