@@ -1,10 +1,22 @@
 version: '2.4'
 
 services:
+
+ identity:
+  image: "${IMAGE_PREFIX}identity:${TAG}"
+  command: -commerceHostname ${COMMERCE_HOST_NAME}
+  isolation: process
+  networks:
+    - exampleNetwork   
+  volumes:
+    - .\logs\identity:C:\inetpub\wwwroot\identity\app_data\logs
+  depends_on:
+    - mssql
+
  commerce:
   image: "${IMAGE_PREFIX}commerce:${TAG}"
   isolation: process
-  command: -commerceHostname ${COMMERCE_HOST_NAME} -sitecoreHostname ${SITECORE_HOST_NAME}
+  command: -commerceHostname ${COMMERCE_HOST_NAME} -sitecoreHostname ${SITECORE_HOST_NAME} -identityServerHostname ${IDENTITY_HOST_NAME}
   networks:
     exampleNetwork:
       aliases:
@@ -21,6 +33,7 @@ services:
     - mssql
     - solr
     - sitecore
+    - identity
 
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
@@ -49,6 +62,7 @@ services:
     - xconnect
     - mssql
     - solr
+    - identity
   
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"

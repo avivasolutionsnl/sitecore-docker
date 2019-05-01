@@ -2,7 +2,7 @@ Param(
     $certificateFile = 'c:\\Files\\commerce.pfx',
     $shopsServiceUrl = 'https://commerce.local:5000/api/',
     $commerceOpsServiceUrl = 'https://commerce.local:5000/commerceops/',
-    $identityServerUrl = 'https://commerce.local:5050/',
+    $identityServerUrl = 'https://identity/',
     $defaultEnvironment = 'HabitatShops',
     $defaultShopName = 'CommerceEngineDefaultStorefront',
     $sitecoreUserName = 'sitecore\admin',
@@ -58,6 +58,10 @@ Function InitializeCommerceServices {
         [Parameter(Mandatory = $true)]
         [string]$urlCommerceShopsServicesInitializeEnvironment,
         [Parameter(Mandatory = $true)]
+        [string]$urlCheckCommandStatus,
+        [Parameter(Mandatory = $true)]
+        [string]$environment,
+        [Parameter(Mandatory = $true)]
         [string]$bearerToken
     )
 
@@ -65,8 +69,26 @@ Function InitializeCommerceServices {
     $headers.Add("Authorization", $bearerToken);
     Write-Host "Initializing Shops: $($urlCommerceShopsServicesInitializeEnvironment)" -ForegroundColor Yellow
 
-    Invoke-RestMethod $urlCommerceShopsServicesInitializeEnvironment -TimeoutSec 1200 -Method PUT -Headers $headers
+    $payload = @{
+        "environment"=$environment;
+    }
 
+    $result = Invoke-RestMethod $urlCommerceShopsServicesInitializeEnvironment -TimeoutSec 1200 -Method POST -Body ($payload|ConvertTo-Json) -Headers $headers -ContentType "application/json"
+    $checkUrl = $urlCheckCommandStatus -replace "taskIdValue", $result.TaskId
+
+    $sw = [system.diagnostics.stopwatch]::StartNew()
+    $tp = New-TimeSpan -Minute 10
+    do {
+        Start-Sleep -s 30
+        Write-Host "Checking if $($checkUrl) has completed ..." -ForegroundColor White
+        $result = Invoke-RestMethod $checkUrl -TimeoutSec 1200 -Method Get -Headers $headers -ContentType "application/json"
+
+        if ($result.ResponseCode -ne "Ok") {
+            $(throw Write-Host "Initialize environment $($environment) failed, please check Engine service logs for more info." -Foregroundcolor Red)
+        }
+    } while ($result.Status -ne "RanToCompletion" -and $sw.Elapsed -le $tp)
+
+    Write-Host "Initialization for $($environment) completed ..." -ForegroundColor Green
     Write-Host "Shops initialization complete..." -ForegroundColor Green 
 }
 
@@ -98,11 +120,12 @@ Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/C
     -BaseUrl "$sitecoreUrl/SiteUtilityPages" `
     -AutomationEngineModule 'none' `
     -XConnectSitePath 'none' `
-    -Skip 'InstallAutomationEngineModule' # Automation Engine is installed in XConnect
+    -SiteName 'none' `
+    -Skip 'InstallAutomationEngineModule', 'StopServices', 'StartServices' # Automation Engine is installed in XConnect
 
 Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/CEConnect/CEConnect.json' `
-    -PackageFullPath /Files/Sitecore.Commerce.Engine.Connect.update `
-    -PackagesDirDst c:\\inetpub\wwwroot\\sitecore\\sitecore\\admin\\Packages `
+    -ModuleFullPath /Files/Sitecore.Commerce.Engine.Connect.zip `
+    -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
     -BaseUrl "$sitecoreUrl/SiteUtilityPages" `
     -MergeTool '/Files/Microsoft.Web.XmlTransform.dll' `
     -InputFile c:\\inetpub\\wwwroot\\sitecore\\MergeFiles\\Sitecore.Commerce.Engine.Connectors.Merge.Config `
@@ -126,7 +149,7 @@ $xml.Save($pathToConfig);
 $bearerToken = GetIdServerToken -userName $sitecoreUserName -password $sitecorePassword -urlIdentityServerGetToken "${identityServerUrl}connect/token"
 
 BootStrapCommerceServices -urlCommerceShopsServicesBootstrap "${commerceOpsServiceUrl}Bootstrap()" -bearerToken $bearerToken
-InitializeCommerceServices -urlCommerceShopsServicesInitializeEnvironment "${commerceOpsServiceUrl}InitializeEnvironment(environment='$defaultEnvironment')" -bearerToken $bearerToken
+InitializeCommerceServices -urlCommerceShopsServicesInitializeEnvironment "${commerceOpsServiceUrl}InitializeEnvironment()" -urlCheckCommandStatus "${commerceOpsServiceUrl}CheckCommandStatus(taskId=taskIdValue)" -environment $defaultEnvironment -bearerToken $bearerToken
 
 $commerceConfigFolder = 'C:\inetpub\wwwroot\sitecore\App_Config\Include\Y.Commerce.Engine'
 Rename-Item $commerceConfigFolder\Sitecore.Commerce.Engine.DataProvider.config.disabled $commerceConfigFolder\Sitecore.Commerce.Engine.DataProvider.config
