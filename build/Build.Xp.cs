@@ -39,10 +39,10 @@ partial class Build : NukeBuild
     readonly string PSE_PACKAGE = "Sitecore PowerShell Extensions-5.0.zip";
     
     [Parameter("SXA package")]
-    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.0.zip";
+    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8.1 rev. 190319 for 9.1.1.zip";
         
     [Parameter("JSS package")]
-    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.0 11.0.0 rev. 181031.zip";
+    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.1.1 XP 11.0.1 rev. 190318.zip";
 
     // Build configuration parameters
     [Parameter("SQL password")]
@@ -181,7 +181,6 @@ partial class Build : NukeBuild
     
     Target XpSitecoreMssqlSxa => _ => _
         .Requires(() => File.Exists(XpLicenseFile))
-        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .Requires(() => File.Exists(Files / PSE_PACKAGE))
         .Requires(() => File.Exists(Files / SXA_PACKAGE))
         .DependsOn(Xp)
@@ -223,7 +222,6 @@ partial class Build : NukeBuild
         });
 
     Target XpSitecoreMssqlJss => _ => _
-        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .Requires(() => File.Exists(Files / JSS_PACKAGE))
         .DependsOn(Xp)
         .Executes(() => {

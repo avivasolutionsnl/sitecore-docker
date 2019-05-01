@@ -24,7 +24,7 @@ ARG IDENTITYSERVER_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"] 
 
-COPY files/license.xml /Files/
+COPY xp/license/license.xml /Files/
 COPY files/$IDENTITYSERVER_PACKAGE /Files/
 COPY files/*.pfx /Files/
 COPY --from=prepare /Files/Config /Files/Config/
