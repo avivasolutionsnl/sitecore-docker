@@ -35,12 +35,15 @@ COPY scripts /Scripts
 ENV XCONNECT_CLIENT_CERT_PATH "c:\\Files\\xconnect-client.pfx"
 ENV XCONNECT_SSL_CERT_PATH "c:\\Files\\xconnect-ssl.pfx"
 ENV SITECORE_CERT_PATH "c:\\Files\\sitecore.pfx"
+ENV IDENTITY_CERT_PATH "c:\\Files\\identity.pfx"
 
 # Trust Self signed certificates & import XConnect certificate
 RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_SSL_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
 # Install chocolatey
@@ -58,10 +61,13 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -Package c:/Files/$Env:SITECORE_PACKAGE `
     -LicenseFile "c:/license/license.xml" `
     -Sitename $Env:SITE_NAME `
+    -SitecoreIdentityAuthority "https://identity" `
     -SqlDbPrefix $Env:SQL_DB_PREFIX `
     -SqlServer $Env:SQL_SERVER `
     -SqlAdminUser $Env:SQL_USER `
     -SqlAdminPassword $Env:SQL_SA_PASSWORD `
+    -SqlSecurityUser $Env:SQL_USER `
+    -SqlSecurityPassword $Env:SQL_SA_PASSWORD `    
     -SqlCoreUser $Env:SQL_USER `
     -SqlCorePassword $Env:SQL_SA_PASSWORD `
     -SqlMasterUser $Env:SQL_USER `
@@ -70,14 +76,13 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SqlWebPassword $Env:SQL_SA_PASSWORD `
     -SqlFormsUser $Env:SQL_USER `
     -SqlFormsPassword $Env:SQL_SA_PASSWORD `
-    -SolrCorePrefix $Env:SITECORE_CORE_PREFIX `
     -SqlProcessingTasksUser $Env:SQL_USER `
     -SqlProcessingTasksPassword $Env:SQL_SA_PASSWORD `
     -SqlReferenceDataUser $Env:SQL_USER `
     -SqlReferenceDataPassword $Env:SQL_SA_PASSWORD ` 
-    -SqlExmMasterUser "sa" `
+    -SqlExmMasterUser $Env:SQL_USER `
     -SqlExmMasterPassword $Env:SQL_SA_PASSWORD `
-    -SqlMessagingUser "sa" `
+    -SqlMessagingUser $Env:SQL_USER `
     -SqlMessagingPassword $Env:SQL_SA_PASSWORD `	
     -SqlProcessingPoolsUser $Env:SQL_USER `
     -SqlProcessingPoolsPassword $Env:SQL_SA_PASSWORD `
@@ -85,6 +90,7 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SqlReportingPassword $Env:SQL_SA_PASSWORD `  
     -SqlMarketingAutomationUser $Env:SQL_USER `
     -SqlMarketingAutomationPassword $Env:SQL_SA_PASSWORD `
+    -SolrCorePrefix $Env:SOLR_CORE_PREFIX `    
     -SolrUrl $solrUrl `
     -XConnectCert "xConnect.client" `
     -XConnectCollectionService "https://xconnect" `

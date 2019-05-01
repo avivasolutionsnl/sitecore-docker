@@ -14,7 +14,7 @@ using System.Collections.Generic;
 partial class Build : NukeBuild
 {
     [Parameter("Docker image sitecore version")]
-    public readonly string XpSitecoreVersion = "9.0.2";
+    public readonly string XpSitecoreVersion = "9.1.1";
 
     [Parameter("Docker image prefix for Sitecore XP")]
     public readonly string XpImagePrefix = "sitecore-xp-";
@@ -32,21 +32,24 @@ partial class Build : NukeBuild
 
     // Packages
     [Parameter("Sitecore XPO configuration package")]
-    readonly string CONFIG_PACKAGE = "XP0 Configuration files 9.0.2 rev. 180604.zip";
+    readonly string CONFIG_PACKAGE = "XP0 Configuration files 9.1.1 rev. 002459.zip";
     [Parameter("Sitecore package")]
-    readonly string SITECORE_PACKAGE = "Sitecore 9.0.2 rev. 180604 (OnPrem)_single.scwdp.zip";
+    readonly string SITECORE_PACKAGE = "Sitecore 9.1.1 rev. 002459 (OnPrem)_single.scwdp.zip";
     
     [Parameter("Sitecore XConnect package")]
-    readonly string XCONNECT_PACKAGE = "Sitecore 9.0.2 rev. 180604 (OnPrem)_xp0xconnect.scwdp.zip";
+    readonly string XCONNECT_PACKAGE = "Sitecore 9.1.1 rev. 002459 (OnPrem)_xp0xconnect.scwdp.zip";
+    
+    [Parameter("Identity Server Package")]
+    readonly string IDENTITYSERVER_PACKAGE = "Sitecore.IdentityServer 2.0.1 rev. 00166 (OnPrem)_identityserver.scwdp.zip";
     
     [Parameter("Powershell Extension package")]
     readonly string PSE_PACKAGE = "Sitecore PowerShell Extensions-5.0.zip";
     
     [Parameter("SXA package")]
-    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.0.zip";
+    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8.1 rev. 190319 for 9.1.1.zip";
         
     [Parameter("JSS package")]
-    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.0 11.0.0 rev. 181031.zip";
+    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.1.1 XP 11.0.1 rev. 190318.zip";
 
     // Build configuration parameters
     [Parameter("SQL password")]
@@ -57,6 +60,8 @@ partial class Build : NukeBuild
     readonly string SOLR_PORT = "8983";
     [Parameter("Xconnect site name")]
     readonly string XCONNECT_SITE_NAME = "xconnect";
+    [Parameter("Identity server site name")]
+    readonly string IDENTITY_SITE_NAME = "identity";
     [Parameter("Xconnect Solr core prefix")]
     readonly string XCONNECT_SOLR_CORE_PREFIX = "xp0";
     [Parameter("Sitecore Solr core prefix")]
@@ -130,6 +135,28 @@ partial class Build : NukeBuild
             );
         });
     
+    Target XpIdentity => _ => _
+        .Executes(() =>
+        {
+            var baseImage = BaseImageName("sitecore");
+
+             DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xp/identityserver/Dockerfile")
+                .SetIsolation("process")
+                .SetTag(XpImageName("identity"))
+                .SetBuildArg(new string[]{
+                    $"BASE_IMAGE={baseImage}",
+                    $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
+                    $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
+                    $"SQL_SERVER=mssql",
+                    $"SITE_NAME={IDENTITY_SITE_NAME}",
+                    $"IDENTITYSERVER_PACKAGE={IDENTITYSERVER_PACKAGE}",
+                    $"CONFIG_PACKAGE={CONFIG_PACKAGE}"
+                })
+            );
+        });
+
     Target XpSolr => _ => _
         .Requires(() => File.Exists(Files / XCONNECT_PACKAGE))
         .DependsOn(BaseOpenJdk, BaseSolrBuilder)
@@ -148,7 +175,8 @@ partial class Build : NukeBuild
                     $"BUILDER_BASE_IMAGE={builderBaseImage}",
                     $"XCONNECT_CORE_PREFIX={XCONNECT_SOLR_CORE_PREFIX}",
                     $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}",
-                    $"XCONNECT_PACKAGE={XCONNECT_PACKAGE}"
+                    $"XCONNECT_PACKAGE={XCONNECT_PACKAGE}",
+                    $"CONFIG_PACKAGE={CONFIG_PACKAGE}"                    
                 })
             );
         });
@@ -181,7 +209,6 @@ partial class Build : NukeBuild
     
     Target XpSitecoreMssqlSxa => _ => _
         .Requires(() => File.Exists(XpLicenseFile))
-        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .Requires(() => File.Exists(Files / PSE_PACKAGE))
         .Requires(() => File.Exists(Files / SXA_PACKAGE))
         .DependsOn(Xp)
@@ -223,7 +250,6 @@ partial class Build : NukeBuild
         });
 
     Target XpSitecoreMssqlJss => _ => _
-        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .Requires(() => File.Exists(Files / JSS_PACKAGE))
         .DependsOn(Xp)
         .Executes(() => {
@@ -245,7 +271,7 @@ partial class Build : NukeBuild
         });        
 
     Target Xp => _ => _
-        .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect);
+        .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect, XpIdentity);
 
     Target XpSxa => _ => _
         .DependsOn(XpSitecoreMssqlSxa, XpSolrSxa);

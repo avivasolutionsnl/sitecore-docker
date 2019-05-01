@@ -73,7 +73,7 @@ The build results in the following Docker images:
     - `sitecore-xc-sitecore-jss`
     - `sitecore-xc-mssql-jss`
 
-All images are contain a version tag that corresponds to the Sitecore commercial version number e.g. `xp-sitecore-sitecore:9.0.2`.
+All images are contain a version tag that corresponds to the Sitecore commercial version number e.g. `xp-sitecore-sitecore:9.1.1`.
 
 ### Build a selection of images
 To build a certain Docker image or set of images run a specific Nuke.Build target, e.g to build only XP0 images:
