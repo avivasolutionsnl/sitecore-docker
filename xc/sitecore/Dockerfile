@@ -39,7 +39,7 @@ COPY --from=builder /Files/CommerceMACoreForAE /Files/CommerceMACoreForAE
 COPY --from=builder /Files/CommerceXProfiles /Files/CommerceXProfiles
 COPY --from=builder /Files/CommerceXAnalytics /Files/CommerceXAnalytics
 COPY --from=builder /Files/${WEB_TRANSFORM_TOOL} /Files/Microsoft.Web.XmlTransform.dll
-COPY --from=builder /Files/${COMMERCE_CONNECT_ENGINE_PACKAGE} /Files/Sitecore.Commerce.Engine.Connect.update
+COPY --from=builder /Files/${COMMERCE_CONNECT_ENGINE_PACKAGE} /Files/Sitecore.Commerce.Engine.Connect.zip
 COPY --from=builder /Files/${ROOT_CERT_PATH} /Files/${ROOT_CERT_PATH}
 
 COPY xc/sitecore/InstallCommercePackages.ps1 /Scripts/

@@ -24,6 +24,7 @@ ARG SITE_NAME="sitecore"
 ARG SOLR_PORT=8983
 ARG SITECORE_CORE_PREFIX
 ARG SITECORE_PACKAGE
+ARG SOLR_CORE_PREFIX="sitecore" 
 
 COPY files/*.pfx /Files/
 COPY dummylicense.xml /license/license.xml
