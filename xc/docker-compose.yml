@@ -1,6 +1,15 @@
 version: '2.4'
 
 services:
+ 
+ identity:
+  image: "${IMAGE_PREFIX}identity:${TAG}"
+  isolation: process
+  networks:
+    - exampleNetwork   
+  depends_on:
+    - mssql
+
  mssql:
   image: "${IMAGE_PREFIX}mssql-intermediate:${TAG}"
   isolation: process
@@ -21,6 +30,7 @@ services:
     - xconnect
     - mssql
     - solr
+    - identity
 
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
@@ -51,6 +61,7 @@ services:
     - mssql
     - solr
     - sitecore
+    - identity
 
 networks:
   exampleNetwork:
