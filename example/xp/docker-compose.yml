@@ -1,6 +1,18 @@
 version: '2.4'
 
 services:
+
+ identity:
+  image: "${IMAGE_PREFIX}identity:${TAG}"
+  command: -sitecoreHostname ${SITECORE_HOST_NAME}
+  isolation: process
+  networks:
+    - exampleNetwork   
+  volumes:
+    - .\logs\identity:C:\inetpub\wwwroot\identity\app_data\logs
+  depends_on:
+    - mssql
+
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
   isolation: process
@@ -25,6 +37,7 @@ services:
     - xconnect
     - mssql
     - solr
+    - identity
 
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
