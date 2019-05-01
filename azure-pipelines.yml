@@ -11,30 +11,36 @@ trigger:
 jobs:
 - template: azure-build-image.yml
   parameters:
-    name: BaseXpXc
-    buildTargets: Xc
-    pushTargets: PushBase PushXp PushXc
+    name: BaseXp
+    buildTargets: Xp
+    pushTargets: PushBase PushXp
 
-- template: azure-build-image.yml
-  parameters:
-    name: XpSxa
-    buildTargets: XpSxa
-    pushTargets: PushXpSxa
+# - template: azure-build-image.yml
+#   parameters:
+#     name: BaseXpXc
+#     buildTargets: Xc
+#     pushTargets: PushBase PushXp PushXc
 
-- template: azure-build-image.yml
-  parameters:
-    name: XcSxa
-    buildTargets: XcSxa
-    pushTargets: PushXcSxa
+# - template: azure-build-image.yml
+#   parameters:
+#     name: XpSxa
+#     buildTargets: XpSxa
+#     pushTargets: PushXpSxa
 
-- template: azure-build-image.yml
-  parameters:
-    name: XpJss
-    buildTargets: XpJss
-    pushTargets: PushXpJss
+# - template: azure-build-image.yml
+#   parameters:
+#     name: XcSxa
+#     buildTargets: XcSxa
+#     pushTargets: PushXcSxa
 
-- template: azure-build-image.yml
-  parameters:
-    name: XcJss
-    buildTargets: XcJss
-    pushTargets: PushXcJss
+# - template: azure-build-image.yml
+#   parameters:
+#     name: XpJss
+#     buildTargets: XpJss
+#     pushTargets: PushXpJss
+
+# - template: azure-build-image.yml
+#   parameters:
+#     name: XcJss
+#     buildTargets: XcJss
+#     pushTargets: PushXcJss
