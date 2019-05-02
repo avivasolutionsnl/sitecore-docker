@@ -60,4 +60,4 @@ COPY xc/sitecore/UpdateHostname.ps1 /Scripts
 COPY xc/sitecore/Boot.ps1 C:/
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]
-CMD [ "-commerceHostname commerce.local" ]
+CMD [ "-commerceHostname commerce.local -identityHostname identity" ]

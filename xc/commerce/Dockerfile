@@ -64,7 +64,6 @@ COPY --from=prepare /Files/${PLUMBER_FILE_NAME} /Files/
 
 # Trust & import self signed certificates
 RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
@@ -137,7 +136,7 @@ RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';
     -UserDomain $Env:COMPUTERNAME ` 
     -UserName 'commerceuser' `
     -UserPassword 'Pa$$w0rd' `
-    -CommerceInstallRoot 'c:\\inetpub\\wwwroot' `
+    -CommerceInstallRoot 'c:\inetpub\wwwroot' `
     -SitecoreBizFxPort 4200 `
     -SitecoreBizFxServerName 'SitecoreBizFx' `
     -BaseConfigurationFolder '/Files/SIF.Sitecore.Commerce/Configuration' ` 
@@ -210,4 +209,4 @@ COPY xc/commerce/UpdateHostname.ps1 /Scripts
 COPY xc/commerce/Boot.ps1 C:/
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]
-CMD [ "-commerceHostname commerce.local -sitecoreHostname sitecore -identityServerHostname identity" ]
+CMD [ "-commerceHostname commerce.local -sitecoreHostname sitecore -identityHostname identity" ]

@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
 
-Function UpdateIdentityServerConfig {
+Function UpdateIdentityServerCommerceConfig {
     param (
         [Parameter(Mandatory = $true)]
         [string]$configPath, 
@@ -27,4 +27,24 @@ Function UpdateIdentityServerConfig {
     Write-Host "Done patching $configPath!" -ForegroundColor Green
 }
 
-UpdateIdentityServerConfig -configPath "C:\inetpub\wwwroot\identity\Config\production\Sitecore.Commerce.IdentityServer.Host.xml" -commerceHostName $commerceHostName
+Function UpdateIdentityServerPlumberConfig {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$configPath, 
+        [Parameter(Mandatory = $true)]
+        [string]$commerceHostName
+    )
+
+    Write-Host "Patching $configPath"
+
+    $allowedCors = "http://${commerceHostName}:4000"
+
+    $xml = [xml](Get-Content $configPath)
+    $xml.Settings.Sitecore.IdentityServer.Clients.PlumberClient.AllowedCorsOrigins.AllowedCorsOrigins1 = $allowedCors
+    $xml.Save($configPath);
+    
+    Write-Host "Done patching $configPath!" -ForegroundColor Green
+}
+
+UpdateIdentityServerCommerceConfig -configPath "C:\inetpub\wwwroot\identity\Config\production\Sitecore.Commerce.IdentityServer.Host.xml" -commerceHostName $commerceHostName
+UpdateIdentityServerPlumberConfig -configPath "C:\inetpub\wwwroot\identity\Config\production\Sitecore.Plumber.IdentityServer.Host.xml" -commerceHostName $commerceHostName

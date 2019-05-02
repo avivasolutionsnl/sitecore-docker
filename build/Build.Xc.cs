@@ -241,6 +241,7 @@ partial class Build : NukeBuild
 
     Target XcIdentity => _ => _
         .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .DependsOn(XpIdentity)
         .Executes(() =>
         {
             var baseImage = XpImageName("identity");
