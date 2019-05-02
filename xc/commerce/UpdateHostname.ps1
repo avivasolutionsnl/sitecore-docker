@@ -6,7 +6,7 @@ param(
     [Parameter(Mandatory=$true)]
     [String]$sitecoreHostname,
     [Parameter(Mandatory=$true)]
-    [String]$identityServerHostname
+    [String]$identityHostname
 )
 
 $ErrorActionPreference = 'Stop'
@@ -61,6 +61,33 @@ Function UpdateBizFxConfig {
     Write-Host "Done patching $configPath!" -ForegroundColor Green
 }
 
+Function UpdatePlumberConfig {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$configPath, 
+        [Parameter(Mandatory = $true)]
+        [string]$plumberUrl,
+        [Parameter(Mandatory = $true)]
+        [string]$identityServerUrl,
+        [Parameter(Mandatory = $true)]
+        [string]$engineServerUrl
+    )
+
+    Write-Host "Patching $configPath"
+    $json = Get-Content $configPath -raw | ConvertFrom-Json; 
+    Write-Host "Patching PlumberUri with $plumberUrl"
+    $json.PlumberUri = $plumberUrl
+    Write-Host "Patching IdentityServerUri with $identityServerUrl"
+    $json.IdentityServerUri = $identityServerUrl
+    Write-Host "Patching EngineUri with $engineServerUrl"
+    $json.EngineUri = $engineServerUrl
+    $json | ConvertTo-Json | set-content $configPath
+
+    $json = ConvertTo-Json $json -Depth 100
+    Set-Content $configPath -Value $json -Encoding UTF8
+    Write-Host "Done patching $configPath!" -ForegroundColor Green
+}
+
 Function UpdateCommerceConfig() {
     param(
         [Parameter(Mandatory = $true)]
@@ -88,7 +115,7 @@ $hostFileName = 'c:\\windows\\system32\\drivers\\etc\\hosts'; '\"`r`n127.0.0.1`t
 Write-Host "Succesfully updated hostfile!" -ForegroundColor Green
 
 #Modify the certificate with the new hostnames
-[X509Certificate[]]$certificates = Get-ChildItem -Path 'cert:\localmachine\root' -DnsName 'DO_NOT_TRUST_SitecoreRootCert';
+[X509Certificate[]]$certificates = Get-ChildItem -Path 'cert:\localmachine\root' -DnsName 'sitecore-docker-devonly';
 [X509Certificate]$rootCert = $certificates[0];
 Write-Host "Creating a new certificate with hostnames $commerceHostname"
 [X509Certificate]$certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $commerceHostname -Signer $rootcert -KeyUsage CertSign,CRLSign,DataEncipherment,DigitalSignature,KeyAgreement,KeyEncipherment -Provider 'Microsoft Enhanced RSA and AES Cryptographic Provider';
@@ -102,10 +129,10 @@ UpdateBindingCertificate -certificate $certificate -bindingName 'SitecoreBizFx' 
 
 #Prepare some variables to be passed as arguments 
 [string]$baseUrl = "https://$commerceHostname"
-[string]$identityServerUrl = "https://${identityServerHostname}"
+[string]$identityServerUrl = "https://${identityHostname}"
 [string]$engineServerUrl = $baseUrl + ":5000"
 [string]$bizFxUrl = $baseUrl + ":4200"
-[string]$plumberUrl = $baseUrl + ":4000"
+[string]$plumberUrl = "http://${commerceHostname}:4000"
 $redirectUrls = [string[]]@(
     ($bizFxUrl),
     ($bizFxUrl + "/?")
@@ -124,6 +151,7 @@ $plumberAllowedOrigins = [string[]]@(
 
 #Modify the commerce config with the new hostnames
 UpdateBizFxConfig -configPath "C:\inetpub\wwwroot\SitecoreBizFx\assets\config.json" -bizFxUrl $bizFxUrl -identityServerUrl $identityServerUrl -engineServerUrl $engineServerUrl
+UpdatePlumberConfig -configPath "C:\inetpub\plumber\static\config.json" -plumberUrl $plumberUrl -identityServerUrl $identityServerUrl -engineServerUrl $engineServerUrl
 
 UpdateCommerceConfig -configPath "C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\config.json" -allowedOrigins $allowedOrigins -identityServerUrl $identityServerUrl
 UpdateCommerceConfig -configPath "C:\inetpub\wwwroot\CommerceOps_Sc9\wwwroot\config.json" -allowedOrigins $allowedOrigins -identityServerUrl $identityServerUrl

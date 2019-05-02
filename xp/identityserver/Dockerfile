@@ -61,4 +61,4 @@ RUN Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
 COPY xp/identityserver/Boot.ps1 C:/
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]
-CMD [ "-sitecoreHostname sitecore" ]
+CMD [ "-sitecoreHostname sitecore -identityHostname identity" ]
