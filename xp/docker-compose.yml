@@ -1,7 +1,7 @@
 version: '2.4'
 
 services:
-identity:
+ identity:
   image: "${IMAGE_PREFIX}identity:${TAG}"
   isolation: process
   depends_on:

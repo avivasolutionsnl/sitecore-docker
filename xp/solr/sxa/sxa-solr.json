@@ -143,8 +143,8 @@
             // Tells Solr to create the new cores.
             "Type": "ManageSolrCore",
             "Params": [
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('SXAMaster.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('SXAWeb.Name')]" } }
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('SXAMaster.Name')]" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('SXAWeb.Name')]" } }
             ]
         }
     }
