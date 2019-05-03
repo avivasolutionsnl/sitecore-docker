@@ -64,13 +64,9 @@ COPY --from=prepare /Files/${PLUMBER_FILE_NAME} /Files/
 
 # Trust & import self signed certificates
 RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
+    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:XCONNECT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; 
 
 RUN net user /add commerceuser 'Pa$$w0rd'; `
     Set-LocalUser -Name 'commerceuser' -PasswordNeverExpires:$true

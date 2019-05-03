@@ -53,7 +53,8 @@ Function UpdateIdentityServerConfig {
 [X509Certificate]$rootCert = $certificates[0];
 
 Write-Host "Creating a new certificate with hostnames $identityHostname"
-[X509Certificate]$certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $identityHostname -Signer $rootcert -KeyUsage CertSign,CRLSign,DataEncipherment,DigitalSignature,KeyAgreement,KeyEncipherment -Provider 'Microsoft Enhanced RSA and AES Cryptographic Provider';
+[X509Certificate]$certificate = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $identityHostname -Signer $rootcert -KeyUsage CertSign,CRLSign,DataEncipherment,DigitalSignature,KeyAgreement,KeyEncipherment -Provider "Microsoft Strong Cryptographic Provider" `
+-HashAlgorithm "SHA256"
 Write-Host "Succesfully created the certificate!. Updating bindings..." -ForegroundColor Green
 
 UpdateBindingCertificate -certificate $certificate -bindingName 'identity' -port 443
