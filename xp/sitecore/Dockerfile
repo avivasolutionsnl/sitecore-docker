@@ -90,7 +90,7 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SqlReportingPassword $Env:SQL_SA_PASSWORD `  
     -SqlMarketingAutomationUser $Env:SQL_USER `
     -SqlMarketingAutomationPassword $Env:SQL_SA_PASSWORD `
-    -SolrCorePrefix $Env:SOLR_CORE_PREFIX `    
+    -SolrCorePrefix $Env:SITECORE_CORE_PREFIX `    
     -SolrUrl $solrUrl `
     -XConnectCert "xConnect.client" `
     -XConnectCollectionService "https://xconnect" `

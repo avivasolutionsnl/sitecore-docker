@@ -5,6 +5,7 @@ services:
     volumes:
       - .\sitecore\sxa:C:\sxa
       - ..\files:C:\files-mount
+      - ..\files:C:\inetpub\wwwroot\sitecore\App_Data\packages
       - .\license:C:\license  
     environment:
       PSE_PACKAGE: ${PSE_PACKAGE}
