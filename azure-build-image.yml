@@ -36,13 +36,6 @@ jobs:
       cleanTargetFolder: false
 
   - task: CopyFiles@2
-    displayName: Copy certificates
-    inputs:
-      sourceFolder: Z:/certificates
-      targetFolder: files
-      cleanTargetFolder: false
-
-  - task: CopyFiles@2
     displayName: Copy XC license
     inputs:
       sourceFolder: Z:/

@@ -24,6 +24,7 @@ ARG SITE_NAME="sitecore"
 ARG SOLR_PORT=8983
 ARG SITECORE_CORE_PREFIX
 ARG SITECORE_PACKAGE
+ARG SOLR_CORE_PREFIX="sitecore" 
 
 COPY files/*.pfx /Files/
 COPY dummylicense.xml /license/license.xml
@@ -33,18 +34,14 @@ COPY --from=prepare /Files/Config /Files/Config/
 COPY scripts /Scripts
 
 ENV XCONNECT_CLIENT_CERT_PATH "c:\\Files\\xconnect-client.pfx"
-ENV XCONNECT_SSL_CERT_PATH "c:\\Files\\xconnect-ssl.pfx"
 ENV SITECORE_CERT_PATH "c:\\Files\\sitecore.pfx"
-ENV IDENTITY_CERT_PATH "c:\\Files\\identity.pfx"
+ENV ROOT_SSL_CERT_PATH "c:\\Files\\root.pfx"
 
 # Trust Self signed certificates & import XConnect certificate
-RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_SSL_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
+RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_CLIENT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:SITECORE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:ROOT_SSL_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:ROOT_SSL_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; 
 
 # Install chocolatey
 RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')); `

@@ -31,12 +31,14 @@ COPY --from=prepare /Files/Config /Files/Config/
 ADD scripts /Scripts
 
 ENV IDENTITY_CERT_PATH "C:\\Files\\identity.pfx"
+ENV ROOT_CERT_PATH "C:\\Files\\root.pfx"
 
  #Instal donet core windows hosting
 RUN choco install -y --params="Quiet" dotnetcore-windowshosting; 
 
  # Trust Self signed certificates & certificate
-RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:ROOT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
+    /Scripts/Import-Certificate.ps1 -certificateFile $Env:ROOT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
     /Scripts/Import-Certificate.ps1 -certificateFile $Env:IDENTITY_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
 
 ENV SIF_CONFIG="c:\\Files\\Config\\identityserver.json"
@@ -61,4 +63,4 @@ RUN Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
 COPY xp/identityserver/Boot.ps1 C:/
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]
-CMD [ "-sitecoreHostname sitecore" ]
+CMD [ "-sitecoreHostname sitecore -identityHostname identity" ]

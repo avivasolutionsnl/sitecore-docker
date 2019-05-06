@@ -28,7 +28,6 @@ FROM ${BASE_IMAGE}
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 ARG COMMERCE_CERT_PATH
-ARG ROOT_CERT_PATH
 ARG WEB_TRANSFORM_TOOL
 ARG COMMERCE_CONNECT_ENGINE_PACKAGE
 
@@ -39,25 +38,21 @@ COPY --from=builder /Files/CommerceMACoreForAE /Files/CommerceMACoreForAE
 COPY --from=builder /Files/CommerceXProfiles /Files/CommerceXProfiles
 COPY --from=builder /Files/CommerceXAnalytics /Files/CommerceXAnalytics
 COPY --from=builder /Files/${WEB_TRANSFORM_TOOL} /Files/Microsoft.Web.XmlTransform.dll
-COPY --from=builder /Files/${COMMERCE_CONNECT_ENGINE_PACKAGE} /Files/Sitecore.Commerce.Engine.Connect.update
-COPY --from=builder /Files/${ROOT_CERT_PATH} /Files/${ROOT_CERT_PATH}
-
-COPY xc/sitecore/InstallCommercePackages.ps1 /Scripts/
+COPY --from=builder /Files/${COMMERCE_CONNECT_ENGINE_PACKAGE} /Files/Sitecore.Commerce.Engine.Connect.zip
 COPY files/$COMMERCE_CERT_PATH /Files/
 COPY scripts/Import-Certificate.ps1 /Scripts/
 
-# Trust Self signed certificates & import XConnect certificate
-RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'Root' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'; `
-    /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:ROOT_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine'
+# Import commerce certificate
+RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine';
+
+COPY xc/sitecore/InstallCommercePackages.ps1 /Scripts/
 
 # Patch Solr config, set initializeOnAdd = true
 # See: https://sitecore.stackexchange.com/questions/11523/index-sitecore-marketingdefinitions-master-was-not-found-exception-in-sitecore
 COPY xc/sitecore/Sitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config /inetpub/wwwroot/sitecore/App_Config/Include/zSitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config
 
-COPY xc/sitecore/UpdateHostname.ps1 /Scripts
+COPY xc/sitecore/UpdateHostnames.ps1 /Scripts
 COPY xc/sitecore/Boot.ps1 C:/
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]
-CMD [ "-commerceHostname commerce.local" ]
+CMD [ "-commerceHostname commerce.local -identityHostname identity" ]
