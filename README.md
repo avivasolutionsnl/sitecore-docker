@@ -196,6 +196,8 @@ If none are returned for the `xConnect.client` certificate, you probably need to
 PS>  Grant-Permission -Identity sitecore -Permission GenericRead -Path 'cert:\localmachine\my\9CC4483261B92D7C5B32239115283933FC5014C4'
 ```
 
+NB. Ensure that the signer certificate is present in `cert:\localmachine\root`.
+
 ## Certificates issues with Commerce
 Communication between services might fail when the certificates are not installed correctly. Verify what certificates are installed by:
 ```
