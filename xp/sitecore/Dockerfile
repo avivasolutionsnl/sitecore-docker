@@ -107,4 +107,8 @@ COPY xp/sitecore/config /Config
 RUN Copy-Item /Config/*.* c:\inetpub\wwwroot\$Env:SITE_NAME\App_Config\Include; `
     mv C:\inetpub\wwwroot\sitecore\App_Config\Include\Examples\LiveMode.config.example C:\inetpub\wwwroot\sitecore\App_Config\Include\Examples\LiveMode.config
 
+# Add IIS app pool user to Performance groups
+RUN net localgroup \"Performance Monitor Users\" \"IIS APPPOOL\$Env:SITE_NAME\" /add; `
+    net localgroup \"Performance Log Users\" \"IIS APPPOOL\$Env:SITE_NAME\" /add;
+
 ENTRYPOINT /Boot.ps1

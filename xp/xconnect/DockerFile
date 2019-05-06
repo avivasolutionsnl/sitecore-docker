@@ -80,8 +80,12 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     Remove-Item -Recurse -Force -Path c:\inetpub\wwwroot\xconnect\App_Data\logs;
 
 # Starting these automatically may lead to race conditions so we start them from the boot script
-RUN Set-Service -Name "xconnect-IndexWorker" -StartupType "Manual"
-RUN Set-Service -Name "xconnect-MarketingAutomationService" -StartupType "Manual"
+RUN Set-Service -Name "xconnect-IndexWorker" -StartupType "Manual"; `
+    Set-Service -Name "xconnect-MarketingAutomationService" -StartupType "Manual"
+
+# Add IIS app pool user to Performance groups
+RUN net localgroup \"Performance Monitor Users\" \"IIS APPPOOL\$Env:SITE_NAME\" /add; `
+    net localgroup \"Performance Log Users\" \"IIS APPPOOL\$Env:SITE_NAME\" /add;
 
 EXPOSE 443
 
