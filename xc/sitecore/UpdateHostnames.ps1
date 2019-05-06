@@ -1,7 +1,27 @@
 Param(
     [Parameter(Mandatory = $true)]
-    [String]$commerceHostname
+    [String]$commerceHostname,
+    [Parameter(Mandatory = $true)]
+    [String]$identityHostname
 )
+
+Function UpdateIdentityConfig() {
+    param(
+        [Parameter(Mandatory = $true)]
+        [String]$identityHostname
+    )
+
+    # Modify the commerce engine connection
+    $identityServerDir = 'c:\\inetpub\\wwwroot\\sitecore\\App_Config\\Sitecore\\Owin.Authentication.IdentityServer'
+    $configPath = $(Join-Path -Path $identityServerDir -ChildPath "\Sitecore.Owin.Authentication.IdentityServer.config")
+
+    Write-Host "Patching $configPath with $commerceHostname"
+    $xml = [xml](Get-Content $configPath)
+    $node = $xml.SelectSingleNode('//sc.variable[@name="identityServerAuthority"]')
+    $node.value =  "https://$identityHostname"
+    $xml.Save($configPath);
+    Write-Host "Done patching $configPath!" -ForegroundColor Green
+}
 
 Function UpdateCommerceConfig() {
     param(
@@ -22,4 +42,5 @@ Function UpdateCommerceConfig() {
     Write-Host "Done patching $configPath!" -ForegroundColor Green
 }
 
+UpdateIdentityConfig -identityHostname $identityHostname
 UpdateCommerceConfig -commerceHostname $commerceHostname

@@ -2,6 +2,7 @@
 # suppress all warnings as it clutters the build output
 mkdir -p .\logs\sitecore 2> $null
 mkdir -p .\logs\xconnect 2> $null
+mkdir -p .\logs\identity 2> $null
 mkdir -p .\logs\commerce\CommerceAuthoring_Sc9 2> $null 
 mkdir -p .\logs\commerce\CommerceMinions_Sc9 2> $null
 mkdir -p .\logs\commerce\CommerceOps_Sc9 2> $null
