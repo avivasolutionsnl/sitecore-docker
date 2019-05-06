@@ -84,11 +84,8 @@ RUN Set-Service -Name "xconnect-IndexWorker" -StartupType "Manual"; `
     Set-Service -Name "xconnect-MarketingAutomationService" -StartupType "Manual"
 
 # Add IIS app pool user to Performance groups
-RUN Get-LocalGroup; `
-    net localgroup 'Performance Log Users'; `
-    net localgroup 'Performance Monitor Users'; `
-    net localgroup 'Performance Monitor Users' 'IIS APPPOOL\xconnect' /add; `
-    net localgroup 'Performance Log Users' 'IIS APPPOOL\xconnect' /add;
+RUN net localgroup 'Performance Monitor Users' 'IIS APPPOOL\$Env:SITE_NAME' /add; `
+    net localgroup 'Performance Log Users' 'IIS APPPOOL\$Env:SITE_NAME' /add;
 
 EXPOSE 443
 
