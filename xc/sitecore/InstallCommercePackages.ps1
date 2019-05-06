@@ -1,12 +1,13 @@
 Param(
     $certificateFile = 'c:\\Files\\commerce.pfx',
-    $shopsServiceUrl = 'https://commerce:5000/api/',
-    $commerceOpsServiceUrl = 'https://commerce:5000/commerceops/',
-    $identityServerUrl = 'https://commerce:5050/',
+    $shopsServiceUrl = 'https://commerce.local:5000/api/',
+    $commerceOpsServiceUrl = 'https://commerce.local:5000/commerceops/',
+    $identityServerUrl = 'https://commerce.local:5050/',
     $defaultEnvironment = 'HabitatShops',
     $defaultShopName = 'CommerceEngineDefaultStorefront',
     $sitecoreUserName = 'sitecore\admin',
-    $sitecorePassword = 'b'
+    $sitecorePassword = 'b',
+    $sitecoreUrl = "http://sitecore"
 )
 
 Function GetIdServerToken {
@@ -79,22 +80,22 @@ Copy-Item -Path /Files/CommerceSIF/SiteUtilityPages -Destination c:\\inetpub\\ww
 Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/Connect/Connect.json' `
      -ModuleFullPath '/Files/SitecoreCommerceConnectCore/package.zip' `
      -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
-     -BaseUrl 'http://sitecore/SiteUtilityPages'
+     -BaseUrl "$sitecoreUrl/SiteUtilityPages"
 
 Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/Connect/Connect_xProfiles.json' `
      -ModuleFullPath '/Files/CommerceXProfiles/package.zip' `
      -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
-     -BaseUrl 'http://sitecore/SiteUtilityPages'
+     -BaseUrl "$sitecoreUrl/SiteUtilityPages"
 
 Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/Connect/Connect_xAnalytics.json' `
     -ModuleFullPath '/Files/CommerceXAnalytics/package.zip' `
     -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
-    -BaseUrl 'http://sitecore/SiteUtilityPages'
+    -BaseUrl "$sitecoreUrl/SiteUtilityPages"
 
 Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/Connect/Connect_MarketingAutomation.json' `
     -ModuleFullPath '/Files/CommerceMACore/package.zip' `
     -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
-    -BaseUrl 'http://sitecore/SiteUtilityPages' `
+    -BaseUrl "$sitecoreUrl/SiteUtilityPages" `
     -AutomationEngineModule 'none' `
     -XConnectSitePath 'none' `
     -Skip 'InstallAutomationEngineModule' # Automation Engine is installed in XConnect
@@ -102,7 +103,7 @@ Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/C
 Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/CEConnect/CEConnect.json' `
     -PackageFullPath /Files/Sitecore.Commerce.Engine.Connect.update `
     -PackagesDirDst c:\\inetpub\wwwroot\\sitecore\\sitecore\\admin\\Packages `
-    -BaseUrl 'http://sitecore/SiteUtilityPages' `
+    -BaseUrl "$sitecoreUrl/SiteUtilityPages" `
     -MergeTool '/Files/Microsoft.Web.XmlTransform.dll' `
     -InputFile c:\\inetpub\\wwwroot\\sitecore\\MergeFiles\\Sitecore.Commerce.Engine.Connectors.Merge.Config `
     -WebConfig c:\\inetpub\\wwwroot\\sitecore\\web.config
