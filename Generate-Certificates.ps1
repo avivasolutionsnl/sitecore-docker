@@ -1,4 +1,4 @@
-$cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname 'sitecore-docker-devonly' -KeyUsage DigitalSignature,CertSign -KeyExportPolicy Exportable -Provider "Microsoft Strong Cryptographic Provider" `
+$cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname 'DO_NOT_TRUST_SitecoreRootCert' -KeyUsage DigitalSignature,CertSign -KeyExportPolicy Exportable -Provider "Microsoft Strong Cryptographic Provider" `
 -HashAlgorithm "SHA256";
 $pwd = ConvertTo-SecureString -String 'secret' -Force -AsPlainText;
 Export-PfxCertificate -cert $cert -FilePath '.\Files\root.pfx' -Password $pwd;
