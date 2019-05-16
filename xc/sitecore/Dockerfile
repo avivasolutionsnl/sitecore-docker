@@ -47,10 +47,6 @@ RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_P
 
 COPY xc/sitecore/InstallCommercePackages.ps1 /Scripts/
 
-# Patch Solr config, set initializeOnAdd = true
-# See: https://sitecore.stackexchange.com/questions/11523/index-sitecore-marketingdefinitions-master-was-not-found-exception-in-sitecore
-COPY xc/sitecore/Sitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config /inetpub/wwwroot/sitecore/App_Config/Include/zSitecore.Commerce.Engine.Connectors.Index.Solr.InitializeOnAdd.config
-
 COPY xc/sitecore/UpdateHostnames.ps1 /Scripts
 COPY xc/sitecore/Boot.ps1 C:/
 
