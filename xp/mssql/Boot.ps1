@@ -48,7 +48,7 @@ Get-ChildItem -Path $DataPath -Filter "*.mdf" | ForEach-Object {
         Write-Host "The following error occurred while attaching $databaseName : $ErrorMessage"
         Write-Host "### Repairing '$databaseName'..."
         
-        $repairCmd = "ALTER DATABASE $databaseName SET EMERGENCY; DBCC CHECKDB ($databaseName, REPAIR_ALLOW_DATA_LOSS) WITH NO_INFOMSGS";
+        $repairCmd = "ALTER DATABASE [$databaseName] SET EMERGENCY; DBCC CHECKDB ([$databaseName], REPAIR_ALLOW_DATA_LOSS) WITH NO_INFOMSGS";
         Invoke-Sqlcmd -Query $repairCmd -Querytimeout 65535 -ConnectionTimeout 65535
     }
 }
