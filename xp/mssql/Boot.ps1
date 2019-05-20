@@ -40,24 +40,25 @@ Get-ChildItem -Path $DataPath -Filter "*.mdf" | ForEach-Object {
     Write-Host "### Attaching '$databaseName'..."
 
     try {
-        Invoke-Sqlcmd -Query $sqlcmd
+        # Pass in explicit long timeouts because by default its not infinite (in contrary to what the documentation claims)
+        Invoke-Sqlcmd -Query $sqlcmd -Querytimeout 65535 -ConnectionTimeout 65535
     } catch {
         $ErrorMessage = $_.Exception.Message
         Write-Host "The following error occurred while attaching $databaseName : $ErrorMessage"
         Write-Host "### Repairing '$databaseName'..."
         
         $repairCmd = "ALTER DATABASE $databaseName SET EMERGENCY; DBCC CHECKDB ($databaseName, REPAIR_ALLOW_DATA_LOSS) WITH NO_INFOMSGS";
-        Invoke-Sqlcmd -Query $repairCmd
+        Invoke-Sqlcmd -Query $repairCmd -Querytimeout 65535 -ConnectionTimeout 65535
     }
 }
 
 # See http://jonnekats.nl/2017/sql-connection-issue-xconnect/
 $DbNameManager='{0}_Xdb.Collection.ShardMapManager' -f $env:DB_PREFIX;
 $sqlcmd = 'UPDATE [{0}].[__ShardManagement].[ShardsGlobal] SET ServerName = ''{1}''' -f $DbNameManager, $env:HOST_NAME;
-Invoke-Sqlcmd -Query $sqlcmd
+Invoke-Sqlcmd -Query $sqlcmd -Querytimeout 65535 -ConnectionTimeout 65535
 
 $sqlcmd = "EXEC sp_MSforeachdb 'IF charindex(''{0}'', ''?'' ) = 1 BEGIN EXEC [?]..sp_changedbowner ''sa'' END'" -f $env:DB_PREFIX;
-Invoke-Sqlcmd -Query $sqlcmd
+Invoke-Sqlcmd -Query $sqlcmd -Querytimeout 65535 -ConnectionTimeout 65535
 
 # Dbs are now ready
 Write-Host "### Sitecore databases ready!"
