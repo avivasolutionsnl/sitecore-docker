@@ -23,6 +23,11 @@ else
     Write-Host "### Existing Sitecore databases found in '$DataPath'..."
 }
 
+
+Write-Host "Waiting for the the MSSQLSERVER service to start..."
+(Get-Service MSSQLSERVER).WaitForStatus('Running')
+Write-Host "MSSQLSERVER service is now running!" -ForegroundColor Green
+
 Get-ChildItem -Path $DataPath -Filter "*.mdf" | ForEach-Object {
     # Replace case-insensitive,
     # Move-Item removes casing: https://stackoverflow.com/questions/54437210/move-item-and-preserve-filename-casing?noredirect=1#comment95683944_54437210

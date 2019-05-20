@@ -49,6 +49,7 @@ COPY files/$XCONNECT_PACKAGE ${INSTALL_PATH}/
 COPY xp/mssql/*.ps1 ${INSTALL_PATH}
 
 ADD https://dist.nuget.org/win-x86-commandline/v4.1.0/nuget.exe C:\\Windows\\nuget.exe
+
 RUN New-Item -Path 'C:/tools' -ItemType Directory | Out-Null; `
     & nuget install Microsoft.Data.Tools.Msbuild -Version 10.0.61710.120 -OutputDirectory c:/tools
     
