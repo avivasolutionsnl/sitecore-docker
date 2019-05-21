@@ -21,8 +21,9 @@ partial class Build : NukeBuild
     private string XcFullImageName(string name) => string.IsNullOrEmpty(BuildVersion) ? 
     $"{RepoImagePrefix}/{XcImageName(name)}" : 
     $"{RepoImagePrefix}/{XcImageName(name)}-{BuildVersion}";
-    private string XcImageName(string name) => $"{XcImagePrefix}{name}:{XcSitecoreVersion}";
-
+    private string XcImageName(string name) => $"{XcNakedImageName(name)}:{XcSitecoreVersion}";
+    private string XcNakedImageName(string name) => $"{XcImagePrefix}{name}";
+    
     // Packages
     [Parameter("Sitecore Identity server package")]
     readonly string SITECORE_IDENTITY_PACKAGE = "Sitecore.IdentityServer.1.4.2.zip";
@@ -90,6 +91,28 @@ partial class Build : NukeBuild
     readonly string COMMERCE_DB_PREFIX = "SitecoreCommerce9";
 
     public AbsolutePath XcLicenseFile = RootDirectory / "xc" / "license" / "license.xml";
+
+    private string[] XcNames = new string[]
+    {
+        "commerce",
+        "mssql",
+        "sitecore",
+        "solr",
+        "xconnect"
+    };
+
+    private string[] XcSxaNames = new string[]
+    {
+        "mssql-sxa",
+        "sitecore-sxa",
+        "solr-sxa"
+    };
+
+    private string[] XcJssNames = new string[]
+    {
+        "mssql-jss",
+        "sitecore-jss"
+    };
 
     Target XcCommerce => _ => _
         .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
@@ -315,29 +338,32 @@ partial class Build : NukeBuild
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .Executes(() => {
-            PushXcImage("commerce");
-            PushXcImage("mssql");
-            PushXcImage("sitecore");
-            PushXcImage("solr");
-            PushXcImage("xconnect");
+            foreach(var name in XcNames)
+            {
+                PushXcImage(name);
+            }
         });
     
     Target PushXcSxa => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .Executes(() => {
-            PushXcImage("mssql-sxa");
-            PushXcImage("sitecore-sxa");
-            PushXcImage("solr-sxa");
+            foreach (var name in XcSxaNames)
+            {
+                PushXcImage(name);
+            }
         });
 
     Target PushXcJss => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .Executes(() => {
-            PushXcImage("mssql-jss");
-            PushXcImage("sitecore-jss");
-        });    
+
+            foreach (var name in XcJssNames)
+            {
+                PushXcImage(name);
+            }
+        });
 
     private void PushXcImage(string name)
     {
