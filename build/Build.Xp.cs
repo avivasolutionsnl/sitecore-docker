@@ -9,6 +9,7 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Docker.DockerTasks;
 using Nuke.Docker;
 using Nuke.Common.Tooling;
+using System.Collections.Generic;
 
 partial class Build : NukeBuild
 {
@@ -23,6 +24,11 @@ partial class Build : NukeBuild
     $"{RepoImagePrefix}/{XpImageName(name)}-{BuildVersion}";
     private string XpImageName(string name) => $"{XpNakedImageName(name)}:{XpSitecoreVersion}";
     private string XpNakedImageName(string name) => $"{XpImagePrefix}{name}";
+
+    private IEnumerable<string> XpRepositoryNames => XpNames
+        .Concat(XpJssNames)
+        .Concat(XpSxaNames)
+        .Select(XpNakedImageName);
 
     // Packages
     [Parameter("Sitecore XPO configuration package")]
@@ -287,23 +293,4 @@ partial class Build : NukeBuild
 
         DockerTasks.DockerImagePush(x => x.SetName(target));
     }
-    Target ExecuteRetentionPolicyXp => _ => _
-       .Requires(
-           () => GitHubRepositoryName,
-           () => ACRName)
-       .Executes(async () => {
-           var repositoryNames = XpNames
-                 .Concat(XpJssNames)
-                 .Concat(XpSxaNames)
-                 .Select(XpNakedImageName);
-
-           var timeStampsInGitHubReleases = await GetTimestampsInGitHubReleases(GitHubRepositoryName);
-           Console.WriteLine("Timestamps currently present as release in GitHub");
-           Console.WriteLine(string.Join(Environment.NewLine, timeStampsInGitHubReleases));
-
-           foreach (var repositoryName in repositoryNames)
-           {
-               CleanACRImages(ACRName, repositoryName, timeStampsInGitHubReleases);
-           }
-       });
 }

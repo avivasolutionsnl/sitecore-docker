@@ -9,6 +9,7 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Docker.DockerTasks;
 using Nuke.Docker;
 using Nuke.Common.Tooling;
+using System.Collections.Generic;
 
 partial class Build : NukeBuild
 {
@@ -23,7 +24,12 @@ partial class Build : NukeBuild
     $"{RepoImagePrefix}/{XcImageName(name)}-{BuildVersion}";
     private string XcImageName(string name) => $"{XcNakedImageName(name)}:{XcSitecoreVersion}";
     private string XcNakedImageName(string name) => $"{XcImagePrefix}{name}";
-    
+
+    private IEnumerable<string> XcRepositoryNames => XcNames
+        .Concat(XcJssNames)
+        .Concat(XcSxaNames)
+        .Select(XcNakedImageName);
+
     // Packages
     [Parameter("Sitecore Identity server package")]
     readonly string SITECORE_IDENTITY_PACKAGE = "Sitecore.IdentityServer.1.4.2.zip";
@@ -375,24 +381,4 @@ partial class Build : NukeBuild
 
         DockerTasks.DockerImagePush(x => x.SetName(target));
     }
-
-    Target ExecuteRetentionPolicyXc => _ => _
-        .Requires(
-            () => GitHubRepositoryName,
-            () => ACRName)
-        .Executes(async () => {
-            var repositoryNames = XcNames
-                  .Concat(XcJssNames)
-                  .Concat(XcSxaNames)
-                  .Select(XcNakedImageName);                        
-
-            var timeStampsInGitHubReleases = await GetTimestampsInGitHubReleases(GitHubRepositoryName);
-            Console.WriteLine("Timestamps currently present as release in GitHub");
-            Console.WriteLine(string.Join(Environment.NewLine, timeStampsInGitHubReleases));
-
-            foreach (var repositoryName in repositoryNames)
-            {
-                CleanACRImages(ACRName, repositoryName, timeStampsInGitHubReleases);
-            }
-        });
 }

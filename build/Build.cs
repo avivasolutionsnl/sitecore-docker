@@ -130,7 +130,4 @@ partial class Build : NukeBuild
     Target Push => _ => _
         .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .DependsOn(PushXp, PushXpSxa, PushXpJss, PushXc, PushXcSxa, PushXcJss);
-
-    Target ExecuteRetentionPolicy => _ => _
-        .DependsOn(ExecuteRetentionPolicyBase, ExecuteRetentionPolicyXc, ExecuteRetentionPolicyXp);
 }

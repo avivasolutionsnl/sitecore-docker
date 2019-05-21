@@ -8,6 +8,7 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Docker.DockerTasks;
 using Nuke.Docker;
 using Nuke.Common.Tooling;
+using System.Collections.Generic;
 
 partial class Build : NukeBuild
 {
@@ -21,7 +22,7 @@ partial class Build : NukeBuild
     {
         "openjdk",
         "sitecore",
-        "solr-builder""
+        "solr-builder"
     };
 
     private string BaseFullImageName(string name) => string.IsNullOrEmpty(BuildVersion) ? 
@@ -29,6 +30,8 @@ partial class Build : NukeBuild
     $"{RepoImagePrefix}/{BaseImageName(name)}-{BuildVersion}";
     private string BaseImageName(string name) => $"{BaseNakedImageName(name)}:{BaseSitecoreVersion}";
     private string BaseNakedImageName(string name) => $"{BaseImagePrefix}{name}";
+    
+    private IEnumerable<string> BaseRepositoryNames => BaseNames.Select(BaseNakedImageName);
 
     Target BaseOpenJdk => _ => _
         .Executes(() =>
@@ -92,23 +95,4 @@ partial class Build : NukeBuild
 
         DockerTasks.DockerImagePush(x => x.SetName(target));
     }
-
-    Target ExecuteRetentionPolicyBase => _ => _
-        .Requires(
-            () => GitHubRepositoryName,
-            () => ACRName)
-        .Executes(async () => {
-
-            var repositoryNames = BaseNames
-                  .Select(BaseNakedImageName);
-
-            var timeStampsInGitHubReleases = await GetTimestampsInGitHubReleases(GitHubRepositoryName);
-            Console.WriteLine("Timestamps currently present as release in GitHub");
-            Console.WriteLine(string.Join(Environment.NewLine, timeStampsInGitHubReleases));
-
-            foreach (var repositoryName in repositoryNames)
-            {
-                CleanACRImages(ACRName, repositoryName, timeStampsInGitHubReleases);
-            }
-        });
 }

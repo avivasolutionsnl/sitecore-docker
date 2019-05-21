@@ -14,8 +14,22 @@ partial class Build : NukeBuild
     readonly string GitHubRepositoryName;
 
     [Parameter("Azure Container Registry instance name")]
-    readonly string ACRName;       
-    
+    readonly string ACRName;
+
+    Target ExecuteRetentionPolicy => _ => _
+        .Executes(async () => {               
+            var allRepositoryNames = BaseRepositoryNames.Concat(XcRepositoryNames).Concat(XpRepositoryNames);
+
+            var timeStampsInGitHubReleases = await GetTimestampsInGitHubReleases(GitHubRepositoryName);
+            Console.WriteLine("Timestamps currently present as release in GitHub");
+            Console.WriteLine(string.Join(Environment.NewLine, timeStampsInGitHubReleases));
+
+            foreach (var repositoryName in allRepositoryNames)
+            {
+                CleanACRImages(ACRName, repositoryName, timeStampsInGitHubReleases);
+            }
+        });
+
     private void CleanACRImages(string registryName, string repositoryName, IEnumerable<string> timestamps)
     {
         var tagsInACR = GetTagsInACR(registryName, repositoryName);
