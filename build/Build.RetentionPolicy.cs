@@ -38,7 +38,6 @@ partial class Build : NukeBuild
             {
                 CleanACRImages(ACRName, repositoryName, timeStampsInGitHubReleases);
             }
-
         });
     
     private void CleanACRImages(string registryName, string repositoryName, IEnumerable<string> timestamps)

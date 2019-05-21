@@ -1,0 +1,17 @@
+trigger:
+  branches:
+    exclude: ['*']
+  tags:
+    exclude: ['*']
+
+pr: none
+
+pool:
+  name: Hosted VS2017
+steps:
+- task: AzureCLI@1
+  displayName: 'Execute retention policy'
+  inputs:
+    azureSubscription: 'aviva-sitecore-docker'
+    scriptLocation: inlineScript
+    inlineScript: 'PowerShell -Command "$(System.DefaultWorkingDirectory)/build.ps1 ExecuteRetentionPolicy"'
