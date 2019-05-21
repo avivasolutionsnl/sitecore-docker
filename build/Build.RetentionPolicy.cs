@@ -11,34 +11,10 @@ using System.Threading.Tasks;
 partial class Build : NukeBuild
 {
     [Parameter("GitHub repository name to look for in the retention policy")]
-    readonly string GitHubRepositoryName = "avivasolutionsnl/sitecore-docker";
+    readonly string GitHubRepositoryName;
 
     [Parameter("Azure Container Registry instance name")]
-    readonly string ACRName = "avivasolutionsnl";
-       
-    Target ExecuteRetentionPolicy => _ => _
-        .Executes(async () => {
-            var xcRepositoryNames = XcNames
-                  .Concat(XcJssNames)
-                  .Concat(XcSxaNames)
-                  .Select(XcNakedImageName);
-
-            var xpRepositoryNames = XpNames
-                  .Concat(XpJssNames)
-                  .Concat(XpSxaNames)
-                  .Select(XpNakedImageName);
-
-            var allRepositoryNames = xcRepositoryNames.Concat(xpRepositoryNames);
-
-            var timeStampsInGitHubReleases = await GetTimestampsInGitHubReleases(GitHubRepositoryName);
-            Console.WriteLine("Timestamps currently present as release in GitHub");
-            Console.WriteLine(string.Join(Environment.NewLine, timeStampsInGitHubReleases));
-
-            foreach(var repositoryName in allRepositoryNames)
-            {
-                CleanACRImages(ACRName, repositoryName, timeStampsInGitHubReleases);
-            }
-        });
+    readonly string ACRName;       
     
     private void CleanACRImages(string registryName, string repositoryName, IEnumerable<string> timestamps)
     {

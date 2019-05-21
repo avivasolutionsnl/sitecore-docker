@@ -1,3 +1,6 @@
+# There is a scheduled trigger defined in Azure DevOps since this is currently impossible in YAML
+# Every night at 00:00
+
 trigger:
   branches:
     exclude: ['*']
@@ -12,6 +15,6 @@ steps:
 - task: AzureCLI@1
   displayName: 'Execute retention policy'
   inputs:
-    azureSubscription: 'aviva-sitecore-docker'
+    azureSubscription: '$(azureSubscription)'
     scriptLocation: inlineScript
-    inlineScript: 'PowerShell -Command "$(System.DefaultWorkingDirectory)/build.ps1 ExecuteRetentionPolicy"'
+    inlineScript: 'PowerShell -Command "$(System.DefaultWorkingDirectory)/build.ps1 ExecuteRetentionPolicy -GitHubRepositoryName avivasolutionsnl/sitecore-docker -ACRName avivasolutionsnl"'

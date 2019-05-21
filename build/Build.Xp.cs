@@ -287,4 +287,23 @@ partial class Build : NukeBuild
 
         DockerTasks.DockerImagePush(x => x.SetName(target));
     }
+    Target ExecuteRetentionPolicyXp => _ => _
+       .Requires(
+           () => GitHubRepositoryName,
+           () => ACRName)
+       .Executes(async () => {
+           var repositoryNames = XpNames
+                 .Concat(XpJssNames)
+                 .Concat(XpSxaNames)
+                 .Select(XpNakedImageName);
+
+           var timeStampsInGitHubReleases = await GetTimestampsInGitHubReleases(GitHubRepositoryName);
+           Console.WriteLine("Timestamps currently present as release in GitHub");
+           Console.WriteLine(string.Join(Environment.NewLine, timeStampsInGitHubReleases));
+
+           foreach (var repositoryName in repositoryNames)
+           {
+               CleanACRImages(ACRName, repositoryName, timeStampsInGitHubReleases);
+           }
+       });
 }
