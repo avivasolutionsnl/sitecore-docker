@@ -61,6 +61,7 @@ RUN mkdir -p $env:DATA_PATH; `
      Get-ChildItem -Path $env:INSTALL_PATH -Exclude "*.mdf", "*.ldf" | Remove-Item -Force;
 
 COPY xp/mssql/Boot.ps1 .
+COPY xp/mssql/UnlockAdminUser.ps1 .
 COPY xp/mssql/Persist-Databases.ps1 .
 
 CMD C:/Boot.ps1 -InstallPath $env:INSTALL_PATH -DataPath $env:DATA_PATH
