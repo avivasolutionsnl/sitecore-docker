@@ -48,6 +48,7 @@ COPY files/$XCONNECT_PACKAGE ${INSTALL_PATH}/
 
 COPY xp/mssql/*.ps1 ${INSTALL_PATH}
 
+# Install some utilities to handle dacpac files (like SqlPackage.exe)
 ADD https://dist.nuget.org/win-x86-commandline/v4.1.0/nuget.exe C:\\Windows\\nuget.exe
 
 RUN New-Item -Path 'C:/tools' -ItemType Directory | Out-Null; `
