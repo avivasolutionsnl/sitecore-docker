@@ -16,6 +16,9 @@ partial class Build : NukeBuild
     [Parameter("Azure Container Registry instance name")]
     readonly string ACRName;
 
+    [PathExecutable]
+    Tool Az;
+
     Target ExecuteRetentionPolicy => _ => _
         .Executes(async () => {               
             var allRepositoryNames = BaseRepositoryNames.Concat(XcRepositoryNames).Concat(XpRepositoryNames);
@@ -41,14 +44,14 @@ partial class Build : NukeBuild
         foreach (var tag in tagsToBeDeleted)
         {
             Console.WriteLine($"Deleting {tag}");
-            ProcessTasks.StartProcess("az", $"acr repository delete -n {registryName} --image {repositoryName}:{tag} --yes").AssertZeroExitCode();
+            Az($"acr repository delete -n {registryName} --image {repositoryName}:{tag} --yes");
         }
     }
 
     private IEnumerable<string> GetTagsInACR(string registryName, string repositoryName)
     {
-        var showTagsProcess = ProcessTasks.StartProcess("az", $"acr repository show-tags -n {registryName} --repository {repositoryName}").AssertZeroExitCode();
-        var textOutput = string.Join(' ', showTagsProcess.Output.Select(x => x.Text));
+        var showTagsProcess = Az($"acr repository show-tags -n {registryName} --repository {repositoryName}");
+        var textOutput = string.Join(' ', showTagsProcess.Select(x => x.Text));
         var tags = JsonConvert.DeserializeObject<string[]>(textOutput);
 
         return tags;
