@@ -9,6 +9,7 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Docker.DockerTasks;
 using Nuke.Docker;
 using Nuke.Common.Tooling;
+using System.Collections.Generic;
 
 partial class Build : NukeBuild
 {
@@ -21,7 +22,13 @@ partial class Build : NukeBuild
     private string XpFullImageName(string name) => string.IsNullOrEmpty(BuildVersion) ? 
     $"{RepoImagePrefix}/{XpImageName(name)}" :
     $"{RepoImagePrefix}/{XpImageName(name)}-{BuildVersion}";
-    private string XpImageName(string name) => $"{XpImagePrefix}{name}:{XpSitecoreVersion}";
+    private string XpImageName(string name) => $"{XpNakedImageName(name)}:{XpSitecoreVersion}";
+    private string XpNakedImageName(string name) => $"{XpImagePrefix}{name}";
+
+    private IEnumerable<string> XpRepositoryNames => XpNames
+        .Concat(XpJssNames)
+        .Concat(XpSxaNames)
+        .Select(XpNakedImageName);
 
     // Packages
     [Parameter("Sitecore XPO configuration package")]
@@ -56,6 +63,27 @@ partial class Build : NukeBuild
     readonly string SITECORE_SOLR_CORE_PREFIX = "sitecore";
 
     public AbsolutePath XpLicenseFile = RootDirectory / "xp" / "license" / "license.xml";
+
+    private string[] XpNames = new string[]
+    {
+        "mssql",
+        "sitecore",
+        "solr",
+        "xconnect"        
+    };
+
+    private string[] XpSxaNames = new string[]
+    {
+        "mssql-sxa",
+        "sitecore-sxa",
+        "solr-sxa"
+    };
+
+    private string[] XpJssNames = new string[]
+    {
+        "mssql-jss",
+        "sitecore-jss"
+    };
 
     Target XpMssql => _ => _
         .Requires(() => File.Exists(Files / SITECORE_PACKAGE))
@@ -229,27 +257,30 @@ partial class Build : NukeBuild
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .Executes(() => {
-            PushXpImage("mssql");
-            PushXpImage("sitecore");
-            PushXpImage("solr");
-            PushXpImage("xconnect");
+            foreach (var name in XpNames)
+            {
+                PushXpImage(name);
+            }
         });
     
     Target PushXpSxa => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .Executes(() => {
-            PushXpImage("mssql-sxa");
-            PushXpImage("sitecore-sxa");
-            PushXpImage("solr-sxa");
+            foreach (var name in XpSxaNames)
+            {
+                PushXpImage(name);
+            }
         });
 
     Target PushXpJss => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .Executes(() => {
-            PushXpImage("mssql-jss");
-            PushXpImage("sitecore-jss");
+            foreach (var name in XpJssNames)
+            {
+                PushXpImage(name);
+            }
         });     
 
     private void PushXpImage(string name)

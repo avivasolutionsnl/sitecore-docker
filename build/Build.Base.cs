@@ -8,6 +8,7 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Docker.DockerTasks;
 using Nuke.Docker;
 using Nuke.Common.Tooling;
+using System.Collections.Generic;
 
 partial class Build : NukeBuild
 {
@@ -17,11 +18,21 @@ partial class Build : NukeBuild
     [Parameter("Docker image prefix for Sitecore base")]
     readonly string BaseImagePrefix = "sitecore-base-";
 
+    private string[] BaseNames = new string[]
+    {
+        "openjdk",
+        "sitecore",
+        "solr-builder"
+    };
+
     private string BaseFullImageName(string name) => string.IsNullOrEmpty(BuildVersion) ? 
     $"{RepoImagePrefix}/{BaseImageName(name)}" : 
     $"{RepoImagePrefix}/{BaseImageName(name)}-{BuildVersion}";
-    private string BaseImageName(string name) => $"{BaseImagePrefix}{name}:{BaseSitecoreVersion}";
+    private string BaseImageName(string name) => $"{BaseNakedImageName(name)}:{BaseSitecoreVersion}";
+    private string BaseNakedImageName(string name) => $"{BaseImagePrefix}{name}";
     
+    private IEnumerable<string> BaseRepositoryNames => BaseNames.Select(BaseNakedImageName);
+
     Target BaseOpenJdk => _ => _
         .Executes(() =>
         {
@@ -68,9 +79,10 @@ partial class Build : NukeBuild
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
         .Executes(() => {
-            PushBaseImage("openjdk");
-            PushBaseImage("sitecore");
-            PushBaseImage("solr-builder");
+            foreach (var name in BaseNames)
+            {
+                PushBaseImage(name);
+            }
         });
 
     private void PushBaseImage(string name)
