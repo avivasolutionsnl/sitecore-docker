@@ -16,11 +16,11 @@ partial class Build : NukeBuild
     [Parameter("Azure Container Registry instance name")]
     readonly string ACRName;
 
-    [PathExecutable]
-    Tool Az;
-
     [Parameter("Dry run (don't actually delete images)")]
     readonly bool DryRun;
+
+    [PathExecutable]
+    Tool Az;
 
     Target ExecuteRetentionPolicy => _ => _
         .Executes(async () => {
