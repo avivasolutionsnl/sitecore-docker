@@ -16,11 +16,19 @@ partial class Build : NukeBuild
     [Parameter("Azure Container Registry instance name")]
     readonly string ACRName;
 
+    [Parameter("Dry run (don't actually delete images)")]
+    readonly bool DryRun;
+
     [PathExecutable]
     Tool Az;
 
     Target ExecuteRetentionPolicy => _ => _
-        .Executes(async () => {               
+        .Executes(async () => {
+            if (DryRun)
+            {
+                Console.WriteLine("### DRY RUN ONLY ###");
+            }
+
             var allRepositoryNames = BaseRepositoryNames.Concat(XcRepositoryNames).Concat(XpRepositoryNames);
 
             var timeStampsInGitHubReleases = await GetTimestampsInGitHubReleases(GitHubRepositoryName);
@@ -36,15 +44,15 @@ partial class Build : NukeBuild
     private void CleanACRImages(string registryName, string repositoryName, IEnumerable<string> timestamps)
     {
         var tagsInACR = GetTagsInACR(registryName, repositoryName);
-        Console.WriteLine("Tags currently present in ACR:");
-        Console.WriteLine(string.Join(Environment.NewLine, tagsInACR));
-
         var tagsToBeDeleted = tagsInACR.Where(x => !timestamps.Contains(GetTimeStamp(x)));
 
         foreach (var tag in tagsToBeDeleted)
         {
-            Console.WriteLine($"Deleting {tag}");
-            Az($"acr repository delete -n {registryName} --image {repositoryName}:{tag} --yes");
+            Console.WriteLine($"Deleting {repositoryName}:{tag} from {registryName}");
+            if (!DryRun)
+            {
+                Az($"acr repository delete -n {registryName} --image {repositoryName}:{tag} --yes");
+            }
         }
     }
 
