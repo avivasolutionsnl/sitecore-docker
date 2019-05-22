@@ -17,4 +17,4 @@ steps:
   inputs:
     azureSubscription: '$(azureSubscription)'
     scriptLocation: inlineScript
-    inlineScript: 'PowerShell -Command "$(System.DefaultWorkingDirectory)/build.ps1 ExecuteRetentionPolicy -GitHubRepositoryName avivasolutionsnl/sitecore-docker -ACRName avivasolutionsnl"'
+    inlineScript: 'PowerShell -Command "$(System.DefaultWorkingDirectory)/build.ps1 ExecuteRetentionPolicy -GitHubRepositoryName $(gitHubRepositoryName) -ACRName $(acrName) -DryRun $(dryRun)"'

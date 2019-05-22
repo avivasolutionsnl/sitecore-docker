@@ -32,5 +32,6 @@
     <Content Include="Build.Base.cs" />
     <Content Include="Build.Xc.cs" />
     <Content Include="Build.Xp.cs" />
+    <None Include="..\execute-retention-policy.yml" />
   </ItemGroup>
 </Project>
