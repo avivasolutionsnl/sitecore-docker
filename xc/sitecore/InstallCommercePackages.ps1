@@ -99,7 +99,7 @@ Copy-Item -Path /Files/CommerceSIF/SiteUtilityPages -Destination c:\\inetpub\\ww
 # Enlarge timeout to 7200 seconds
 ((Get-Content -path C:/Files/CommerceSIF/Modules/SitecoreUtilityTasks/SitecoreUtilityTasks.psm1 -Raw) -replace '720','7200') | Set-Content -Path C:/Files/CommerceSIF/Modules/SitecoreUtilityTasks/SitecoreUtilityTasks.psm1
 
-# Wait for all the containers to be initialized. For some reason if we don't do this on 9.1.1, installing the packages
+# Wait for all the containers to be initialized. For some reason if we don't do this on 9.1.0, installing the packages
 # will result in timeout exceptions in the item saved event handler. We need to investigate this further. 
 Sleep -Seconds 300
 

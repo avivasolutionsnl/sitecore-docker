@@ -14,7 +14,7 @@ using System.Collections.Generic;
 partial class Build : NukeBuild
 {
     [Parameter("Docker image sitecore version")]
-    public readonly string XcSitecoreVersion = "9.1.1";
+    public readonly string XcSitecoreVersion = "9.1.0";
     // Docker image naming
     [Parameter("Docker image prefix for Sitecore XC")]
     readonly string XcImagePrefix = "sitecore-xc-";
