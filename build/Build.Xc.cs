@@ -101,6 +101,7 @@ partial class Build : NukeBuild
     private string[] XcNames = new string[]
     {
         "commerce",
+        "identity",
         "mssql",
         "sitecore",
         "solr",

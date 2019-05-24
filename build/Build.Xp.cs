@@ -72,6 +72,7 @@ partial class Build : NukeBuild
     private string[] XpNames = new string[]
     {
         "mssql",
+        "identity",
         "sitecore",
         "solr",
         "xconnect"        
