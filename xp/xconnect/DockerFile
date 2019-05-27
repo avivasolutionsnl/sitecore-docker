@@ -83,6 +83,9 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
 RUN Set-Service -Name "xconnect-IndexWorker" -StartupType "Manual"; `
     Set-Service -Name "xconnect-MarketingAutomationService" -StartupType "Manual"
 
+# Fixes a issue where xconnect would crash. See https://github.com/avivasolutionsnl/sitecore-docker/issues/130
+RUN sc.exe config w3svc start=demand
+
 # Add IIS app pool user to Performance groups
 RUN net localgroup \"Performance Monitor Users\" \"IIS APPPOOL\$Env:SITE_NAME\" /add; `
     net localgroup \"Performance Log Users\" \"IIS APPPOOL\$Env:SITE_NAME\" /add;
