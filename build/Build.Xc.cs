@@ -14,7 +14,7 @@ using System.Collections.Generic;
 partial class Build : NukeBuild
 {
     [Parameter("Docker image sitecore version")]
-    public readonly string XcSitecoreVersion = "9.0.3";
+    public readonly string XcSitecoreVersion = "9.1.0";
     // Docker image naming
     [Parameter("Docker image prefix for Sitecore XC")]
     readonly string XcImagePrefix = "sitecore-xc-";
@@ -31,41 +31,38 @@ partial class Build : NukeBuild
         .Select(XcNakedImageName);
 
     // Packages
-    [Parameter("Sitecore Identity server package")]
-    readonly string SITECORE_IDENTITY_PACKAGE = "Sitecore.IdentityServer.1.4.2.zip";
-
     [Parameter("Sitecore BizFx package")]
-    readonly string SITECORE_BIZFX_PACKAGE = "Sitecore.BizFX.1.4.1.zip";
+    readonly string SITECORE_BIZFX_PACKAGE = "Sitecore.BizFX.2.0.3.zip";
 
     [Parameter("Commerce Engine package")]
-    readonly string COMMERCE_ENGINE_PACKAGE = "Sitecore.Commerce.Engine.2.4.63.zip";
+    readonly string COMMERCE_ENGINE_PACKAGE = "Sitecore.Commerce.Engine.3.0.163.zip";
 
     [Parameter("Commerce Connect package")]
-    readonly string COMMERCE_CONNECT_PACKAGE = "Sitecore Commerce Connect Core 11.4.15.zip";
+    readonly string COMMERCE_CONNECT_PACKAGE = "Sitecore Commerce Connect Core 12.0.18.zip";
 
     [Parameter("Commerce Connect Engine package")]
-    readonly string COMMERCE_CONNECT_ENGINE_PACKAGE = "Sitecore.Commerce.Engine.Connect.2.4.32.update";
+    readonly string COMMERCE_CONNECT_ENGINE_PACKAGE = "Sitecore Commerce Engine Connect 3.0.45.zip";
 
     [Parameter("Commerce SIF package")]
-    readonly string COMMERCE_SIF_PACKAGE = "SIF.Sitecore.Commerce.1.4.7.zip";
+    readonly string COMMERCE_SIF_PACKAGE = "SIF.Sitecore.Commerce.2.0.19.zip";
 
     [Parameter("Commerce Marketing Automation package")]
-    readonly string COMMERCE_MA_PACKAGE = "Sitecore Commerce Marketing Automation Core 11.4.15.zip";
+    readonly string COMMERCE_MA_PACKAGE = "Sitecore Commerce Marketing Automation Core 12.0.18.zip";
 
     [Parameter("Commerce Marketing Automation for AutomationEngine package")]
-    readonly string COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE = "Sitecore Commerce Marketing Automation for AutomationEngine 11.4.15.zip";
+    readonly string COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE = "Sitecore Commerce Marketing Automation for AutomationEngine 12.0.18.zip";
 
     [Parameter("Commerce SDK package")]
-    readonly string COMMERCE_SDK_PACKAGE = "Sitecore.Commerce.Engine.SDK.2.4.43.zip";
+    readonly string COMMERCE_SDK_PACKAGE = "Sitecore.Commerce.Engine.SDK.3.0.40.zip";
 
     [Parameter("Commerce XP Core package")]
-    readonly string COMMERCE_XPROFILES_PACKAGE = "Sitecore Commerce ExperienceProfile Core 11.4.15.zip";
+    readonly string COMMERCE_XPROFILES_PACKAGE = "Sitecore Commerce ExperienceProfile Core 12.0.18.zip";
 
     [Parameter("Commerce XP Analytics Core package")]
-    readonly string COMMERCE_XANALYTICS_PACKAGE = "Sitecore Commerce ExperienceAnalytics Core 11.4.15.zip";
+    readonly string COMMERCE_XANALYTICS_PACKAGE = "Sitecore Commerce ExperienceAnalytics Core 12.0.18.zip";
 
     [Parameter("SXA Commerce package")]
-    readonly string SCXA_PACKAGE = "Sitecore Commerce Experience Accelerator 1.4.150.zip";
+    readonly string SCXA_PACKAGE = "Sitecore Commerce Experience Accelerator 2.0.181.zip";
 
     [Parameter("Web transform tool")]
     readonly string WEB_TRANSFORM_TOOL = "Microsoft.Web.XmlTransform.dll";
@@ -86,6 +83,9 @@ partial class Build : NukeBuild
     [Parameter("Xconnect certificate file")]
     readonly string XCONNECT_CERT_PATH = "xconnect-client.pfx";
 
+    [Parameter("Identity server certificate file")]
+    readonly string IDENTITY_CERT_PATH = "identity.pfx";
+
     // Build configuration parameters
     [Parameter("Commerce shop name")]
     readonly string SHOP_NAME = "CommerceEngineDefaultStorefront";
@@ -101,6 +101,7 @@ partial class Build : NukeBuild
     private string[] XcNames = new string[]
     {
         "commerce",
+        "identity",
         "mssql",
         "sitecore",
         "solr",
@@ -124,7 +125,6 @@ partial class Build : NukeBuild
         .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .Requires(() => File.Exists(Files / COMMERCE_SDK_PACKAGE))
         .Requires(() => File.Exists(Files / SITECORE_BIZFX_PACKAGE))
-        .Requires(() => File.Exists(Files / SITECORE_IDENTITY_PACKAGE))
         .Requires(() => File.Exists(Files / COMMERCE_ENGINE_PACKAGE))
         .Requires(() => File.Exists(Files / PLUMBER_FILE_NAME))
         .Executes(() =>
@@ -143,12 +143,12 @@ partial class Build : NukeBuild
                     $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}",
                     $"COMMERCE_SDK_PACKAGE={COMMERCE_SDK_PACKAGE}",
                     $"SITECORE_BIZFX_PACKAGE={SITECORE_BIZFX_PACKAGE}",
-                    $"SITECORE_IDENTITY_PACKAGE={SITECORE_IDENTITY_PACKAGE}",
                     $"COMMERCE_ENGINE_PACKAGE={COMMERCE_ENGINE_PACKAGE}",
                     $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
                     $"ROOT_CERT_PATH={ROOT_CERT_PATH}",
                     $"SITECORE_CERT_PATH={SITECORE_CERT_PATH}",
                     $"XCONNECT_CERT_PATH={XCONNECT_CERT_PATH}",
+                    $"IDENTITY_CERT_PATH={IDENTITY_CERT_PATH}",
                     $"PLUMBER_FILE_NAME={PLUMBER_FILE_NAME}"
                 })
             );
@@ -269,6 +269,25 @@ partial class Build : NukeBuild
             );
         });
 
+    Target XcIdentity => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .DependsOn(XpIdentity)
+        .Executes(() =>
+        {
+            var baseImage = XpImageName("identity");
+
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xc/identityserver/Dockerfile")
+                .SetIsolation("process")
+                .SetTag(XcImageName("identity"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}"
+                })
+            );
+        });
+
     Target XcSitecoreMssqlSxa => _ => _
         .Requires(() => File.Exists(XcLicenseFile))
         .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
@@ -332,7 +351,7 @@ partial class Build : NukeBuild
         });        
 
     Target Xc => _ => _
-        .DependsOn(XcCommerce, XcSitecoreMssql, XcSolr, XcXconnect);
+        .DependsOn(XcCommerce, XcSitecoreMssql, XcSolr, XcXconnect, XcIdentity);
 
     Target XcSxa => _ => _
         .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);

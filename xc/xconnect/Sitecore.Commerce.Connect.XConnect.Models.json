@@ -19,7 +19,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRParty, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRParty, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Id": {
           "Type": "Guid"
@@ -69,7 +69,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRString, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRString, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Id": {
           "Type": "Guid"
@@ -86,7 +86,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRCustomerPaymentInfo, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRCustomerPaymentInfo, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Id": {
           "Type": "Guid"
@@ -118,7 +118,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRCommerceUser, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRCommerceUser, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Id": {
           "Type": "Guid"
@@ -159,7 +159,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRPartyList, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRPartyList, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "PartyList": {
           "Type": {
@@ -179,7 +179,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRStringList, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRStringList, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "StringList": {
           "Type": {
@@ -199,7 +199,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRCustomerPaymentInfoList, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRCustomerPaymentInfoList, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CustomerPaymentInfoList": {
           "Type": {
@@ -219,7 +219,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRCommerceUserList, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Facets.GDPR.GDPRCommerceUserList, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "UserList": {
           "Type": {
@@ -239,7 +239,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Facets.CurrentCartFacet, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Facets.CurrentCartFacet, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CartJson": {
           "Type": "String"
@@ -260,7 +260,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.Entity, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.Entity, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.Models.MappedEntity": {
@@ -272,7 +272,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.MappedEntity, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.MappedEntity, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -288,7 +288,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.EnumType`1[[Sitecore.Commerce.CustomModels.Models.StockStatus, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null]], Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.EnumType`1[[Sitecore.Commerce.CustomModels.Models.StockStatus, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null]], Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Value": {
           "Type": "Int32"
@@ -306,7 +306,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.StockStatus, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.StockStatus, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.Models.Total": {
@@ -317,7 +317,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.Total, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.Total, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Amount": {
           "Type": "Decimal"
@@ -341,7 +341,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.TaxTotal, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.TaxTotal, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Amount": {
           "Type": "Decimal"
@@ -367,7 +367,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.TaxSubtotal, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.TaxSubtotal, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "BaseUnitMeasure": {
           "Type": "String"
@@ -394,7 +394,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.Price, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.Price, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Amount": {
           "Type": "Decimal"
@@ -423,7 +423,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.PriceCondition, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.PriceCondition, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ConditionType": {
           "Type": "String"
@@ -453,7 +453,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.Party, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.Party, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "PartyId": {
           "Type": "String"
@@ -507,7 +507,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.ShippingInfo, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.ShippingInfo, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "LineIDs": {
           "Type": [
@@ -533,7 +533,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.PaymentInfo, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.PaymentInfo, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "LineIDs": {
           "Type": [
@@ -559,7 +559,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartParty, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartParty, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "PartyID": {
           "Type": "String"
@@ -577,7 +577,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartAdjustment, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartAdjustment, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Amount": {
           "Type": "Decimal"
@@ -604,7 +604,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartOption, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartOption, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Description": {
           "Type": "String"
@@ -625,7 +625,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartProduct, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartProduct, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Adjustments": {
           "Type": [
@@ -671,7 +671,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartBase, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartBase, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "UserId": {
           "Type": "String"
@@ -727,7 +727,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.WishListLine, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.WishListLine, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ProductId": {
           "Type": "String"
@@ -747,7 +747,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.WishListEmailed, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.WishListEmailed, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -777,7 +777,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.WishList, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.WishList, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -815,7 +815,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CustomerPaymentInfo, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CustomerPaymentInfo, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Name": {
           "Type": "String"
@@ -857,7 +857,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CustomerParty, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CustomerParty, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "PartyID": {
           "Type": "String"
@@ -878,7 +878,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CommerceCustomer, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CommerceCustomer, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Name": {
           "Type": "String"
@@ -919,7 +919,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CommerceUser, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CommerceUser, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "UserDataFacet": {
           "Type": "Guid"
@@ -978,7 +978,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.EnumType`1[[Sitecore.Commerce.CustomModels.Models.RewardPointType, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null]], Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.EnumType`1[[Sitecore.Commerce.CustomModels.Models.RewardPointType, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null]], Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Value": {
           "Type": "Int32"
@@ -996,7 +996,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.RewardPointType, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.RewardPointType, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.Models.LoyaltyRewardPoint": {
@@ -1007,7 +1007,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.LoyaltyRewardPoint, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.LoyaltyRewardPoint, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Description": {
           "Type": "String"
@@ -1040,7 +1040,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.LoyaltyCard, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.LoyaltyCard, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CustomerId": {
           "Type": "String"
@@ -1080,7 +1080,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartLine, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartLine, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Adjustments": {
           "Type": [
@@ -1120,7 +1120,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartSubLine, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartSubLine, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Adjustments": {
           "Type": [
@@ -1157,7 +1157,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartLineContainer, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.CartLineContainer, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ProductId": {
           "Type": "String"
@@ -1184,7 +1184,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.Cart, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.Cart, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "Adjustments": {
           "Type": [
@@ -1224,7 +1224,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.Order, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.Order, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "OrderID": {
           "Type": "String"
@@ -1248,7 +1248,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.BaseCustomPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.BaseCustomPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.CultureChosenPageEvent": {
@@ -1259,7 +1259,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CultureChosenPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CultureChosenPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -1277,7 +1277,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CurrencyChosenPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CurrencyChosenPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -1295,7 +1295,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.SearchPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.SearchPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -1316,7 +1316,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.FacetAppliedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.FacetAppliedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -1337,7 +1337,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.ProductSortingPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.ProductSortingPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -1358,7 +1358,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitedCategoryPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitedCategoryPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -1379,7 +1379,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitedProductDetailsPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitedProductDetailsPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -1404,6 +1404,27 @@
         }
       }
     },
+    "Sitecore.Commerce.CustomModels.PageEvents.AbandonedCartPageEvent": {
+      "Type": "Event",
+      "BaseType": "Sitecore.Commerce.CustomModels.PageEvents.BaseCustomPageEvent",
+      "Annotations": [
+        {
+          "Type": "DoNotIndexAttribute"
+        }
+      ],
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.AbandonedCartPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "Properties": {
+        "ShopName": {
+          "Type": "String"
+        },
+        "ExternalId": {
+          "Type": "String"
+        },
+        "Cart": {
+          "Type": "Sitecore.Commerce.CustomModels.Models.Cart"
+        }
+      }
+    },
     "Sitecore.Commerce.CustomModels.PageEvents.CartPageEvent": {
       "Type": "Event",
       "BaseType": "Sitecore.Commerce.CustomModels.PageEvents.BaseCustomPageEvent",
@@ -1412,7 +1433,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -1445,7 +1466,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartCreatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartCreatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.CartDeletedPageEvent": {
@@ -1456,7 +1477,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartDeletedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartDeletedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.CartLockedPageEvent": {
@@ -1467,7 +1488,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartLockedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartLockedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.CartResumedPageEvent": {
@@ -1478,7 +1499,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartResumedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartResumedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "PreviousStateName": {
           "Type": "String"
@@ -1493,7 +1514,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartUnlockedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartUnlockedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.CartUpdatedPageEvent": {
@@ -1504,7 +1525,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartUpdatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartUpdatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CustomerId": {
           "Type": "String"
@@ -1528,7 +1549,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartLinesPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CartLinesPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CartLines": {
           "Type": [
@@ -1554,7 +1575,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesAddedToCartPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesAddedToCartPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.LinesRemovedFromCartPageEvent": {
@@ -1565,7 +1586,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesRemovedFromCartPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesRemovedFromCartPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.LinesUpdatedOnCartPageEvent": {
@@ -1576,7 +1597,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesUpdatedOnCartPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesUpdatedOnCartPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountPageEvent": {
@@ -1587,7 +1608,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CustomerName": {
           "Type": "String"
@@ -1608,7 +1629,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountDeletedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountDeletedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountDisabledPageEvent": {
@@ -1619,7 +1640,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountDisabledPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountDisabledPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountEnabledPageEvent": {
@@ -1630,7 +1651,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountEnabledPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountEnabledPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountUpdatedPageEvent": {
@@ -1641,7 +1662,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountUpdatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.CustomerAccountUpdatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.AddToCartStockStatusPageEvent": {
@@ -1652,7 +1673,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.AddToCartStockStatusPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.AddToCartStockStatusPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -1684,7 +1705,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.BackInStockSubscriptionPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.BackInStockSubscriptionPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "InventoryProduct": {
           "Type": "Sitecore.Commerce.CustomModels.Models.InventoryProduct"
@@ -1714,7 +1735,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Models.InventoryProduct, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Models.InventoryProduct, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ProductId": {
           "Type": "String"
@@ -1729,7 +1750,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.BackInStockUnsubscriptionPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.BackInStockUnsubscriptionPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "InventoryProduct": {
           "Type": "Sitecore.Commerce.CustomModels.Models.InventoryProduct"
@@ -1756,7 +1777,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.ProductsAreBackInStockPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.ProductsAreBackInStockPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "RequestJson": {
           "Type": "String"
@@ -1771,7 +1792,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitedProductStockStatusPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitedProductStockStatusPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -1801,7 +1822,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.GiftCardPurchasePageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.GiftCardPurchasePageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -1840,7 +1861,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LoyaltyCardPurchasePageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LoyaltyCardPurchasePageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -1876,7 +1897,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.OfflineOrdersSynchronizedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.OfflineOrdersSynchronizedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "UserId": {
           "Type": "String"
@@ -1911,7 +1932,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.OrderStatusChangedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.OrderStatusChangedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "OrderId": {
           "Type": "String"
@@ -1929,7 +1950,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.ReorderRequestedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.ReorderRequestedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"
@@ -1958,7 +1979,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitorOrderCancelPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitorOrderCancelPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CustomerId": {
           "Type": "String"
@@ -1991,7 +2012,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitorViewedOrderDetailPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitorViewedOrderDetailPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CustomerId": {
           "Type": "String"
@@ -2021,7 +2042,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitorViewedOrderHistoryPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.VisitorViewedOrderHistoryPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CustomerId": {
           "Type": "String"
@@ -2042,7 +2063,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.OrderedProductStockStatusPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.OrderedProductStockStatusPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ProductId": {
           "Type": "String"
@@ -2072,7 +2093,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "UserName": {
           "Type": "String"
@@ -2096,7 +2117,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountDeletedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountDeletedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.UserAccountDisabledPageEvent": {
@@ -2107,7 +2128,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountDisabledPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountDisabledPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.UserAccountEnabledPageEvent": {
@@ -2118,7 +2139,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountEnabledPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountEnabledPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.UserAccountUpdatedPageEvent": {
@@ -2129,7 +2150,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountUpdatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.UserAccountUpdatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.WishListLinesPageEvent": {
@@ -2140,7 +2161,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListLinesPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListLinesPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -2175,7 +2196,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesAddedToWishListPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesAddedToWishListPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.LinesRemovedFromWishListPageEvent": {
@@ -2186,7 +2207,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesRemovedFromWishListPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesRemovedFromWishListPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.LinesUpdatedOnWishListPageEvent": {
@@ -2197,7 +2218,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesUpdatedOnWishListPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.LinesUpdatedOnWishListPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.PageEvents.WishListCreatedPageEvent": {
@@ -2208,7 +2229,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListCreatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListCreatedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -2238,7 +2259,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListDeletedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListDeletedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -2268,7 +2289,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListEmailedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListEmailedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "WishLists": {
           "Type": [
@@ -2285,7 +2306,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListPrintedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.PageEvents.WishListPrintedPageEvent, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -2315,7 +2336,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Goals.BaseCustomGoal, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Goals.BaseCustomGoal, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.Goals.UserAccountCreatedGoal": {
@@ -2326,7 +2347,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Goals.UserAccountCreatedGoal, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Goals.UserAccountCreatedGoal, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "UserName": {
           "Type": "String"
@@ -2350,7 +2371,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Goals.CustomerAccountCreatedGoal, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Goals.CustomerAccountCreatedGoal, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "CustomerName": {
           "Type": "String"
@@ -2374,7 +2395,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Goals.LoyaltyProgramJoinedGoal, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Goals.LoyaltyProgramJoinedGoal, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -2404,7 +2425,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Goals.VisitorOrderCreatedGoal, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Goals.VisitorOrderCreatedGoal, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "SitecoreUserName": {
           "Type": "String"
@@ -2437,7 +2458,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Outcomes.BaseCustomOutcome, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Outcomes.BaseCustomOutcome, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {}
     },
     "Sitecore.Commerce.CustomModels.Outcomes.SubmittedOrderOutcome": {
@@ -2448,7 +2469,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Outcomes.SubmittedOrderOutcome, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Outcomes.SubmittedOrderOutcome, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ExternalId": {
           "Type": "String"
@@ -2469,7 +2490,7 @@
           "Type": "DoNotIndexAttribute"
         }
       ],
-      "ClrType": "Sitecore.Commerce.CustomModels.Outcomes.AbandonedCartOutcome, Sitecore.Commerce.Connect.Collection.Model, Version=11.2.0.0, Culture=neutral, PublicKeyToken=null",
+      "ClrType": "Sitecore.Commerce.CustomModels.Outcomes.AbandonedCartOutcome, Sitecore.Commerce.Connect.Collection.Model, Version=12.0.0.0, Culture=neutral, PublicKeyToken=null",
       "Properties": {
         "ShopName": {
           "Type": "String"

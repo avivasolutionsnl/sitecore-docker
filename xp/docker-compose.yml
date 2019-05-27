@@ -1,6 +1,14 @@
 version: '2.4'
 
 services:
+ identity:
+  image: "${IMAGE_PREFIX}identity:${TAG}"
+  isolation: process
+  depends_on:
+    - mssql
+  mem_limit: 2048m
+  cpu_count: 4
+
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
   isolation: process
@@ -21,6 +29,7 @@ services:
     - xconnect
     - mssql
     - solr
+    - identity
 
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"

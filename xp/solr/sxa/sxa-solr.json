@@ -20,17 +20,17 @@
         },
         "SolrRoot": {
             "Type": "string",
-            "DefaultValue": "c:\\solr\\solr-6.6.2",
+            "DefaultValue": "c:\\solr\\solr-7.2.1",
             "Description": "The file path to the Solr instance."
         },
         "SolrService": {
             "Type": "string",
-            "DefaultValue": "Solr-6",
+            "DefaultValue": "Solr-7",
             "Description": "The name of the Solr service."
         },
         "BaseConfig": {
             "Type": "string",
-            "DefaultValue": "basic_configs",
+            "DefaultValue": "_default",
             "Description": "The configset to copy as a base for each core."
         },
         "CorePrefix": {
@@ -143,8 +143,8 @@
             // Tells Solr to create the new cores.
             "Type": "ManageSolrCore",
             "Params": [
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('SXAMaster.Name')]" } },
-                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "Name": "[variable('SXAWeb.Name')]" } }
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('SXAMaster.Name')]" } },
+                { "Action": "Create", "Address": "[parameter('SolrUrl')]", "Arguments": { "name": "[variable('SXAWeb.Name')]" } }
             ]
         }
     }

@@ -1,6 +1,6 @@
 [![Build Status](https://dev.azure.com/avivasolutions-public/sitecore-docker/_apis/build/status/avivasolutionsnl.sitecore-docker?branchName=master)](https://dev.azure.com/avivasolutions-public/sitecore-docker/_build/latest?definitionId=1&branchName=master)
 
-Run Sitecore 9 XP0 and XC using Docker for Windows.
+Run Sitecore XP 9.1.1 and XC 9.1.0 using Docker for Windows.
 
 # Disclaimer
 This repository contains experimental code that we use in development setups. We do not consider the current code in this repository ready for production.
@@ -73,7 +73,7 @@ The build results in the following Docker images:
     - `sitecore-xc-sitecore-jss`
     - `sitecore-xc-mssql-jss`
 
-All images are contain a version tag that corresponds to the Sitecore commercial version number e.g. `xp-sitecore-sitecore:9.0.2`.
+All images are contain a version tag that corresponds to the Sitecore commercial version number e.g. `xp-sitecore-sitecore:9.1.1`.
 
 ### Build a selection of images
 To build a certain Docker image or set of images run a specific Nuke.Build target, e.g to build only XP0 images:

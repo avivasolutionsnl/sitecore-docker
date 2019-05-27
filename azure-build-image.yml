@@ -24,21 +24,21 @@ jobs:
   - task: CopyFiles@2
     displayName: Copy XP files
     inputs:
-      sourceFolder: Z:/xp/9.0.2
+      sourceFolder: Z:/xp/9.1.1 
       targetFolder: files
       cleanTargetFolder: true
 
   - task: CopyFiles@2
     displayName: Copy XC files
     inputs:
-      sourceFolder: Z:/xc/9.0.3
+      sourceFolder: Z:/xc/9.1.0
       targetFolder: files
       cleanTargetFolder: false
 
   - task: CopyFiles@2
     displayName: Copy certificates
     inputs:
-      sourceFolder: Z:/certificates/sha1
+      sourceFolder: Z:/certificates
       targetFolder: files
       cleanTargetFolder: false
 

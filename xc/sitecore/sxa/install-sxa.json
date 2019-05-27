@@ -28,7 +28,7 @@
     "PackagesDirDst": {
       "Type": "string",
       "Description": "The path to packages directory.",
-      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\sitecore\\admin\\Packages\\"
+      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\App_Data\\packages\\"
     },
     "BaseUrl": {
       "Type": "string",
@@ -60,26 +60,26 @@
       }
     },
     "InstallPSEPackage": {
-      "Type": "InstallPackage",
+      "Type": "InstallModule",
       "Params": {
-        "PackageFullPath": "[parameter('PowershellExtensionPackageFullPath')]",
-        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "ModuleFullPath": "[parameter('PowershellExtensionPackageFullPath')]",
+        "ModulesDirDst": "[parameter('PackagesDirDst')]",
         "BaseUrl": "[parameter('BaseUrl')]"
       }
     },
     "InstallSXAPackage": {
-      "Type": "InstallPackage",
+      "Type": "InstallModule",
       "Params": {
-        "PackageFullPath": "[parameter('SXAPackageFullPath')]",
-        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "ModuleFullPath": "[parameter('SXAPackageFullPath')]",
+        "ModulesDirDst": "[parameter('PackagesDirDst')]",
         "BaseUrl": "[parameter('BaseUrl')]"
       }
     },
     "InstallSCXAPackage": {
-      "Type": "InstallPackage",
+      "Type": "InstallModule",
       "Params": {
-        "PackageFullPath": "[parameter('SCXAPackageFullPath')]",
-        "PackagesDirDst": "[parameter('PackagesDirDst')]",
+        "ModuleFullPath": "[parameter('SCXAPackageFullPath')]",
+        "ModulesDirDst": "[parameter('PackagesDirDst')]",
         "BaseUrl": "[parameter('BaseUrl')]"
       }
     }
