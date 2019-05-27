@@ -114,7 +114,7 @@ RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';
     -CommerceSearchProvider 'SOLR' `
     -CertPath ${INSTALL_TEMP}/ `
     -CommerceEngineCertificateName 'commerce' `
-    -Skip "DeployCommerceDatabase", "AddCommerceUserToCoreDatabase", "CreateSignedEngineCert", "CreateSignedCert", "CreateLocalhostSignedCert"
+    -Skip "DeployCommerceDatabase", "AddCommerceUserToCoreDatabase", "CreateSignedEngineCert", "CreateSignedCert", "CreateLocalhostSignedCert", "StartMinionsAppPool", "StartMinionsWebsite"
 
 # Patch bug in CommerceEngine.Deploy.json file. It misses the module InstallSitecoreConfiguration. Only a problem
 # because we use it directly. Also have to remove the comments from the json file when reading it, because
