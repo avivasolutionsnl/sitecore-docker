@@ -10,6 +10,12 @@ param(
     $Destination
 )
 
+# Milliseconds to sleep between sync operations
+$SleepMilliseconds = 5000
+if (Get-Item -Path Env:WatchSleepMilliseconds -ErrorAction SilentlyContinue) {
+    $SleepMilliseconds = $Env:WatchSleepMilliseconds
+}
+
 function Sync
 {
     param(
@@ -74,7 +80,7 @@ try
     {
         Sync -Path $Path -Destination $Destination | Write-Host
 
-        Start-Sleep -Milliseconds 200
+        Start-Sleep -Milliseconds $SleepMilliseconds
     }
 }
 finally 
