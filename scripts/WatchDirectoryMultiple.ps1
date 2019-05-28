@@ -13,6 +13,11 @@ param(
     [array]$Ignore = @("*\obj\*", "*.cs", "*.csproj", "*.user")
 )
 
+# Milliseconds to sleep between sync operations
+$SleepMilliseconds = 5000
+if (Get-Item -Path Env:WatchSleepMilliseconds -ErrorAction SilentlyContinue) {
+    $SleepMilliseconds = $Env:WatchSleepMilliseconds
+}
 function Sync 
 {
     Foreach($destination in $Destinations) {
@@ -51,5 +56,5 @@ Foreach($destination in $Destinations) {
 while($true) {   
     Sync | Write-Host
 
-    Sleep -Milliseconds 500
+    Sleep -Milliseconds $SleepMilliseconds
 }
