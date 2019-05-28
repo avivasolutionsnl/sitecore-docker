@@ -13,7 +13,7 @@ using System.Collections.Generic;
 partial class Build : NukeBuild
 {
     [Parameter("Docker image sitecore version")]
-    public readonly string BaseSitecoreVersion = "1.0.0";
+    public readonly string BaseSitecoreVersion = "9.1.1";
     // Docker image naming
     [Parameter("Docker image prefix for Sitecore base")]
     readonly string BaseImagePrefix = "sitecore-base-";
