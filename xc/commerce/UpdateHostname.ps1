@@ -143,7 +143,7 @@ UpdateBindingCertificate -certificate $certificate -bindingName 'SitecoreIdentit
 [string]$identityServerUrl = $baseUrl + ":5050"
 [string]$engineServerUrl = $baseUrl + ":5000"
 [string]$bizFxUrl = $baseUrl + ":4200"
-[string]$plumberUrl = $baseUrl + ":4000"
+[string]$plumberUrl = "http://$commerceHostname:4000"
 $redirectUrls = [string[]]@(
     ($bizFxUrl),
     ($bizFxUrl + "/?")
