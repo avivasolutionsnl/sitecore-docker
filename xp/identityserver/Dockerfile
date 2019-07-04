@@ -61,6 +61,7 @@ RUN Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -ClientSecret "SIF-Default"
 
 COPY xp/identityserver/Boot.ps1 C:/
+COPY xp/identityserver/UpdateHostname.ps1 /Scripts
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]
 CMD [ "-sitecoreHostname sitecore -identityHostname identity" ]
