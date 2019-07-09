@@ -39,7 +39,6 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")               
                 .SetFile("base/openjdk/Dockerfile")
-                .SetIsolation("process")
                 .SetTag(BaseImageName("openjdk"))
             );
         });
@@ -50,7 +49,6 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("base/sitecore/Dockerfile")
-                .SetIsolation("process")
                 .SetTag(BaseImageName("sitecore"))
             );
         });
@@ -64,7 +62,6 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("base/solr-builder/Dockerfile")
-                .SetIsolation("process")
                 .SetTag(BaseImageName("solr-builder"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}"

@@ -132,7 +132,6 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xc/commerce/Dockerfile")
-                .SetIsolation("process")
                 .SetTag(XcImageName("commerce"))
                 .SetBuildArg(new string[] {
                     $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
@@ -164,7 +163,6 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xc/mssql/Dockerfile")
-                .SetIsolation("process")
                 .SetTag(XcImageName("mssql-intermediate"))
                 .SetMemory(4000000000) // 4GB, SQL needs some more memory
                 .SetBuildArg(new string[] {
@@ -191,7 +189,6 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xc/sitecore/Dockerfile")
-                .SetIsolation("process")
                 .SetTag(XcImageName("sitecore-intermediate"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
@@ -239,7 +236,6 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xc/solr/Dockerfile")
-                .SetIsolation("process")
                 .SetTag(XcImageName("solr"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
@@ -260,7 +256,6 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xc/xconnect/Dockerfile")
-                .SetIsolation("process")
                 .SetTag(XcImageName("xconnect"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
@@ -279,7 +274,6 @@ partial class Build : NukeBuild
             DockerBuild(x => x
                 .SetPath(".")
                 .SetFile("xc/identityserver/Dockerfile")
-                .SetIsolation("process")
                 .SetTag(XcImageName("identity"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
@@ -320,7 +314,6 @@ partial class Build : NukeBuild
 
             DockerBuild(x => x
                 .SetPath("xc/solr/sxa")
-                .SetIsolation("process")
                 .SetTag(XcImageName("solr-sxa"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
