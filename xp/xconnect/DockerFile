@@ -17,6 +17,7 @@ RUN Expand-Archive -Path /Files/$Env:CONFIG_PACKAGE -DestinationPath /Files/Conf
 # Stage 1: create actual image
 FROM ${BASE_IMAGE}
 
+ARG SQL_ADMIN_USER="sa"
 ARG SQL_SA_PASSWORD
 ARG SQL_DB_PREFIX
 ARG SQL_SERVER="mssql"
@@ -49,6 +50,8 @@ RUN /Scripts/Import-Certificate.ps1 -certificateFile $Env:XCONNECT_SSL_CERT_PATH
 
 RUN $config = Get-Content $Env:SIF_CONFIG | Where-Object { $_ -notmatch '^\s*\/\/'} | Out-String | ConvertFrom-Json; `
     $config.Tasks.InstallWDP.Params.Arguments | Add-Member -Name 'Skip' -Value @(@{'ObjectName' = 'dbDacFx'}, @{'ObjectName' = 'dbFullSql'}) -MemberType NoteProperty; `
+    $config.Variables.'Sql.Database.ProcessingEngineTasks' = "\"[concat(parameter('SqlDbPrefix'), '_Processing.engine.tasks')]\""; `
+    $config.Variables.'Sql.Database.ProcessingEngineStorage' = "\"[concat(parameter('SqlDbPrefix'), '_Processing.engine.storage')]\""; `
     ConvertTo-Json $config -Depth 50 | Set-Content -Path $Env:SIF_CONFIG
 
 RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
@@ -60,18 +63,13 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
     -SslCert "xconnect" `
     -SqlDbPrefix $Env:SQL_DB_PREFIX `
     -SqlServer $Env:SQL_SERVER `
-    -SqlAdminUser "sa" `
-    -SqlAdminPassword $Env:SQL_SA_PASSWORD `
-    -SqlCollectionUser "sa" `
-    -SqlCollectionPassword $Env:SQL_SA_PASSWORD `
-    -SqlProcessingPoolsUser "sa" `
-    -SqlProcessingPoolsPassword $Env:SQL_SA_PASSWORD `
-    -SqlReferenceDataUser "sa" `
-    -SqlReferenceDataPassword $Env:SQL_SA_PASSWORD `
-    -SqlMessagingUser "sa" `
-    -SqlMessagingPassword $Env:SQL_SA_PASSWORD `
-    -SqlMarketingAutomationUser "sa" `
-    -SqlMarketingAutomationPassword $Env:SQL_SA_PASSWORD `    
+    -SqlAdminUser $env:SQL_ADMIN_USER -SqlAdminPassword $env:SQL_SA_PASSWORD `
+    -SqlCollectionUser $env:SQL_ADMIN_USER -SqlCollectionPassword $env:SQL_SA_PASSWORD `
+    -SqlMessagingUser $env:SQL_ADMIN_USER -SqlMessagingPassword $env:SQL_SA_PASSWORD `
+    -SqlProcessingEngineUser $env:SQL_ADMIN_USER -SqlProcessingEnginePassword $env:SQL_SA_PASSWORD `
+    -SqlMarketingAutomationUser $env:SQL_ADMIN_USER -SqlMarketingAutomationPassword $env:SQL_SA_PASSWORD `
+    -SqlReferenceDataUser $env:SQL_ADMIN_USER -SqlReferenceDataPassword $env:SQL_SA_PASSWORD `
+    -SqlProcessingPoolsUser $env:SQL_ADMIN_USER -SqlProcessingPoolsPassword $env:SQL_SA_PASSWORD `
     -SolrCorePrefix $Env:SOLR_CORE_PREFIX `
     -SolrURL $solrUrl `
     -Skip "CleanShards", "CreateShards", "CreateShardApplicationDatabaseServerLoginSqlCmd", "CreateShardManagerApplicationDatabaseUserSqlCmd", `
@@ -82,7 +80,8 @@ RUN $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
 
 # Starting these automatically may lead to race conditions so we start them from the boot script
 RUN Set-Service -Name "xconnect-IndexWorker" -StartupType "Manual"; `
-    Set-Service -Name "xconnect-MarketingAutomationService" -StartupType "Manual"
+    Set-Service -Name "xconnect-MarketingAutomationService" -StartupType "Manual"; `
+    Set-Service -Name "xconnect-ProcessingEngineService" -StartupType "Manual"
 
 # Add IIS app pool user to Performance groups
 RUN net localgroup \"Performance Monitor Users\" \"IIS APPPOOL\$Env:SITE_NAME\" /add; `
