@@ -5,11 +5,13 @@ if(Test-Path $licenseFile)
     Copy-Item -Path $licenseFile -Destination "C:/inetpub/wwwroot/xconnect/App_Data"
     Copy-Item -Path $licenseFile -Destination "C:/inetpub/wwwroot/xconnect/App_Data/jobs/continuous/AutomationEngine/App_Data"
     Copy-Item -Path $licenseFile -Destination "C:/inetpub/wwwroot/xconnect/App_Data/jobs/continuous/IndexWorker/App_Data"
+    Copy-Item -Path $licenseFile -Destination "C:/inetpub/wwwroot/xconnect/App_Data/jobs/continuous/ProcessingEngine/App_Data"
     Write-Host "Succesfully copied license file!" -ForegroundColor Green
 
     Write-Host "Starting the xconnect services"
     Start-Service "xconnect-IndexWorker"
     Start-Service "xconnect-MarketingAutomationService"
+    Start-Service "xconnect-ProcessingEngineService"
     Write-Host "Succesfully started the xconnect services" -ForegroundColor Green
 }
 else

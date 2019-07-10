@@ -27,7 +27,11 @@
 
         // The path to the automation engine windows service
         "Services.MarketingAutomationEngine.InstallPath":   "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','AutomationEngine')]",
-        "Services.MarketingAutomationEngine.Name":          "[concat(parameter('SiteName'), '-MarketingAutomationService')]"
+        "Services.MarketingAutomationEngine.Name":          "[concat(parameter('SiteName'), '-MarketingAutomationService')]",
+
+        // The path to the processing engine windows service
+        "Services.ProcessingEngine.InstallPath":   "[joinpath(variable('Site.DataFolder'), 'jobs','continuous','ProcessingEngine')]",
+        "Services.ProcessingEngine.Name":          "[concat(parameter('SiteName'), '-ProcessingEngineService')]"
     },
     "Tasks": {
         // Tasks are separate units of work in a configuration.
@@ -45,6 +49,10 @@
                 {
                     "Path": "[joinpath(variable('Services.MarketingAutomationEngine.InstallPath'), 'maengine.exe')]",
                     "Name": "[variable('Services.MarketingAutomationEngine.Name')]"
+                },
+                {
+                    "Path": "[joinpath(variable('Services.ProcessingEngine.InstallPath'), 'Sitecore.ProcessingEngine.exe')]",
+                    "Name": "[variable('Services.ProcessingEngine.Name')]"
                 }
             ]
         }
