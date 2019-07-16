@@ -20,8 +20,10 @@ if(Test-Path $licenseFile)
         Start-Service "xconnect-IndexWorker"
         Start-Service "xconnect-MarketingAutomationService"
         Start-Service "xconnect-ProcessingEngineService"
-    } catch {}
-    Write-Host "Succesfully started the xconnect services" -ForegroundColor Green
+        Write-Host "Succesfully started the xconnect services" -ForegroundColor Green
+    } catch {
+        Write-Host "Failed to start all services"
+    }
 }
 else
 {
