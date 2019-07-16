@@ -89,4 +89,4 @@ RUN net localgroup \"Performance Monitor Users\" \"IIS APPPOOL\$Env:SITE_NAME\" 
 
 EXPOSE 443
 
-ENTRYPOINT /Boot.ps1
+ENTRYPOINT /Boot.ps1 -xconnectUrl "https://$Env:SITE_NAME"

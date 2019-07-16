@@ -1,4 +1,8 @@
-$licenseFile = "C:/license/license.xml"
+param(
+    [String]$licenseFile = "C:/license/license.xml",
+    [String]$xconnectUrl = "https://xconnect"
+)
+
 if(Test-Path $licenseFile)
 {
     Write-Host "Found license file. Copying it to folders"
@@ -8,10 +12,15 @@ if(Test-Path $licenseFile)
     Copy-Item -Path $licenseFile -Destination "C:/inetpub/wwwroot/xconnect/App_Data/jobs/continuous/ProcessingEngine/App_Data"
     Write-Host "Succesfully copied license file!" -ForegroundColor Green
 
+    # Warm-up xconnect to prevent errors during start of service workers
+    Invoke-WebRequest $xconnectUrl -UseBasicParsing
+
     Write-Host "Starting the xconnect services"
-    Start-Service "xconnect-IndexWorker"
-    Start-Service "xconnect-MarketingAutomationService"
-    Start-Service "xconnect-ProcessingEngineService"
+    try { # Starting a service should not result in an exiting container
+        Start-Service "xconnect-IndexWorker"
+        Start-Service "xconnect-MarketingAutomationService"
+        Start-Service "xconnect-ProcessingEngineService"
+    } catch {}
     Write-Host "Succesfully started the xconnect services" -ForegroundColor Green
 }
 else
