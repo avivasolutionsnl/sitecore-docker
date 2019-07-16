@@ -6,3 +6,8 @@ param(
 )
 
 /Scripts/UpdateHostname.ps1 -sitecoreHostname $sitecoreHostname -identityHostname $identityHostname
+
+while($true)
+{   
+    Sleep -Milliseconds 500
+}
