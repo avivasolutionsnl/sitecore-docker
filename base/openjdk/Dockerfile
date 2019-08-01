@@ -16,7 +16,7 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     Move-Item -Path ('C:\\{0}' -f ($env:JAVA_OJDKBUILD_ZIP -Replace '.zip', '')) -Destination $env:JAVA_HOME;
 
 # Runtime image
-FROM mcr.microsoft.com/windows/nanoserver:1809 as final
+FROM mcr.microsoft.com/windows/nanoserver:1903 as final
 
 # Run under admin user as by default nanoserver starts with ContainerUser iso ContainerAdministrator
 # See https://techcommunity.microsoft.com/t5/Windows-Server-Insiders/nanoserver-insider-image-has-non-admin-user-as-default/td-p/110290

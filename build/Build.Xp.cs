@@ -49,7 +49,7 @@ partial class Build : NukeBuild
     readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8.1 rev. 190319 for 9.1.1.zip";
         
     [Parameter("JSS package")]
-    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.1.1 XP 11.0.1 rev. 190318.zip";
+    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.2 XP 12.0.0 rev. 190522.zip";
 
     // Build configuration parameters
     [Parameter("SQL password")]
