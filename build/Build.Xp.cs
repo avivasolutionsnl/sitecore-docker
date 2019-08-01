@@ -46,7 +46,7 @@ partial class Build : NukeBuild
     readonly string PSE_PACKAGE = "Sitecore PowerShell Extensions-5.0.zip";
     
     [Parameter("SXA package")]
-    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.8.1 rev. 190319 for 9.1.1.zip";
+    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.9.0 rev. 190528 for 9.2.zip";
         
     [Parameter("JSS package")]
     readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.2 XP 12.0.0 rev. 190522.zip";

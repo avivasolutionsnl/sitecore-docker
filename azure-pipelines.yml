@@ -21,11 +21,11 @@ jobs:
 #     buildTargets: Xc
 #     pushTargets: PushBase PushXp PushXc
 
-# - template: azure-build-image.yml
-#   parameters:
-#     name: XpSxa
-#     buildTargets: XpSxa
-#     pushTargets: PushXpSxa
+- template: azure-build-image.yml
+  parameters:
+    name: XpSxa
+    buildTargets: XpSxa
+    pushTargets: PushXpSxa
 
 # - template: azure-build-image.yml
 #   parameters:
