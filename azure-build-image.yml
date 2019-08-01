@@ -6,7 +6,7 @@ parameters:
 jobs:
 - job: ${{ parameters.name }}
   pool:
-    vmImage: win1903
+    vmImage: Windows-2019
   # Use maximum timeout, ie. 6 hours 
   timeoutInMinutes: 0
 
