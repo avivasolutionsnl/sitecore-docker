@@ -14,7 +14,7 @@ using System.Collections.Generic;
 partial class Build : NukeBuild
 {
     [Parameter("Docker image sitecore version")]
-    public readonly string XpSitecoreVersion = "9.1.1";
+    public readonly string XpSitecoreVersion = "9.2.0";
 
     [Parameter("Docker image prefix for Sitecore XP")]
     public readonly string XpImagePrefix = "sitecore-xp-";
@@ -32,15 +32,15 @@ partial class Build : NukeBuild
 
     // Packages
     [Parameter("Sitecore XPO configuration package")]
-    readonly string CONFIG_PACKAGE = "XP0 Configuration files 9.1.1 rev. 002459.zip";
+    readonly string CONFIG_PACKAGE = "XP0 Configuration files 9.2.0 rev. 002893.zip";
     [Parameter("Sitecore package")]
-    readonly string SITECORE_PACKAGE = "Sitecore 9.1.1 rev. 002459 (OnPrem)_single.scwdp.zip";
+    readonly string SITECORE_PACKAGE = "Sitecore 9.2.0 rev. 002893 (OnPrem)_single.scwdp.zip";
     
     [Parameter("Sitecore XConnect package")]
-    readonly string XCONNECT_PACKAGE = "Sitecore 9.1.1 rev. 002459 (OnPrem)_xp0xconnect.scwdp.zip";
+    readonly string XCONNECT_PACKAGE = "Sitecore 9.2.0 rev. 002893 (OnPrem)_xp0xconnect.scwdp.zip";
     
     [Parameter("Identity Server Package")]
-    readonly string IDENTITYSERVER_PACKAGE = "Sitecore.IdentityServer 2.0.1 rev. 00166 (OnPrem)_identityserver.scwdp.zip";
+    readonly string IDENTITYSERVER_PACKAGE = "Sitecore.IdentityServer 3.0.0 rev. 00211 (OnPrem)_identityserver.scwdp.zip";
     
     [Parameter("Powershell Extension package")]
     readonly string PSE_PACKAGE = "Sitecore PowerShell Extensions-5.0.zip";

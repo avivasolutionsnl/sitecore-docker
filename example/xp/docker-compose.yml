@@ -4,8 +4,7 @@ services:
 
  identity:
   image: "${IMAGE_PREFIX}identity:${TAG}"
-  command: -sitecoreHostname ${SITECORE_HOST_NAME}
-  isolation: process
+  command: -sitecoreHostname ${SITECORE_HOST_NAME} -identityHostname ${IDENTITY_HOST_NAME}
   networks:
     - exampleNetwork   
   volumes:
@@ -15,7 +14,6 @@ services:
 
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   environment:
@@ -26,7 +24,6 @@ services:
 
  sitecore:
   image: "${IMAGE_PREFIX}sitecore:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   volumes:
@@ -41,7 +38,6 @@ services:
 
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   volumes:
@@ -49,7 +45,6 @@ services:
 
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   volumes:

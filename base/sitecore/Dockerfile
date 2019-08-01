@@ -1,6 +1,6 @@
 # escape=`
 # Based on https://github.com/sitecoreops/sitecore-images/blob/master/images/9.0.2%20rev.%20180604/windowsservercore-ltsc2019/sitecore-base/Dockerfile
-FROM mcr.microsoft.com/dotnet/framework/aspnet:4.7.2-windowsservercore-ltsc2019
+FROM mcr.microsoft.com/dotnet/framework/aspnet:4.7.2-windowsservercore-1903
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 

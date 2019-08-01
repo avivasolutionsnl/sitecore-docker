@@ -1,6 +1,6 @@
 # escape=`
 # Based on https://github.com/sitecoreops/sitecore-images/blob/master/images/sitecore-openjdk/nanoserver-1809/Dockerfile
-FROM mcr.microsoft.com/windows/servercore:ltsc2019 as builder
+FROM mcr.microsoft.com/windows/servercore:1903 as builder
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
