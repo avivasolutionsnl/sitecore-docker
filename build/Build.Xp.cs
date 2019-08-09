@@ -246,6 +246,7 @@ partial class Build : NukeBuild
 
     Target XpSitecoreMssqlJss => _ => _
         .Requires(() => File.Exists(Files / JSS_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .DependsOn(Xp)
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xp");
