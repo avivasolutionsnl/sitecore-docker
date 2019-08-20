@@ -25,6 +25,6 @@ Get-ChildItem -Path $DataPath -Filter "*.mdf" | ForEach-Object {
     Move-Item $ldfPath -Destination $InstallPath -Force
 }
 
-if (!((Get-ChildItem $DataPath | Measure-Object).Count -eq 0)) {
+if (!((Get-ChildItem $DataPath -Filter "*.mdf" | Measure-Object).Count -eq 0)) {
     throw "Something went wrong during persisting the databases as $DataPath is not empty"
 }
