@@ -77,11 +77,13 @@ partial class Build : NukeBuild
 
     private void InstallSitecorePackage(string scriptFilename, string sitecoreTargetImageName, string mssqlTargetImageName, string dockerComposeOptions = "")
     {
-        DockerCompose($"{dockerComposeOptions} {DockerComposeSilenceOptions} down");
+        string options = $"{dockerComposeOptions} {DockerComposeSilenceOptions}";
+
+        DockerCompose($"{options} down");
 
         try
         {
-            DockerCompose($"{dockerComposeOptions} {DockerComposeSilenceOptions} up -d");
+            DockerCompose($"{options} up -d");
 
             // Install Commerce Connect package
             var sitecoreContainerName = GetContainerName("sitecore");
@@ -91,13 +93,13 @@ partial class Build : NukeBuild
                 .SetArgs(scriptFilename)
             );
 
-            DockerCompose($"{DockerComposeSilenceOptions} stop");
+            DockerCompose($"{options} stop");
 
             // Remove no longer necessary container to save diskspace
-            DockerCompose($"{DockerComposeSilenceOptions} rm -f commerce identity solr xconnect");
+            DockerCompose($"{options} rm -f commerce identity solr xconnect");
 
             // Persist changes to DB installation directory
-            DockerCompose($"{dockerComposeOptions} {DockerComposeSilenceOptions} up -d mssql");
+            DockerCompose($"{options} up -d mssql");
 
             // Give time to complete attaching databases
             Thread.Sleep(10000);
@@ -109,7 +111,7 @@ partial class Build : NukeBuild
                 .SetArgs(@"C:\Persist-Databases.ps1")
             );
 
-            DockerCompose($"{DockerComposeSilenceOptions} stop");
+            DockerCompose($"{options} stop");
 
             // Commit changes
             DockerCommit(x => x
@@ -123,7 +125,7 @@ partial class Build : NukeBuild
         finally
         {
             // Remove build artefacts
-            DockerCompose($"{DockerComposeSilenceOptions} down");
+            DockerCompose($"{options} down");
         }
     }
 
