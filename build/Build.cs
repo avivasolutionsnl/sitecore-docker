@@ -96,7 +96,12 @@ partial class Build : NukeBuild
             DockerCompose($"{options} stop");
 
             // Remove no longer necessary container to save diskspace
-            DockerCompose($"{options} rm -f commerce identity solr xconnect");
+            var commerceContainer = GetContainerName("commerce");
+            var identityContainer = GetContainerName("identity");
+            var solrContainer = GetContainerName("solr");
+            var xconnectContainer = GetContainerName("xconnect");
+            Docker($"rm -f {commerceContainer} {identityContainer} {solrContainer} {xconnectContainer}");
+            //TODO: DockerCompose($"{options} rm -f commerce identity solr xconnect");
 
             // Persist changes to DB installation directory
             DockerCompose($"{options} up -d mssql");
