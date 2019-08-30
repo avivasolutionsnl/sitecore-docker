@@ -93,6 +93,9 @@ partial class Build : NukeBuild
 
             DockerCompose($"{DockerComposeSilenceOptions} stop");
 
+            // Remove no longer necessary container to save diskspace
+            DockerCompose($"{DockerComposeSilenceOptions} rm commerce identity sitecore solr xconnect");
+
             // Persist changes to DB installation directory
             DockerCompose($"{dockerComposeOptions} {DockerComposeSilenceOptions} up -d mssql");
 
