@@ -108,6 +108,9 @@ partial class Build : NukeBuild
                 // No commerce container to remove
             }
 
+            // Remove dangling images
+            Docker($"image prune -f");
+
             // Persist changes to DB installation directory
             DockerCompose($"{options} up -d mssql");
 
