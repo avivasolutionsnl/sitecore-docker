@@ -100,7 +100,13 @@ partial class Build : NukeBuild
             var solrContainer = GetContainerName("solr");
             var xconnectContainer = GetContainerName("xconnect");
             Docker($"rm -f {identityContainer} {solrContainer} {xconnectContainer}");
-            //TODO: DockerCompose($"{options} rm -f commerce identity solr xconnect");
+
+            try {
+                var commerceContainer = GetContainerName("commerce");
+                Docker($"rm -f {commerceContainer}");
+            } catch {
+                // No commerce container to remove
+            }
 
             // Persist changes to DB installation directory
             DockerCompose($"{options} up -d mssql");
