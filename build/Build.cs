@@ -99,7 +99,7 @@ partial class Build : NukeBuild
             var identityContainer = GetContainerName("identity");
             var solrContainer = GetContainerName("solr");
             var xconnectContainer = GetContainerName("xconnect");
-            Docker($"rm -f {commerceContainer} {identityContainer} {solrContainer} {xconnectContainer}");
+            Docker($"rm -f {identityContainer} {solrContainer} {xconnectContainer}");
             //TODO: DockerCompose($"{options} rm -f commerce identity solr xconnect");
 
             // Persist changes to DB installation directory
