@@ -96,7 +96,6 @@ partial class Build : NukeBuild
             DockerCompose($"{options} stop");
 
             // Remove no longer necessary container to save diskspace
-            var commerceContainer = GetContainerName("commerce");
             var identityContainer = GetContainerName("identity");
             var solrContainer = GetContainerName("solr");
             var xconnectContainer = GetContainerName("xconnect");
