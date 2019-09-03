@@ -72,18 +72,6 @@ partial class Build : NukeBuild
     Target Base => _ => _
         .DependsOn(BaseOpenJdk, BaseSitecore);
 
-    public void RemoveBaseImages() {
-        foreach (var name in BaseNames)
-        {
-            try {
-                var imageName = BaseImageName(name);
-                Docker($"rmi -f {imageName}");
-            } catch {
-                // Image not found
-            }
-        }
-    }
-
     Target PushBase => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
         .OnlyWhenDynamic(() => HasGitTag() || ForcePush)
