@@ -83,6 +83,9 @@ partial class Build : NukeBuild
 
         try
         {
+            // Remove dangling images (from previous steps)
+            Docker($"image prune -f");
+
             DockerCompose($"{options} up -d");
 
             // Install Commerce Connect package
