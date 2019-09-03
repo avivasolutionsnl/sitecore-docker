@@ -3,15 +3,14 @@ version: '2.4'
 services:
  identity:
   image: "${IMAGE_PREFIX}identity:${TAG}"
-  isolation: process
+  volumes:
+    - .\license:C:\license
   depends_on:
     - mssql
-  mem_limit: 2048m
   cpu_count: 4
 
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   environment:
@@ -20,7 +19,6 @@ services:
 
  sitecore:
   image: "${IMAGE_PREFIX}sitecore:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   volumes:
@@ -33,13 +31,11 @@ services:
 
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
 
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   volumes:

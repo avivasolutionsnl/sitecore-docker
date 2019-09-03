@@ -10,6 +10,7 @@ services:
     - exampleNetwork   
   volumes:
     - .\logs\identity:C:\inetpub\wwwroot\identity\app_data\logs
+    - .\license:C:\license
   depends_on:
     - mssql
 

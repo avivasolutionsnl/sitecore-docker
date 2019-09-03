@@ -24,7 +24,7 @@ ARG IDENTITYSERVER_PACKAGE
 
 SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';"] 
 
-COPY xp/license/license.xml /Files/
+COPY dummylicense.xml /license/license.xml
 COPY files/$IDENTITYSERVER_PACKAGE /Files/
 COPY files/*.pfx /Files/
 COPY --from=prepare /Files/Config /Files/Config/
@@ -51,14 +51,15 @@ RUN Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -Package c:/Files/$Env:IDENTITYSERVER_PACKAGE `
     -SqlDbPrefix $Env:SQL_DB_PREFIX `
     -SitecoreIdentityCert "Identity"`
-    -LicenseFile "c:/Files/license.xml" `
+    -LicenseFile "c:/license/license.xml" `
     -SiteName $Env:SITE_NAME `
     -SqlCoreUser $Env:SQL_USER `
     -SqlCorePassword $Env:SQL_SA_PASSWORD `
     -SqlServer $Env:SQL_SERVER `
     -PasswordRecoveryUrl http://$Env:SITE_NAME `
     -AllowedCorsOrigins http://$Env:SITECORE_SITE_NAME `
-    -ClientSecret "SIF-Default"
+    -ClientSecret "SIF-Default" `
+    -Skip "StartAppPool", "StartWebsite" 
 
 COPY xp/identityserver/Boot.ps1 C:/
 COPY xp/identityserver/UpdateHostname.ps1 /Scripts
