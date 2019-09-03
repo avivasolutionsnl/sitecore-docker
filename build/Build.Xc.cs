@@ -212,6 +212,9 @@ partial class Build : NukeBuild
         .Executes(() => {
             System.IO.Directory.SetCurrentDirectory("xc");
 
+            // To save diskspace remove no longer needed base images
+            RemoveBaseImages();
+
             Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
 

@@ -114,6 +114,9 @@ partial class Build : NukeBuild
             // Remove dangling images
             Docker($"image prune -f");
 
+            // Remove dangling volumes
+            Docker($"volume prune -f");
+
             // Persist changes to DB installation directory
             DockerCompose($"{options} up -d mssql");
 
