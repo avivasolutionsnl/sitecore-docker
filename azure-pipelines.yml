@@ -21,11 +21,12 @@ jobs:
     buildTargets: XpSxa
     pushTargets: PushXpSxa
 
-- template: azure-build-image.yml
-  parameters:
-    name: XcSxa
-    buildTargets: XcSxa
-    pushTargets: PushXcSxa
+# Disabled: this currently results in an out-of-diskspace error    
+# - template: azure-build-image.yml
+#   parameters:
+#     name: XcSxa
+#     buildTargets: XcSxa
+#     pushTargets: PushXcSxa
 
 - template: azure-build-image.yml
   parameters:
