@@ -4,6 +4,7 @@ services:
  
  identity:
   image: "${IMAGE_PREFIX}identity:${TAG}"
+  isolation: process
   volumes:
     - .\license:C:\license
   networks:
@@ -13,6 +14,7 @@ services:
 
  mssql:
   image: "${IMAGE_PREFIX}mssql-intermediate:${TAG}"
+  isolation: process
   networks:
     - exampleNetwork 
   environment:
@@ -21,6 +23,7 @@ services:
 
  sitecore:
   image: "${IMAGE_PREFIX}sitecore-intermediate:${TAG}"
+  isolation: process
   networks:
     - exampleNetwork 
   volumes:
@@ -33,11 +36,13 @@ services:
 
  solr:
   image: "${IMAGE_PREFIX}solr:${TAG}"
+  isolation: process
   networks:
     - exampleNetwork 
 
  xconnect:
   image: "${IMAGE_PREFIX}xconnect:${TAG}"
+  isolation: process
   networks:
     - exampleNetwork 
   volumes:
@@ -48,6 +53,7 @@ services:
 
  commerce:
   image: "${IMAGE_PREFIX}commerce:${TAG}"
+  isolation: process
   networks:
     exampleNetwork:
       aliases:
