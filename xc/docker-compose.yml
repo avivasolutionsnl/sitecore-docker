@@ -5,6 +5,8 @@ services:
  identity:
   image: "${IMAGE_PREFIX}identity:${TAG}"
   isolation: process
+  volumes:
+    - .\license:C:\license
   networks:
     - exampleNetwork   
   depends_on:

@@ -4,9 +4,10 @@ services:
  identity:
   image: "${IMAGE_PREFIX}identity:${TAG}"
   isolation: process
+  volumes:
+    - .\license:C:\license
   depends_on:
     - mssql
-  mem_limit: 2048m
   cpu_count: 4
 
  mssql:
