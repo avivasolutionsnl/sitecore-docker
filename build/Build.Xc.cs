@@ -222,6 +222,11 @@ partial class Build : NukeBuild
                 "-f docker-compose.yml"
             );
 
+            // To save diskspace, remove the no longer needed intermediate images
+            var mssqlInterImage = XcImageName("mssql-intermediate");
+            var sitecoreInterImage = XcImageName("sitecore-intermediate");
+            Docker($"rmi -f {mssqlInterImage} {sitecoreInterImage}");
+
             System.IO.Directory.SetCurrentDirectory("..");
         });
     

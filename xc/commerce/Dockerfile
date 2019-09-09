@@ -159,7 +159,7 @@ RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceAutho
 
 # Install hosting, IIS URL Rewrite, and vim
 RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')); `
-    choco install -y --params="Quiet" dotnetcore-windowshosting; `
+    choco install -y --params="Quiet" --version 2.2.5 dotnetcore-windowshosting; `
     choco install -y --params="Quiet" urlrewrite; `
     /Scripts/Install-Vim.ps1;
 
