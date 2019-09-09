@@ -24,7 +24,7 @@ jobs:
   - task: CopyFiles@2
     displayName: Copy XP files
     inputs:
-      sourceFolder: Z:/xp/9.1.1 
+      sourceFolder: Z:/xp/9.2.0 
       targetFolder: files
       cleanTargetFolder: true
 
