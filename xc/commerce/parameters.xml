@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<parameters>
+
+  <parameter name="Configuration" description="Redis configuration" defaultValue="">
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceholderForRedisConfiguration" />
+  </parameter>
+  <parameter name="InstanceName" description="Redis instance name" defaultValue="">
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceholderForRedisInstanceName" />
+  </parameter>
+
+  <parameter name="IIS Web Application Name" defaultValue="Sitecore.Commerce.Engine" tags="IisApp">
+    <parameterEntry type="ProviderPath" scope="iisapp" match="WebSite" />
+    <parameterEntry kind="ProviderPath" scope="setAcl" match="WebSite" />
+  </parameter>
+
+  <parameter name="CommerceEngineGlobalConnectionString-Admin" description="Connection string to the Commerce Engine global database (i.e. site_global) that has administrative permissions." tags="Hidden, SQLConnectionString, NoStore" defaultValue="Driver={SQL Server Native Client 11.0};Server=tcp:server.region.cloudapp.azure.com, 1433;Database=SitecoreCommerce9_Global;Uid=AdminUser;Pwd=password;Trusted_Connection=No;Connection Timeout=3000;">
+  </parameter>
+  <parameter name="CommerceEngineSharedConnectionString-Admin" description="Connection string to the Commerce Engine shared database (i.e. site_sharedenvironments) that has administrative permissions." tags="Hidden, SQLConnectionString, NoStore" defaultValue="Driver={SQL Server Native Client 11.0};Server=tcp:server.region.cloudapp.azure.com, 1433;Database=SitecoreCommerce9_SharedEnvironments;Uid=AdminUser;Pwd=password;Trusted_Connection=No;Connection Timeout=3000;">
+  </parameter>
+
+  <parameter name="SiteTitle" description="Sitecore Engine Site Title." defaultValue="Sitecore Commerce Engine">
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceholderForSiteTitle" />
+  </parameter>
+  <parameter name="DeploymentId" description="Sitecore Engine Deployment ID." defaultValue="Deployment01">
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceholderForDeploymentId" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForDeploymentId" />
+  </parameter>
+  <parameter name="EnvironmentName" description="Sitecore Engine Environment Name." defaultValue="HabitatShops">
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceholderForEnvironmentName" />
+  </parameter>
+  <parameter name="SitecoreIdentityServerUrl" description="Sitecore Identity Server Url." defaultValue="">
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceHolderFoSitecoreIdentityServerUrl" />
+  </parameter>
+  <parameter name="BizFxUrl" description="Business Tools Url." defaultValue="">
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceHolderForBizFxUrl" />
+  </parameter>
+  <parameter name="SxaStorefrontUrl" description="SXA Storefront Url." defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceHolderForSxaStorefrontUrl" />
+  </parameter>
+  <parameter name="CertificateThumbprint" description="Sitecore Engine Certificate Thumbprint" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceholderForCertificateThumbprint" />
+  </parameter>
+  <parameter name="AntiForgeryEnabled" description="Flag to enable or disable AntiForgery Validation" defaultValue="true">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceholderForAntiForgeryEnabled" />
+  </parameter>
+  <parameter name="CommerceServicesHostPostfix" description="The postfix for Commerce Engine services host names" defaultValue="true">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\config.json" match="PlaceholderForCommerceServicesHostPostfix" />
+  </parameter>
+  <parameter name="GlobalDatabaseName" description="Sitecore Engine Global Database Name" defaultValue="SitecoreCommerce9_Global">
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForGlobalDatabaseName" />
+    <parameterEntry kind="TextFile" scope="CreateUser.Global.sql" match="PlaceholderForGlobalDatabaseName" />
+  </parameter>
+  <parameter name="GlobalDatabaseUserName" description="Sitecore Engine Global Database Username" tags="SQL, DbUsername" defaultValue="CommerceEngineUser">
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForGlobalDatabaseUserName" />
+    <parameterEntry type="TextFile" scope="CreateUser.Global.sql" match="PlaceholderForGlobalDatabaseUserName" />
+  </parameter>
+  <parameter name="GlobalDatabasePassword" description="Sitecore Engine Global Database Password" tags="SQL, DbUserPassword" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForGlobalDatabasePassword" />
+    <parameterEntry type="TextFile" scope="CreateUser.Global.sql" match="PlaceholderForGlobalDatabasePassword" />
+  </parameter>
+  <parameter name="GlobalDatabaseServer" description="Sitecore Engine Global Database Server" defaultValue="tcp:server.region.cloudapp.azure.com, 1433">
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForGlobalDatabaseServer" />
+  </parameter>
+  <parameter name="SharedDatabaseName" description="Sitecore Engine Shared Database Name" defaultValue="SitecoreCommerce9_SharedEnvironments">
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\Plugin.SQL.PolicySet-1.0.0.json" match="PlaceholderForSharedDatabaseName" />
+    <parameterEntry kind="TextFile" scope="CreateUser.Shared.sql" match="PlaceholderForSharedDatabaseName" />
+  </parameter>
+  <parameter name="SharedDatabaseUserName" description="Sitecore Engine Shared Database Username" tags="SQL, DbUsername" defaultValue="CommerceEngineUser">
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\Plugin.SQL.PolicySet-1.0.0.json" match="PlaceholderForSharedDatabaseUserName" />
+    <parameterEntry type="TextFile" scope="CreateUser.Shared.sql" match="PlaceholderForSharedDatabaseUserName" />
+  </parameter>
+  <parameter name="SharedDatabasePassword" description="Sitecore Engine Shared Database Password" tags="SQL, DbUserPassword" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\Plugin.SQL.PolicySet-1.0.0.json" match="PlaceholderForSharedDatabasePassword" />
+    <parameterEntry type="TextFile" scope="CreateUser.Shared.sql" match="PlaceholderForSharedDatabasePassword" />
+  </parameter>
+  <parameter name="SharedDatabaseServer" description="Sitecore Engine Shared Database Server" defaultValue="tcp:server.region.cloudapp.azure.com, 1433">
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\Plugin.SQL.PolicySet-1.0.0.json" match="PlaceholderForSharedDatabaseServer" />
+  </parameter>
+  <parameter name="BraintreeMerchantId" description="Braintree Merchant ID" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Payments.Braintree.PolicySet-1.0.0.json" match="PlaceholderForBraintreeMerchantId" />
+  </parameter>
+  <parameter name="BraintreePublicKey" description="Braintree Public Key" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Payments.Braintree.PolicySet-1.0.0.json" match="PlaceholderForBraintreePublicKey" />
+  </parameter>
+  <parameter name="BraintreePrivateKey" description="Braintree Private Key" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Payments.Braintree.PolicySet-1.0.0.json" match="PlaceholderForBraintreePrivateKey" />
+  </parameter>
+  <parameter name="BraintreeEnvironment" description="Braintree Environment String" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Payments.Braintree.PolicySet-1.0.0.json" match="PlaceholderForBraintreeEnvironment" />
+  </parameter>
+  <parameter name="SitecoreHost" description="Sitecore Web Interface Host Name" defaultValue="sxa.storefront.com">
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Content.PolicySet-1.0.0.json" match="PlaceholderForSitecoreHost" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForSitecoreHost" />
+  </parameter>
+  <parameter name="SitecoreDatabase" description="Sitecore Web Interface Database Name" defaultValue="master">
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Content.PolicySet-1.0.0.json" match="PlaceholderForSitecoreDatabase" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForSitecoreDatabase" />
+  </parameter>
+  <parameter name="SitecoreUsername" description="Sitecore Web Interface User Name" defaultValue="admin">
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Content.PolicySet-1.0.0.json" match="PlaceholderForSitecoreUsername" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForSitecoreUsername" />
+  </parameter>
+  <parameter name="SitecoreDomain" description="Sitecore Web Interface Domain Name" defaultValue="sitecore">
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Content.PolicySet-1.0.0.json" match="PlaceholderForSitecoreDomain" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForSitecoreDomain" />
+  </parameter>
+  <parameter name="SitecorePassword" description="Sitecore Web Interface Password" tags="Password" defaultValue="b">
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Content.PolicySet-1.0.0.json" match="PlaceholderForSitecorePassword" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\bootstrap\\Global.json" match="PlaceholderForSitecorePassword" />
+  </parameter>
+  <parameter name="EngineShopsUrl" description="Engine Shops Service Url" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.AdventureWorks.CommerceShops-1.0.0.json" match="PlaceholderForEngineShopsUrl" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Habitat.CommerceShops-1.0.0.json" match="PlaceholderForEngineShopsUrl" />
+  </parameter>
+  <parameter name="EngineAuthoringUrl" description="Engine Authoring Service Url" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.AdventureWorks.CommerceAuthoring-1.0.0" match="PlaceholderForEngineAuthoringUrl" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Habitat.CommerceAuthoring-1.0.0" match="PlaceholderForEngineAuthoringUrl" />
+  </parameter>
+  <parameter name="EngineMinionsUrl" description="Engine Minions Service Url" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.AdventureWorks.CommerceMinions-1.0.0" match="PlaceholderForEngineMinionsUrl" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Habitat.CommerceMinions-1.0.0" match="PlaceholderForEngineMinionsUrl" />
+  </parameter>
+  <parameter name="SearchIndexPrefix" description="Prefix for search indexes" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\PlugIn.Search.PolicySet-1.0.0.json" match="PlaceholderForSearchIndexPrefix" />
+  </parameter>
+  
+  <parameter name="SolrUrl" description="Solr Url" defaultValue="">
+    <parameterValidation type="AllowEmpty" />
+    <parameterEntry kind="TextFile" scope="wwwroot\\data\\Environments\\Plugin.Search.Solr.PolicySet-1.0.0.json" match="PlaceHolderForSolrUrl" />
+  </parameter>
+</parameters>
