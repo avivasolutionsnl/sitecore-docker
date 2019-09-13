@@ -336,10 +336,40 @@ partial class Build : NukeBuild
             );
 
             System.IO.Directory.SetCurrentDirectory("..");
-        });        
+        });
+
+    Target XcSitecore => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_MA_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XPROFILES_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XANALYTICS_PACKAGE))
+        .DependsOn(XpSitecore)
+        .Executes(() =>
+        {
+            var baseImage = XpImageName("sitecore");
+
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xc/sitecore/Dockerfile")
+                .SetTag(XcImageName("sitecore"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
+                    $"COMMERCE_CONNECT_PACKAGE={COMMERCE_CONNECT_PACKAGE}",
+                    $"COMMERCE_CONNECT_ENGINE_PACKAGE={COMMERCE_CONNECT_ENGINE_PACKAGE}",
+                    $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}",
+                    $"COMMERCE_MA_PACKAGE={COMMERCE_MA_PACKAGE}",
+                    $"COMMERCE_XPROFILES_PACKAGE={COMMERCE_XPROFILES_PACKAGE}",
+                    $"COMMERCE_XANALYTICS_PACKAGE={COMMERCE_XANALYTICS_PACKAGE}",
+                    $"WEB_TRANSFORM_TOOL={WEB_TRANSFORM_TOOL}",
+                })
+            );
+        });
 
     Target Xc => _ => _
-        .DependsOn(XcCommerce, XcSitecoreMssql, XcSolr, XcXconnect, XcIdentity);
+        .DependsOn(XcCommerce, XcSitecore, XcSolr, XcXconnect, XcIdentity);
 
     Target XcSxa => _ => _
         .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);
