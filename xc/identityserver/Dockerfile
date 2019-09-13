@@ -14,7 +14,7 @@ COPY scripts /Scripts
 WORKDIR /files/
 
 RUN Expand-Archive $env:COMMERCE_SIF_PACKAGE -DestinationPath /files/; `
-    $sifConfigFile = Join-Path /files/ 'Configuration/Commerce/IdentityServer/sitecore-identity-config.json'; `
+    $sifConfigFile = Join-Path /files/ 'Configuration/Commerce/IdentityServer/IdentityServer.Config.json'; `
     Install-SitecoreConfiguration -Path $sifConfigFile `
     -CommerceInstallRoot c:\inetpub\wwwroot\ `
     -SitecoreIdentityServerApplicationName 'identity' 
