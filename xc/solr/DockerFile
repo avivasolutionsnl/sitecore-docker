@@ -12,13 +12,13 @@ COPY files/$COMMERCE_SIF_PACKAGE ${INSTALL_TEMP}/
 
 RUN & 'c:/solr/bin/solr.cmd' start -p 8983; `
     Expand-Archive -Path (Join-Path $env:INSTALL_TEMP $env:COMMERCE_SIF_PACKAGE) -DestinationPath $env:INSTALL_TEMP; `
-    $sifConfigFile = Join-Path $env:INSTALL_TEMP 'Configuration/Commerce/Solr/sitecore-commerce-solr.json'; `
+    $sifConfigFile = Join-Path $env:INSTALL_TEMP 'Configuration/Commerce/Solr/Solr.Install.json'; `
     $solrSchemasPath = Join-Path $env:INSTALL_TEMP 'SolrSchemas'; `
     Install-SitecoreConfiguration -Path $sifConfigFile `
     -SolrUrl "http://localhost:8983/solr" `
     -SolrRoot "c:/solr" `
     -SolrService "void" `
-    -CorePrefix $env:SITECORE_CORE_PREFIX `
+    -SearchIndexPrefix $env:SITECORE_CORE_PREFIX `
     -SolrSchemas $solrSchemasPath `
     -Skip "StopSolr", "StartSolr"; `
    Get-Process -Name "java" | Stop-Process -Force;
