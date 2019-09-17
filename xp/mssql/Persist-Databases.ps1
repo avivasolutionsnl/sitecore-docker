@@ -20,9 +20,11 @@ Get-ChildItem -Path $DataPath -Filter "*.mdf" | ForEach-Object {
         throw "Encountered a error while executing a sql query: $msg"
     }
 
-    Write-Host "### Moving '$mdfPath' and '$ldfPath' to '$InstallPath'"
+    Write-Host "### Moving '$mdfPath' and optionally '$ldfPath' to '$InstallPath'"
     Move-Item $mdfPath -Destination $InstallPath -Force
-    Move-Item $ldfPath -Destination $InstallPath -Force
+    if (Test-Path $ldfPath) {
+        Move-Item $ldfPath -Destination $InstallPath -Force
+    }
 }
 
 if (!((Get-ChildItem $DataPath -Filter "*.mdf" | Measure-Object).Count -eq 0)) {
