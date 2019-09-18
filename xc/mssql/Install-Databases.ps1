@@ -8,7 +8,10 @@ param(
     [string]$DataPath,
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()] 
-    [string]$DatabasePrefix
+    [string]$DatabasePrefix,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()] 
+    [string]$CommerceDatabasePrefix
 )
 
 # Make sure SQL server is running
@@ -28,19 +31,53 @@ Write-Host "Using: $sqlPackageExePath"
 
 Push-Location -Path $InstallPath
 
-(Get-ChildItem -Path $InstallPath -Filter "*.dacpac" | Where-Object { ($_.Name -like "*Sitecore.Commerce.Engine*") }) | ForEach-Object {
-    $dacpacPath = ".\{0}" -f $_.Name
-    
-    $sharedDatabaseName = "$DatabasePrefix`_SharedEnvironments"
-    $globalDatabaseName = "$DatabasePrefix`_Global"
+# attach
+Get-ChildItem -Path $InstallPath -Filter "*.mdf" | ForEach-Object {
+    $databaseName = $_.BaseName.Replace("_Primary", "")
+    $mdfPath = $_.FullName
+    $ldfPath = $mdfPath.Replace(".mdf", ".ldf")
+    $sqlcmd = "IF EXISTS (SELECT 1 FROM SYS.DATABASES WHERE NAME = '$databaseName') BEGIN EXEC sp_detach_db [$databaseName] END;CREATE DATABASE [$databaseName] ON (FILENAME = N'$mdfPath'), (FILENAME = N'$ldfPath') FOR ATTACH;"
+
+    Write-Host "### Attaching '$databaseName'..."
+
+    Invoke-Sqlcmd -Query $sqlcmd
+}
+
+# do Sitecore Commerce Global DB
+Get-ChildItem -Path $InstallPath -Include "Sitecore.Commerce.Engine.Global.DB.dacpac" -Recurse | ForEach-Object {
+    $dacpacPath = $_.FullName
+    $databaseName = "$CommerceDatabasePrefix`_Global"
 
     # Install
-    & $sqlPackageExePath /a:Publish /sf:$dacpacPath /tdn:$sharedDatabaseName /tsn:$env:COMPUTERNAME /q
-    & $sqlPackageExePath /a:Publish /sf:$dacpacPath /tdn:$globalDatabaseName /tsn:$env:COMPUTERNAME /q
+    & $sqlPackageExePath /a:Publish /sf:$dacpacPath /tdn:$databaseName /tsn:$env:COMPUTERNAME /q
+}
 
-    # Detach
-    Invoke-Sqlcmd -Query "EXEC MASTER.dbo.sp_detach_db @dbname = N'$sharedDatabaseName', @keepfulltextindexfile = N'false'"
-    Invoke-Sqlcmd -Query "EXEC MASTER.dbo.sp_detach_db @dbname = N'$globalDatabaseName', @keepfulltextindexfile = N'false'"
+# do Sitecore Commerce SharedEnvironments DB
+Get-ChildItem -Path $InstallPath -Include "Sitecore.Commerce.Engine.Shared.DB.dacpac" -Recurse | ForEach-Object {
+    $dacpacPath = $_.FullName
+    $databaseName = "$CommerceDatabasePrefix`_SharedEnvironments"
+
+    # Install
+    & $sqlPackageExePath /a:Publish /sf:$dacpacPath /tdn:$databaseName /tsn:$env:COMPUTERNAME /q
+}
+
+# do modules
+$TextInfo = (Get-Culture).TextInfo
+Get-ChildItem -Path $InstallPath -Include "core.dacpac", "master.dacpac" -Recurse | ForEach-Object {
+    $dacpacPath = $_.FullName
+    $databaseName = "$DatabasePrefix`_" + $TextInfo.ToTitleCase($_.BaseName)
+
+    # Install
+    & $sqlPackageExePath /a:Publish /sf:$dacpacPath /tdn:$databaseName /tsn:$env:COMPUTERNAME /q
+}
+
+# detach DB
+Get-ChildItem -Path $InstallPath -Filter "*.mdf" | ForEach-Object {
+    $databaseName = $_.BaseName.Replace("_Primary", "")
+
+    Write-Host "### Detaching '$databaseName'..."
+
+    Invoke-Sqlcmd -Query "EXEC MASTER.dbo.sp_detach_db @dbname = N'$databaseName', @keepfulltextindexfile = N'false'"
 }
 
 Pop-Location

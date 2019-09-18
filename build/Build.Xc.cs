@@ -368,8 +368,40 @@ partial class Build : NukeBuild
             );
         });
 
+
+    Target XcMssql => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_MA_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XPROFILES_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XANALYTICS_PACKAGE))
+        .DependsOn(XpMssql)
+        .Executes(() => {
+            var baseImage = XpImageName("mssql");
+
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xc/mssql/Dockerfile")
+                .SetTag(XcImageName("mssql"))
+                .SetMemory(4000000000) // 4GB, SQL needs some more memory
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
+                    $"COMMERCE_DB_PREFIX={COMMERCE_DB_PREFIX}",
+                    $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
+                    $"COMMERCE_ENGINE_PACKAGE={COMMERCE_ENGINE_PACKAGE}",
+                    $"COMMERCE_CONNECT_PACKAGE={COMMERCE_CONNECT_PACKAGE}",
+                    $"COMMERCE_CONNECT_ENGINE_PACKAGE={COMMERCE_CONNECT_ENGINE_PACKAGE}",
+                    $"COMMERCE_MA_PACKAGE={COMMERCE_MA_PACKAGE}",
+                    $"COMMERCE_XPROFILES_PACKAGE={COMMERCE_XPROFILES_PACKAGE}",
+                    $"COMMERCE_XANALYTICS_PACKAGE={COMMERCE_XANALYTICS_PACKAGE}"
+                })
+            );
+        });
+
     Target Xc => _ => _
-        .DependsOn(XcCommerce, XcSitecore, XcSolr, XcXconnect, XcIdentity);
+        .DependsOn(XcCommerce, XcSitecore, XcMssql, XcSolr, XcXconnect, XcIdentity);
 
     Target XcSxa => _ => _
         .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);

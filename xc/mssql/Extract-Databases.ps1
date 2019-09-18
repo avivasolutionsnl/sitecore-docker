@@ -5,24 +5,7 @@ param(
     [string]$Path
 )
 
-Add-Type -Assembly "System.IO.Compression.FileSystem"
-
-Get-ChildItem -Path $Path -Filter "*Sitecore.Commerce.Engine.SDK*.zip" | ForEach-Object {
-    $zipPath = $_.FullName
-
-    try
-    {
-        $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
-        
-        ($zip.Entries | Where-Object { $_.FullName -like "Sitecore.*.dacpac" -and !($_.Name -like "*azure*") }) | Foreach-Object { 
-            [IO.Compression.ZipFileExtensions]::ExtractToFile($_, (Join-Path $Path $_.Name), $true)
-        }
-    }
-    finally
-    {
-        if ($zip -ne $null)
-        {
-            $zip.Dispose()
-        }
-    }
+# extract module
+Get-ChildItem -Path $Path -Filter "*.zip" | ForEach-Object {
+    Expand-Archive  $_.FullName -DestinationPath (Join-Path $Path $_.GetHashCode())
 }
