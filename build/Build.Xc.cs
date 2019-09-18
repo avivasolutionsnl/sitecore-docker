@@ -243,6 +243,7 @@ partial class Build : NukeBuild
 
     Target XcXconnect => _ => _
         .Requires(() => File.Exists(Files / COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_PACKAGE))
         .DependsOn(XpXconnect)
         .Executes(() =>
         {
@@ -254,7 +255,8 @@ partial class Build : NukeBuild
                 .SetTag(XcImageName("xconnect"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
-                    $"COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE={COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE}"
+                    $"COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE={COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE}",
+                    $"COMMERCE_CONNECT_PACKAGE={COMMERCE_CONNECT_PACKAGE}"
                 })
             );
         });
