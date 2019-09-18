@@ -35,7 +35,6 @@ partial class Build : NukeBuild
     readonly string SITECORE_BIZFX_PACKAGE = "Sitecore.BizFx.OnPrem.3.0.7.scwdp.zip";
 
     [Parameter("Commerce Engine package")]
-    // TODO Parameterize Commerce Search Provider: Solr vs Azure
     readonly string COMMERCE_ENGINE_PACKAGE = "Sitecore.Commerce.Engine.OnPrem.Solr.4.0.165.scwdp.zip";
 
     [Parameter("Commerce Connect package")]
@@ -403,7 +402,17 @@ partial class Build : NukeBuild
         });
 
     Target Xc => _ => _
-        .DependsOn(XcCommerce, XcSitecore, XcMssql, XcSolr, XcXconnect, XcIdentity);
+        .DependsOn(XcCommerce, XcSitecore, XcMssql, XcSolr, XcXconnect, XcIdentity, XcRedis);
+
+    Target XcRedis => _ => _
+        .Executes(() =>
+        {
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("base/redis/Dockerfile")
+                .SetTag(XcImageName("redis"))
+            );
+        });
 
     Target XcSxa => _ => _
         .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);

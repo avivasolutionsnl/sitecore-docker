@@ -14,7 +14,7 @@ COPY files /Files
 COPY scripts /Scripts
 
 # Expand installation files
-RUN Expand-Archive -Force -Path "/Files/$Env:COMMERCE_SIF_PACKAGE" -DestinationPath '/Files/SIF.Sitecore.Commerce';;
+RUN Expand-Archive -Force -Path "/Files/$Env:COMMERCE_SIF_PACKAGE" -DestinationPath '/Files/SIF.Sitecore.Commerce';
 
 # Remove DacFx and SQL dependencies from the Commerce Engine WebDeploy (WDP) package which is not needed in the Commerce image
 # The dependencies has been removed in the parameters.xml and archive.xml and the Commerce Engine WDP package gets updated with these custom files.
@@ -49,7 +49,8 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 # Install Web Deploy
 ARG WEBDEPLOY_MSI='c:\\Files\\webdeploy.msi'
 ADD https://download.microsoft.com/download/0/1/D/01DC28EA-638C-4A22-A57B-4CEF97755C6C/WebDeploy_amd64_en-US.msi ${WEBDEPLOY_MSI}
-RUN Start-Process msiexec.exe -ArgumentList '/i', $env:WEBDEPLOY_MSI, '/quiet', '/norestart' -NoNewWindow -Wait;
+RUN Start-Process msiexec.exe -ArgumentList '/i', $env:WEBDEPLOY_MSI, '/quiet', '/norestart' -NoNewWindow -Wait; `
+    Remove-Item $Env:WEBDEPLOY_MSI -Force;
 
 WORKDIR /Files
 
@@ -178,7 +179,7 @@ RUN Expand-Archive -Path "/Files/$Env:PLUMBER_FILE_NAME" -DestinationPath 'c:\\i
     $originalJson.EngineUri = ('https://{0}:5000' -f $Env:HOST_NAME); `
     $originalJson.IdentityServerUri = 'https://identity'; `
     $originalJson.PlumberUri = ('http://{0}:4000' -f $Env:HOST_NAME); `
-    $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson; 
+    $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson;
 
 # Expose Plumber port
 EXPOSE 4000
@@ -186,6 +187,12 @@ EXPOSE 4000
 COPY xc/commerce/WatchDefaultDirectories.ps1 /Scripts
 COPY xc/commerce/UpdateHostname.ps1 /Scripts
 COPY xc/commerce/Boot.ps1 C:/
+
+# Remove installation files
+RUN Remove-Item "/Files/$Env:COMMERCE_ENGINE_PACKAGE" -Force; `
+    Remove-Item "/Files/$Env:SITECORE_BIZFX_PACKAGE" -Force; `
+    Remove-Item "/Files/$Env:PLUMBER_FILE_NAME" -Force; `
+    Remove-Item "/Files/SIF.Sitecore.Commerce" -Force -Recurse;
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]
 CMD [ "-commerceHostname commerce.local -sitecoreHostname sitecore -identityHostname identity" ]
