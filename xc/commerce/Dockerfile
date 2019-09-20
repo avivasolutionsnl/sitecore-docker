@@ -49,8 +49,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 # Install Web Deploy
 ARG WEBDEPLOY_MSI='c:\\Files\\webdeploy.msi'
 ADD https://download.microsoft.com/download/0/1/D/01DC28EA-638C-4A22-A57B-4CEF97755C6C/WebDeploy_amd64_en-US.msi ${WEBDEPLOY_MSI}
-RUN Start-Process msiexec.exe -ArgumentList '/i', $env:WEBDEPLOY_MSI, '/quiet', '/norestart' -NoNewWindow -Wait; `
-    Remove-Item $Env:WEBDEPLOY_MSI -Force;
+RUN Start-Process msiexec.exe -ArgumentList '/i', $env:WEBDEPLOY_MSI, '/quiet', '/norestart' -NoNewWindow -Wait;
 
 WORKDIR /Files
 
@@ -187,12 +186,6 @@ EXPOSE 4000
 COPY xc/commerce/WatchDefaultDirectories.ps1 /Scripts
 COPY xc/commerce/UpdateHostname.ps1 /Scripts
 COPY xc/commerce/Boot.ps1 C:/
-
-# Remove installation files
-RUN Remove-Item "/Files/$Env:COMMERCE_ENGINE_PACKAGE" -Force; `
-    Remove-Item "/Files/$Env:SITECORE_BIZFX_PACKAGE" -Force; `
-    Remove-Item "/Files/$Env:PLUMBER_FILE_NAME" -Force; `
-    Remove-Item "/Files/SIF.Sitecore.Commerce" -Force -Recurse;
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]
 CMD [ "-commerceHostname commerce.local -sitecoreHostname sitecore -identityHostname identity" ]

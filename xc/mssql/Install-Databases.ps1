@@ -31,18 +31,6 @@ Write-Host "Using: $sqlPackageExePath"
 
 Push-Location -Path $InstallPath
 
-# attach
-Get-ChildItem -Path $InstallPath -Filter "*.mdf" | ForEach-Object {
-    $databaseName = $_.BaseName.Replace("_Primary", "")
-    $mdfPath = $_.FullName
-    $ldfPath = $mdfPath.Replace(".mdf", ".ldf")
-    $sqlcmd = "IF EXISTS (SELECT 1 FROM SYS.DATABASES WHERE NAME = '$databaseName') BEGIN EXEC sp_detach_db [$databaseName] END;CREATE DATABASE [$databaseName] ON (FILENAME = N'$mdfPath'), (FILENAME = N'$ldfPath') FOR ATTACH;"
-
-    Write-Host "### Attaching '$databaseName'..."
-
-    Invoke-Sqlcmd -Query $sqlcmd
-}
-
 # do Sitecore Commerce Global DB
 Get-ChildItem -Path $InstallPath -Include "Sitecore.Commerce.Engine.Global.DB.dacpac" -Recurse | ForEach-Object {
     $dacpacPath = $_.FullName
@@ -69,15 +57,6 @@ Get-ChildItem -Path $InstallPath -Include "core.dacpac", "master.dacpac" -Recurs
 
     # Install
     & $sqlPackageExePath /a:Publish /sf:$dacpacPath /tdn:$databaseName /tsn:$env:COMPUTERNAME /q
-}
-
-# detach DB
-Get-ChildItem -Path $InstallPath -Filter "*.mdf" | ForEach-Object {
-    $databaseName = $_.BaseName.Replace("_Primary", "")
-
-    Write-Host "### Detaching '$databaseName'..."
-
-    Invoke-Sqlcmd -Query "EXEC MASTER.dbo.sp_detach_db @dbname = N'$databaseName', @keepfulltextindexfile = N'false'"
 }
 
 Pop-Location

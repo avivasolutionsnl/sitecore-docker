@@ -377,6 +377,7 @@ partial class Build : NukeBuild
         .Requires(() => File.Exists(Files / COMMERCE_MA_PACKAGE))
         .Requires(() => File.Exists(Files / COMMERCE_XPROFILES_PACKAGE))
         .Requires(() => File.Exists(Files / COMMERCE_XANALYTICS_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
         .DependsOn(XpMssql)
         .Executes(() => {
             var baseImage = XpImageName("mssql");
@@ -388,7 +389,7 @@ partial class Build : NukeBuild
                 .SetMemory(4000000000) // 4GB, SQL needs some more memory
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
-                    $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
+                    $"SQL_DB_PREFIX={SQL_DB_PREFIX}",                    
                     $"COMMERCE_DB_PREFIX={COMMERCE_DB_PREFIX}",
                     $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
                     $"COMMERCE_ENGINE_PACKAGE={COMMERCE_ENGINE_PACKAGE}",
@@ -396,7 +397,8 @@ partial class Build : NukeBuild
                     $"COMMERCE_CONNECT_ENGINE_PACKAGE={COMMERCE_CONNECT_ENGINE_PACKAGE}",
                     $"COMMERCE_MA_PACKAGE={COMMERCE_MA_PACKAGE}",
                     $"COMMERCE_XPROFILES_PACKAGE={COMMERCE_XPROFILES_PACKAGE}",
-                    $"COMMERCE_XANALYTICS_PACKAGE={COMMERCE_XANALYTICS_PACKAGE}"
+                    $"COMMERCE_XANALYTICS_PACKAGE={COMMERCE_XANALYTICS_PACKAGE}",
+                    $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}",
                 })
             );
         });
