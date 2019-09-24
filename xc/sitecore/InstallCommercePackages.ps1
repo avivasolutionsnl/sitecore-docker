@@ -106,10 +106,4 @@ $node.defaultEnvironment = $defaultEnvironment; `
 $node.defaultShopName = $defaultShopName; `
 $xml.Save($pathToConfig);
 
-# Initialize the commerce engine
-# TODO Enable 
-#$bearerToken = GetIdServerToken -userName $sitecoreUserName -password $sitecorePassword -urlIdentityServerGetToken "${identityServerUrl}connect/token"
-
-#BootStrapCommerceServices -urlCommerceShopsServicesBootstrap "${commerceOpsServiceUrl}Bootstrap()" -bearerToken $bearerToken
-#InitializeCommerceServices -urlCommerceShopsServicesInitializeEnvironment "${commerceOpsServiceUrl}InitializeEnvironment()" -urlCheckCommandStatus "${commerceOpsServiceUrl}CheckCommandStatus(taskId=taskIdValue)" -environment $defaultEnvironment -bearerToken $bearerToken
 

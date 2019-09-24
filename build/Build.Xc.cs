@@ -65,7 +65,7 @@ partial class Build : NukeBuild
     readonly string WEB_TRANSFORM_TOOL = "Microsoft.Web.XmlTransform.dll";
 
     [Parameter("Plumber package")]
-    readonly string PLUMBER_FILE_NAME = "plumber.zip";
+    readonly string PLUMBER_FILE_NAME = "plumber-sc.1.1.3.zip";
 
     // Certificates
     [Parameter("Commerce certificate file")]
