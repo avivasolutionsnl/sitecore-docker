@@ -152,7 +152,7 @@ $plumberAllowedOrigins = [string[]]@(
 
 #Modify the commerce config with the new hostnames
 UpdateBizFxConfig -configPath "C:\inetpub\wwwroot\SitecoreBizFx\assets\config.json" -bizFxUrl $bizFxUrl -identityServerUrl $identityServerUrl -engineServerUrl $engineServerUrl
-UpdatePlumberConfig -configPath "C:\inetpub\plumber\static\config.json" -plumberUrl $plumberUrl -identityServerUrl $identityServerUrl -engineServerUrl $engineServerUrl
+UpdatePlumberConfig -configPath "C:\inetpub\plumber\config.json" -plumberUrl $plumberUrl -identityServerUrl $identityServerUrl -engineServerUrl $engineServerUrl
 
 UpdateCommerceConfig -configPath "C:\inetpub\wwwroot\CommerceAuthoring_Sc9\wwwroot\config.json" -allowedOrigins $allowedOrigins -identityServerUrl $identityServerUrl
 UpdateCommerceConfig -configPath "C:\inetpub\wwwroot\CommerceOps_Sc9\wwwroot\config.json" -allowedOrigins $allowedOrigins -identityServerUrl $identityServerUrl

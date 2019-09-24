@@ -37,6 +37,7 @@ services:
     - solr
     - sitecore
     - identity
+    - redis
 
  mssql:
   image: "${IMAGE_PREFIX}mssql:${TAG}"
@@ -86,6 +87,12 @@ services:
   depends_on:
     - mssql
     - solr
+
+ redis:
+  image: "${IMAGE_PREFIX}redis:${TAG}"
+  isolation: process
+  networks:
+    - exampleNetwork
 
 networks:
   exampleNetwork:

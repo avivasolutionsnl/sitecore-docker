@@ -14,7 +14,7 @@ using System.Collections.Generic;
 partial class Build : NukeBuild
 {
     [Parameter("Docker image sitecore version")]
-    public readonly string XcSitecoreVersion = "9.1.0";
+    public readonly string XcSitecoreVersion = "9.2.0";
     // Docker image naming
     [Parameter("Docker image prefix for Sitecore XC")]
     readonly string XcImagePrefix = "sitecore-xc-";
@@ -32,43 +32,40 @@ partial class Build : NukeBuild
 
     // Packages
     [Parameter("Sitecore BizFx package")]
-    readonly string SITECORE_BIZFX_PACKAGE = "Sitecore.BizFX.2.0.3.zip";
+    readonly string SITECORE_BIZFX_PACKAGE = "Sitecore.BizFx.OnPrem.3.0.7.scwdp.zip";
 
     [Parameter("Commerce Engine package")]
-    readonly string COMMERCE_ENGINE_PACKAGE = "Sitecore.Commerce.Engine.3.0.163.zip";
+    readonly string COMMERCE_ENGINE_PACKAGE = "Sitecore.Commerce.Engine.OnPrem.Solr.4.0.165.scwdp.zip";
 
     [Parameter("Commerce Connect package")]
-    readonly string COMMERCE_CONNECT_PACKAGE = "Sitecore Commerce Connect Core 12.0.18.zip";
+    readonly string COMMERCE_CONNECT_PACKAGE = "Sitecore Commerce Connect Core OnPrem 13.0.16.scwdp.zip";
 
     [Parameter("Commerce Connect Engine package")]
-    readonly string COMMERCE_CONNECT_ENGINE_PACKAGE = "Sitecore Commerce Engine Connect 3.0.45.zip";
+    readonly string COMMERCE_CONNECT_ENGINE_PACKAGE = "Sitecore Commerce Engine Connect OnPrem 4.0.55.scwdp.zip";
 
     [Parameter("Commerce SIF package")]
-    readonly string COMMERCE_SIF_PACKAGE = "SIF.Sitecore.Commerce.2.0.19.zip";
+    readonly string COMMERCE_SIF_PACKAGE = "SIF.Sitecore.Commerce.3.0.28.zip";
 
     [Parameter("Commerce Marketing Automation package")]
-    readonly string COMMERCE_MA_PACKAGE = "Sitecore Commerce Marketing Automation Core 12.0.18.zip";
+    readonly string COMMERCE_MA_PACKAGE = "Sitecore Commerce Marketing Automation Core OnPrem 13.0.16.scwdp.zip";
 
     [Parameter("Commerce Marketing Automation for AutomationEngine package")]
-    readonly string COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE = "Sitecore Commerce Marketing Automation for AutomationEngine 12.0.18.zip";
-
-    [Parameter("Commerce SDK package")]
-    readonly string COMMERCE_SDK_PACKAGE = "Sitecore.Commerce.Engine.SDK.3.0.40.zip";
+    readonly string COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE = "Sitecore Commerce Marketing Automation for AutomationEngine 13.0.16.zip";
 
     [Parameter("Commerce XP Core package")]
-    readonly string COMMERCE_XPROFILES_PACKAGE = "Sitecore Commerce ExperienceProfile Core 12.0.18.zip";
+    readonly string COMMERCE_XPROFILES_PACKAGE = "Sitecore Commerce ExperienceProfile Core OnPrem 13.0.16.scwdp.zip";
 
     [Parameter("Commerce XP Analytics Core package")]
-    readonly string COMMERCE_XANALYTICS_PACKAGE = "Sitecore Commerce ExperienceAnalytics Core 12.0.18.zip";
+    readonly string COMMERCE_XANALYTICS_PACKAGE = "Sitecore Commerce ExperienceAnalytics Core OnPrem 13.0.16.scwdp.zip";
 
     [Parameter("SXA Commerce package")]
-    readonly string SCXA_PACKAGE = "Sitecore Commerce Experience Accelerator 2.0.181.zip";
+    readonly string SCXA_PACKAGE = "Sitecore Commerce Experience Accelerator 3.0.108.scwdp.zip";
 
     [Parameter("Web transform tool")]
     readonly string WEB_TRANSFORM_TOOL = "Microsoft.Web.XmlTransform.dll";
 
     [Parameter("Plumber package")]
-    readonly string PLUMBER_FILE_NAME = "plumber.zip";
+    readonly string PLUMBER_FILE_NAME = "plumber-sc.1.1.3.zip";
 
     // Certificates
     [Parameter("Commerce certificate file")]
@@ -123,7 +120,6 @@ partial class Build : NukeBuild
 
     Target XcCommerce => _ => _
         .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
-        .Requires(() => File.Exists(Files / COMMERCE_SDK_PACKAGE))
         .Requires(() => File.Exists(Files / SITECORE_BIZFX_PACKAGE))
         .Requires(() => File.Exists(Files / COMMERCE_ENGINE_PACKAGE))
         .Requires(() => File.Exists(Files / PLUMBER_FILE_NAME))
@@ -137,24 +133,18 @@ partial class Build : NukeBuild
                     $"SQL_SA_PASSWORD={SQL_SA_PASSWORD}",
                     $"SQL_DB_PREFIX={SQL_DB_PREFIX}",
                     $"SOLR_PORT={SOLR_PORT}",  
-                    $"SHOP_NAME={SHOP_NAME}",
-                    $"ENVIRONMENT_NAME={ENVIRONMENT_NAME}",
                     $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}",
-                    $"COMMERCE_SDK_PACKAGE={COMMERCE_SDK_PACKAGE}",
                     $"SITECORE_BIZFX_PACKAGE={SITECORE_BIZFX_PACKAGE}",
                     $"COMMERCE_ENGINE_PACKAGE={COMMERCE_ENGINE_PACKAGE}",
                     $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
                     $"ROOT_CERT_PATH={ROOT_CERT_PATH}",
-                    $"SITECORE_CERT_PATH={SITECORE_CERT_PATH}",
                     $"XCONNECT_CERT_PATH={XCONNECT_CERT_PATH}",
-                    $"IDENTITY_CERT_PATH={IDENTITY_CERT_PATH}",
                     $"PLUMBER_FILE_NAME={PLUMBER_FILE_NAME}"
                 })
             );
         });
 
     Target XcMssqlIntermediate => _ => _
-        .Requires(() => File.Exists(Files / COMMERCE_SDK_PACKAGE))
         .DependsOn(XpMssql)
         .Executes(() =>
         {
@@ -167,8 +157,7 @@ partial class Build : NukeBuild
                 .SetMemory(4000000000) // 4GB, SQL needs some more memory
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
-                    $"COMMERCE_DB_PREFIX={COMMERCE_DB_PREFIX}",
-                    $"COMMERCE_SDK_PACKAGE={COMMERCE_SDK_PACKAGE}"
+                    $"COMMERCE_DB_PREFIX={COMMERCE_DB_PREFIX}"
                 })
             );
         });
@@ -253,6 +242,7 @@ partial class Build : NukeBuild
 
     Target XcXconnect => _ => _
         .Requires(() => File.Exists(Files / COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_PACKAGE))
         .DependsOn(XpXconnect)
         .Executes(() =>
         {
@@ -264,7 +254,8 @@ partial class Build : NukeBuild
                 .SetTag(XcImageName("xconnect"))
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
-                    $"COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE={COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE}"
+                    $"COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE={COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE}",
+                    $"COMMERCE_CONNECT_PACKAGE={COMMERCE_CONNECT_PACKAGE}"
                 })
             );
         });
@@ -346,10 +337,84 @@ partial class Build : NukeBuild
             );
 
             System.IO.Directory.SetCurrentDirectory("..");
-        });        
+        });
+
+    Target XcSitecore => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_MA_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XPROFILES_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XANALYTICS_PACKAGE))
+        .DependsOn(XpSitecore)
+        .Executes(() =>
+        {
+            var baseImage = XpImageName("sitecore");
+
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xc/sitecore/Dockerfile")
+                .SetTag(XcImageName("sitecore"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
+                    $"COMMERCE_CONNECT_PACKAGE={COMMERCE_CONNECT_PACKAGE}",
+                    $"COMMERCE_CONNECT_ENGINE_PACKAGE={COMMERCE_CONNECT_ENGINE_PACKAGE}",
+                    $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}",
+                    $"COMMERCE_MA_PACKAGE={COMMERCE_MA_PACKAGE}",
+                    $"COMMERCE_XPROFILES_PACKAGE={COMMERCE_XPROFILES_PACKAGE}",
+                    $"COMMERCE_XANALYTICS_PACKAGE={COMMERCE_XANALYTICS_PACKAGE}",
+                    $"WEB_TRANSFORM_TOOL={WEB_TRANSFORM_TOOL}",
+                })
+            );
+        });
+
+
+    Target XcMssql => _ => _
+        .Requires(() => File.Exists(Files / COMMERCE_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_ENGINE_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_MA_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XPROFILES_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_XANALYTICS_PACKAGE))
+        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
+        .DependsOn(XpMssql)
+        .Executes(() => {
+            var baseImage = XpImageName("mssql");
+
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xc/mssql/Dockerfile")
+                .SetTag(XcImageName("mssql"))
+                .SetMemory(4000000000) // 4GB, SQL needs some more memory
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"SQL_DB_PREFIX={SQL_DB_PREFIX}",                    
+                    $"COMMERCE_DB_PREFIX={COMMERCE_DB_PREFIX}",
+                    $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
+                    $"COMMERCE_ENGINE_PACKAGE={COMMERCE_ENGINE_PACKAGE}",
+                    $"COMMERCE_CONNECT_PACKAGE={COMMERCE_CONNECT_PACKAGE}",
+                    $"COMMERCE_CONNECT_ENGINE_PACKAGE={COMMERCE_CONNECT_ENGINE_PACKAGE}",
+                    $"COMMERCE_MA_PACKAGE={COMMERCE_MA_PACKAGE}",
+                    $"COMMERCE_XPROFILES_PACKAGE={COMMERCE_XPROFILES_PACKAGE}",
+                    $"COMMERCE_XANALYTICS_PACKAGE={COMMERCE_XANALYTICS_PACKAGE}",
+                    $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}",
+                })
+            );
+        });
 
     Target Xc => _ => _
-        .DependsOn(XcCommerce, XcSitecoreMssql, XcSolr, XcXconnect, XcIdentity);
+        .DependsOn(XcCommerce, XcSitecore, XcMssql, XcSolr, XcXconnect, XcIdentity, XcRedis);
+
+    Target XcRedis => _ => _
+        .Executes(() =>
+        {
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("base/redis/Dockerfile")
+                .SetTag(XcImageName("redis"))
+            );
+        });
 
     Target XcSxa => _ => _
         .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);

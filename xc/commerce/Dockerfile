@@ -6,8 +6,7 @@ FROM mcr.microsoft.com/dotnet/framework/aspnet:4.7.2-windowsservercore-ltsc2019 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 ARG COMMERCE_SIF_PACKAGE
-ARG COMMERCE_SDK_PACKAGE
-ARG SITECORE_BIZFX_PACKAGE
+ARG COMMERCE_ENGINE_PACKAGE
 
 WORKDIR /Files
 
@@ -15,25 +14,24 @@ COPY files /Files
 COPY scripts /Scripts
 
 # Expand installation files
-RUN Expand-Archive -Force -Path "/Files/$Env:COMMERCE_SDK_PACKAGE" -DestinationPath '/Files/Sitecore.Commerce.SDK'; `
-    Expand-Archive -Force -Path "/Files/$Env:COMMERCE_SIF_PACKAGE" -DestinationPath '/Files/SIF.Sitecore.Commerce'; `
-    Expand-Archive -Force -Path "/Files/$Env:SITECORE_BIZFX_PACKAGE" -DestinationPath '/Files/Sitecore.BizFX';
+RUN Expand-Archive -Force -Path "/Files/$Env:COMMERCE_SIF_PACKAGE" -DestinationPath '/Files/SIF.Sitecore.Commerce';
 
-# Remove the long retry in DeployCommerceContent.psm1
-RUN (Get-Content -path 'C:/Files/SIF.Sitecore.Commerce/Modules/DeployCommerceContent/DeployCommerceContent.psm1' -Raw) | Foreach-Object { `
-    $_ -replace '-lt 30', '-lt 1' `
-       -replace 'Start-Sleep -Seconds 10', '' `
-    } | Set-Content 'C:/Files/SIF.Sitecore.Commerce/Modules/DeployCommerceContent/DeployCommerceContent.psm1'
+# Remove DacFx and SQL dependencies from the Commerce Engine WebDeploy (WDP) package which is not needed in the Commerce image
+# The dependencies has been removed in the parameters.xml and archive.xml and the Commerce Engine WDP package gets updated with these custom files.
+COPY xc/commerce/parameters.xml /Files
+COPY xc/commerce/archive.xml /Files
+RUN Compress-Archive -Path "/Files/parameters.xml" -DestinationPath "/Files/$Env:COMMERCE_ENGINE_PACKAGE" -Update; `
+    Compress-Archive -Path "/Files/archive.xml" -DestinationPath "/Files/$Env:COMMERCE_ENGINE_PACKAGE" -Update;
 
 # Stage 1: create actual image
 FROM mcr.microsoft.com/dotnet/framework/aspnet:4.7.2-windowsservercore-ltsc2019
 
 ARG HOST_NAME="commerce"
-ARG SITECORE_HOSTNAME="sitecore"
-ARG SHOP_NAME="CommerceEngineDefaultStorefront"
-ARG ENVIRONMENT_NAME="HabitatAuthoring"
 ARG COMMERCE_ENGINE_PACKAGE
 ARG PLUMBER_FILE_NAME="plumber.zip"
+ARG REDIS_HOSTNAME="redis"
+ARG REDIS_INSTANCE_NAME="Redis"
+ARG SITECORE_BIZFX_PACKAGE
 
 ARG SQL_USER="sa"
 ARG SQL_SA_PASSWORD
@@ -43,12 +41,15 @@ ARG SOLR_PORT=8983
 ARG SOLR_CORE_PREFIX="sitecore"
 
 ARG XCONNECT_CERT_PATH
-ARG SITECORE_CERT_PATH
 ARG COMMERCE_CERT_PATH
 ARG ROOT_CERT_PATH
-ARG IDENTITY_CERT_PATH 
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+# Install Web Deploy
+ARG WEBDEPLOY_MSI='c:\\Files\\webdeploy.msi'
+ADD https://download.microsoft.com/download/0/1/D/01DC28EA-638C-4A22-A57B-4CEF97755C6C/WebDeploy_amd64_en-US.msi ${WEBDEPLOY_MSI}
+RUN Start-Process msiexec.exe -ArgumentList '/i', $env:WEBDEPLOY_MSI, '/quiet', '/norestart' -NoNewWindow -Wait;
 
 WORKDIR /Files
 
@@ -56,9 +57,8 @@ WORKDIR /Files
 COPY scripts /Scripts
 
 COPY files/*.pfx /Files/
-COPY --from=prepare /Files/Sitecore.Commerce.SDK /Files/Sitecore.Commerce.SDK/
 COPY --from=prepare /Files/SIF.Sitecore.Commerce /Files/SIF.Sitecore.Commerce/
-COPY --from=prepare /Files/Sitecore.BizFX /Files/Sitecore.BizFX/
+COPY --from=prepare /Files/${SITECORE_BIZFX_PACKAGE} /Files/
 COPY --from=prepare /Files/${COMMERCE_ENGINE_PACKAGE} /Files/
 COPY --from=prepare /Files/${PLUMBER_FILE_NAME} /Files/
 
@@ -74,29 +74,27 @@ RUN net user /add commerceuser 'Pa$$w0rd'; `
 # Install SIF
 RUN /Scripts/Install-SIF.ps1
 
-# Patch bug in CommerceEngine.Deploy.json file. It misses the module InstallSitecoreConfiguration. Only a problem
+# Patch bug in CommerceEngine.json file. It misses the definition of the parameter CommerceServicesPostfix. Only a problem
 # because we use it directly. Also have to remove the comments from the json file when reading it, because
 # json does not support comments and the powershell command will fail otherwise.
-RUN $configPath = '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/CommerceEngine/CommerceEngine.Deploy.json'; `
+RUN $configPath = '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/CommerceEngine/CommerceEngine.json'; `
     $json = (Get-Content $configPath) -replace '^\s*//.*' | Out-String | ConvertFrom-Json; `
-    $json.Modules += 'InstallSitecoreConfiguration'; `
+    $json.Parameters | Add-Member -Name 'CommerceServicesPostfix' -Value @{'Type' = 'string'; 'Description' = 'The Commerce Engine postfix for services names'; 'DefaultValue' = ''} -MemberType NoteProperty; `
     $json = ConvertTo-Json $json -Depth 100; `
     Set-Content $configPath -Value $json -Encoding UTF8
 
 # Configure
 RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce/Modules'); `
     $solrUrl = 'http://solr:{0}/solr' -f $Env:SOLR_PORT; `
-    $engineZip = '/Files/{0}' -f $Env:COMMERCE_ENGINE_PACKAGE; `
-    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/CommerceEngine/CommerceEngine.Deploy.json' `
-    -BaseConfigurationFolder '/Files/SIF.Sitecore.Commerce/Configuration' ` 
+    cd '/Files/SIF.Sitecore.Commerce'; `
+    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/CommerceEngine/CommerceEngine.json' `
     -CommerceServicesDbServer $Env:SQL_SERVER `
     -CommerceServicesDbName SitecoreCommerce9_SharedEnvironments `
-    -CommerceServicesGlobalDbName SitecoreCommerce9_Global `
+    -CommerceServicesGlobalDbName SitecoreCommerce9_Global `    
     -CommerceServicesPostfix Sc9 `
-    -CommerceInstallRoot c:\inetpub\wwwroot\ `
     -SitecoreDbServer $Env:SQL_SERVER `
     -SitecoreCoreDbName "${$Env:SQL_DB_PREFIX}_Core" `
-    -SitecoreBizFxPort 4200 `
+    -BizFxPort 4200 `
     -SolrUrl $solrUrl `
     -SearchIndexPrefix $Env:SOLR_CORE_PREFIX `
     -EnvironmentsPrefix commerce `
@@ -109,51 +107,44 @@ RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';
     -UserDomain $Env:COMPUTERNAME ` 
     -UserName 'commerceuser' `
     -UserPassword 'Pa$$w0rd' `
-    -CommerceEngineDacPac '/Files/Dacpac.dacpac' `
-    -SitecoreCommerceEnginePath $engineZip `
     -CommerceSearchProvider 'SOLR' `
-    -CertPath ${INSTALL_TEMP}/ `
     -CommerceEngineCertificateName 'commerce' `
-    -Skip "DeployCommerceDatabase", "AddCommerceUserToCoreDatabase", "CreateSignedEngineCert", "CreateSignedCert", "CreateLocalhostSignedCert", "StartMinionsAppPool", "StartMinionsWebsite"
-
-# Patch bug in CommerceEngine.Deploy.json file. It misses the module InstallSitecoreConfiguration. Only a problem
-# because we use it directly. Also have to remove the comments from the json file when reading it, because
-# json does not support comments and the powershell command will fail otherwise.
-RUN $configPath = '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/SitecoreBizFx/SitecoreBizFx.json'; `
-    $json = (Get-Content $configPath) -replace '^\s*//.*' | Out-String | ConvertFrom-Json; `
-    $json.Modules += 'InstallSitecoreConfiguration'; `
-    $json = ConvertTo-Json $json -Depth 100; `
-    Set-Content $configPath -Value $json -Encoding UTF8
+    -CommerceEngineWdpFullPath "/Files/$Env:COMMERCE_ENGINE_PACKAGE" `
+    -SitecoreDomain 'sitecore' `
+    -SitecoreUsername 'admin' `
+    -SitecoreUserPassword 'b' `
+    -RedisConfiguration $Env:REDIS_HOSTNAME `
+    -RedisInstanceName $Env:REDIS_INSTANCE_NAME `
+    -Skip "CommerceEngine-Pre_ClearRedis", "CommerceEngine-Pre_AddCommerceUserToCoreDatabase", "CommerceEngine-Pre_CreateSignedEngineCert", "CommerceEngine-Pre_CreateSignedCert", "CommerceEngine-Pre_CreateLocalhostSignedCert"
 
 RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/SIF.Sitecore.Commerce/Modules'); `
-    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/SitecoreBizFx/SitecoreBizFx.json' `
-    -SitecoreBizFxServicesContentPath './Sitecore.BizFX' `
-    -CommerceAuthoringServicesPort 5000 `
+    Install-SitecoreConfiguration -Path '/Files/SIF.Sitecore.Commerce/Configuration/Commerce/SitecoreBizFx/SitecoreBizFx.Install.json' `
     -UserDomain $Env:COMPUTERNAME ` 
     -UserName 'commerceuser' `
     -UserPassword 'Pa$$w0rd' `
-    -CommerceInstallRoot 'c:\inetpub\wwwroot' `
-    -SitecoreBizFxPort 4200 `
-    -SitecoreBizFxServerName 'SitecoreBizFx' `
-    -BaseConfigurationFolder '/Files/SIF.Sitecore.Commerce/Configuration' ` 
-    -SitecoreIdentityServerUrl https://identity 
+    -Port 4200 `
+    -SiteName 'SitecoreBizFx' `
+    -SitecoreIdentityServerUrl https://identity `
+    -EngineAuthoringUrl https://commerce:5000 `
+    -EngineBizFxUrl https://commerce:4200 `
+    -Package "/Files/$Env:SITECORE_BIZFX_PACKAGE"
 
 COPY xc/commerce/UpdateConnectionString.ps1 /Scripts
 
 RUN /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceAuthoring_Sc9 `
-    -userName 'sa' `
+    -userName $Env:SQL_USER `
     -password $Env:SQL_SA_PASSWORD `
     -server $Env:SQL_SERVER; `
     /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceMinions_Sc9 `
-    -userName 'sa' `
+    -userName $Env:SQL_USER `
     -password $Env:SQL_SA_PASSWORD `
     -server $Env:SQL_SERVER; `
     /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceOps_Sc9 `
-    -userName 'sa' `
+    -userName $Env:SQL_USER `
     -password $Env:SQL_SA_PASSWORD `
     -server $Env:SQL_SERVER; `
     /Scripts/UpdateConnectionString.ps1 -folder c:\inetpub\wwwroot\CommerceShops_Sc9 `
-    -userName 'sa' `
+    -userName $Env:SQL_USER `
     -password $Env:SQL_SA_PASSWORD `
     -server $Env:SQL_SERVER
 
@@ -178,23 +169,16 @@ RUN $CommerceServicesPathCollection = @('C:\\inetpub\\wwwroot\\CommerceAuthoring
 		$originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson; `
     } 
 
-# Configure the business tools
-RUN $pathToJson = $(Join-Path -Path 'C:\\inetpub\\wwwroot\\SitecoreBizFx' -ChildPath "assets\\config.json"); `
-    $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json; `
-    $originalJson.EnvironmentName = $Env:ENVIRONMENT_NAME; `
-    $originalJson.ShopName = $Env:SHOP_NAME; `
-    $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson;
-
 # Install plumber
 RUN Expand-Archive -Path "/Files/$Env:PLUMBER_FILE_NAME" -DestinationPath 'c:\\inetpub\\plumber'; `
     Import-Module -Name WebAdministration; `
     $iisApp = New-Item IIS:\Sites\Plumber -bindings @{protocol='http';bindingInformation='*:4000:*'} -physicalPath 'c:\inetpub\plumber'; `
-    $pathToJson = $(Join-Path -Path 'C:\\inetpub\\plumber' -ChildPath "static\\config.json"); `
+    $pathToJson = $(Join-Path -Path 'C:\\inetpub\\plumber' -ChildPath "config.json"); `
     $originalJson = Get-Content $pathToJson -Raw | ConvertFrom-Json; `
     $originalJson.EngineUri = ('https://{0}:5000' -f $Env:HOST_NAME); `
     $originalJson.IdentityServerUri = 'https://identity'; `
     $originalJson.PlumberUri = ('http://{0}:4000' -f $Env:HOST_NAME); `
-    $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson; 
+    $originalJson | ConvertTo-Json -Depth 100 -Compress | set-content $pathToJson;
 
 # Expose Plumber port
 EXPOSE 4000
