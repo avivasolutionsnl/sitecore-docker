@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--Extracted from the COMMERCE_ENGINE_PACKAGE -->
 <parameters>
 
   <parameter name="Configuration" description="Redis configuration" defaultValue="">
