@@ -43,10 +43,10 @@ partial class Build : NukeBuild
     readonly string IDENTITYSERVER_PACKAGE = "Sitecore.IdentityServer 3.0.0 rev. 00211 (OnPrem)_identityserver.scwdp.zip";
     
     [Parameter("Powershell Extension package")]
-    readonly string PSE_PACKAGE = "Sitecore PowerShell Extensions-5.0.zip";
+    readonly string PSE_PACKAGE = "Sitecore PowerShell Extensions-5.0 for 9.2.scwdp.zip";
     
     [Parameter("SXA package")]
-    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.9.0 rev. 190528 for 9.2.zip";
+    readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.9.0 rev. 190528 for 9.2.scwdp.zip";
         
     [Parameter("JSS package")]
     readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.2 XP 12.0.0 rev. 190522.zip";
@@ -203,28 +203,42 @@ partial class Build : NukeBuild
             );
         });
     
-    Target XpSitecoreMssqlSxa => _ => _
-        .Requires(() => File.Exists(XpLicenseFile))
+    Target XpSitecoreSxa => _ => _
         .Requires(() => File.Exists(Files / PSE_PACKAGE))
         .Requires(() => File.Exists(Files / SXA_PACKAGE))
-        .DependsOn(Xp)
+        .DependsOn(XpSitecore)
         .Executes(() => {
-            System.IO.Directory.SetCurrentDirectory("xp");
+            var baseImage = XpImageName("sitecore");
 
-            // Set env variables for docker-compose
-            Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XpImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XpSitecoreVersion}", EnvironmentVariableTarget.Process);
-
-            InstallSitecorePackage(
-                @"C:\sxa\InstallSXA.ps1",
-                XpImageName("sitecore-sxa"),
-                XpImageName("mssql-sxa"),
-                "-f docker-compose.yml -f docker-compose.sxa.yml"
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xp/sitecore/sxa/Dockerfile")
+                .SetTag(XpImageName("sitecore-sxa"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"PSE_PACKAGE={PSE_PACKAGE}",
+                    $"SXA_PACKAGE={SXA_PACKAGE}"
+                })
             );
+        });
+    
+    Target XpMssqlSxa => _ => _
+        .Requires(() => File.Exists(Files / PSE_PACKAGE))
+        .Requires(() => File.Exists(Files / SXA_PACKAGE))
+        .DependsOn(XpMssql)
+        .Executes(() => {
+            var baseImage = XpImageName("mssql");
 
-            System.IO.Directory.SetCurrentDirectory("..");
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xp/mssql/sxa/Dockerfile")
+                .SetTag(XpImageName("mssql-sxa"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"PSE_PACKAGE={PSE_PACKAGE}",
+                    $"SXA_PACKAGE={SXA_PACKAGE}"
+                })
+            );
         });
 
     Target XpSolrSxa => _ => _
@@ -270,7 +284,7 @@ partial class Build : NukeBuild
         .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect, XpIdentity);
 
     Target XpSxa => _ => _
-        .DependsOn(XpSitecoreMssqlSxa, XpSolrSxa);
+        .DependsOn(Xp, XpSitecoreSxa, XpMssqlSxa, XpSolrSxa);
 
     Target XpJss => _ => _
         .DependsOn(XpSitecoreMssqlJss);
