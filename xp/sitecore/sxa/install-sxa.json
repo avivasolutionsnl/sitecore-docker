@@ -27,12 +27,12 @@
     },
     "PowershellExtensionsWdpFullPath": {
       "Type": "string",
-      "Description": "Commerce Engine service wdp package full path.",
+      "Description": "Powershell Extensions wdp package full path.",
       "DefaultValue": ""
     },
     "SXAFrameworkWdpFullPath": {
       "Type": "string",
-      "Description": "Commerce Engine service wdp package full path.",
+      "Description": "SXA Framework wdp package full path.",
       "DefaultValue": ""
     }
   },

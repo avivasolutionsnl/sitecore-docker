@@ -1,88 +1,133 @@
 {
   "Parameters": {
     "SiteName": {
-        "Type": "string",
-        "DefaultValue": "Sitecore",
-        "Description": "The name of the site to be deployed."
-    },
-    "SitecoreAdminPassword": {
-        "Type": "string",
-        "DefaultValue": "b",
-        "Description": "The admin password for the Sitecore instance."
-    },
-    "PowershellExtensionPackageFullPath": {
       "Type": "string",
-      "Description": "The path to the Sitecore Powershell Extensions zip.",
-      "DefaultValue": "/files-mount/pse-package.zip"
+      "Description": "The name of the site to be deployed.",
+      "DefaultValue": ""
     },
-    "SXAPackageFullPath": {
+    "SqlDbPrefix": {
       "Type": "string",
-      "Description": "The path to the SXA zip.",
-      "DefaultValue": "/files-mount/sxa-package.zip"
+      "Description": "SQL DB Prefix",
+      "DefaultValue": ""
     },
-    "SCXAPackageFullPath": {
+    "SqlAdminUser": {
       "Type": "string",
-      "Description": "The path to the SCXA zip.",
-      "DefaultValue": "/files-mount/scxa-package.zip"
+      "Description": "The Sql admin user account to use when installing databases.",
+      "DefaultValue": ""
     },
-    "PackagesDirDst": {
+    "SqlAdminPassword": {
       "Type": "string",
-      "Description": "The path to packages directory.",
-      "DefaultValue": "C:\\inetpub\\wwwroot\\sitecore\\App_Data\\packages\\"
+      "Description": "The Sql admin password to use when installing databases.",
+      "DefaultValue": ""
     },
-    "BaseUrl": {
+    "SitecoreDbServer": {
       "Type": "string",
-      "Description": "The utility pages base url.",
-      "DefaultValue": "http://sitecore/SiteUtilityPages"
+      "Description": "The Sitecore database server name.",
+      "DefaultValue": ".\\SQLSERVER"
+    },
+    "PowershellExtensionsWdpFullPath": {
+      "Type": "string",
+      "Description": "Powershell Extensions wdp package full path.",
+      "DefaultValue": ""
+    },
+    "SXAFrameworkWdpFullPath": {
+      "Type": "string",
+      "Description": "SXA Framework wdp package full path.",
+      "DefaultValue": ""
+    },
+    "SXACommerceWdpFullPath": {
+      "Type": "string",
+      "Description": "SXA Commerce wdp package full path.",
+      "DefaultValue": ""
     }
   },
-  "Modules": [ "SitecoreUtilityTasks" ],
+  "Variables": {
+    "PowershellExtensions.Package.Path": "[parameter('PowershellExtensionsWdpFullPath')]",
+    "SXAFramework.Package.Path": "[parameter('SXAFrameworkWdpFullPath')]",
+    "SXACommerce.Package.Path": "[parameter('SXACommerceWdpFullPath')]",
+    "Sql.Server": "[parameter('SitecoreDbServer')]",
+    "Sql.Database.Core": "[concat(parameter('SqlDbPrefix'), '_Core')]",
+    "Sql.Database.Master": "[concat(parameter('SqlDbPrefix'), '_Master')]",
+    "Sql.Core.ConnectionString": "[SqlConnectionString(variable('Sql.Server'),variable('Sql.Database.Core'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]",
+    "Sql.Master.ConnectionString": "[SqlConnectionString(variable('Sql.Server'),variable('Sql.Database.Master'), parameter('SqlAdminUser'), parameter('SqlAdminPassword'))]"
+  },
   "Tasks": {
-    "UpdateSolrSchema": {
-        // Update the solr schemas.
-        "Type": "SitecoreUrl",
-        "Params": {
-            "SitecoreInstanceRoot": "[concat('http://', parameter('SiteName'))]",
-            "SitecoreActionPath": "sitecore/admin/PopulateManagedSchema.aspx?indexes=all",
-            "UserName": "admin",
-            "Password": "[parameter('SitecoreAdminPassword')]"
+    "InstallPowershellExtensionsWDPModule": {
+      "Type": "WebDeploy",
+      "Params": {
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(variable('PowershellExtensions.Package.Path'))]"
+          },
+          "Dest": "Auto",
+          "EnableRule": "DoNotDeleteRule",
+          "SetParam": [
+            {
+              "Name": "Application Path",
+              "Value": "[parameter('SiteName')]"
+            },
+            {
+              "Name": "Core Admin Connection String",
+              "Value": "[variable('Sql.Core.ConnectionString')]"
+            },
+            {
+              "Name": "Master Admin Connection String",
+              "Value": "[variable('Sql.Master.ConnectionString')]"
+            }
+          ]
         }
-    },
-    "CheckPaths": {
-      "Type": "EnsurePath",
-      "Params": {
-        "Exists": [
-          "[parameter('PowershellExtensionPackageFullPath')]",
-          "[parameter('SXAPackageFullPath')]",
-          "[parameter('SCXAPackageFullPath')]",
-          "[parameter('PackagesDirDst')]"
-        ]
       }
     },
-    "InstallPSEPackage": {
-      "Type": "InstallModule",
+    "InstallSXAFrameworkWDPModule": {
+      "Type": "WebDeploy",
       "Params": {
-        "ModuleFullPath": "[parameter('PowershellExtensionPackageFullPath')]",
-        "ModulesDirDst": "[parameter('PackagesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(variable('SXAFramework.Package.Path'))]"
+          },
+          "Dest": "Auto",
+          "EnableRule": "DoNotDeleteRule",
+          "SetParam": [
+            {
+              "Name": "Application Path",
+              "Value": "[parameter('SiteName')]"
+            },
+            {
+              "Name": "Core Admin Connection String",
+              "Value": "[variable('Sql.Core.ConnectionString')]"
+            },
+            {
+              "Name": "Master Admin Connection String",
+              "Value": "[variable('Sql.Master.ConnectionString')]"
+            }
+          ]
+        }
       }
     },
-    "InstallSXAPackage": {
-      "Type": "InstallModule",
+    "InstallSXACommerceWDPModule": {
+      "Type": "WebDeploy",
       "Params": {
-        "ModuleFullPath": "[parameter('SXAPackageFullPath')]",
-        "ModulesDirDst": "[parameter('PackagesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
-      }
-    },
-    "InstallSCXAPackage": {
-      "Type": "InstallModule",
-      "Params": {
-        "ModuleFullPath": "[parameter('SCXAPackageFullPath')]",
-        "ModulesDirDst": "[parameter('PackagesDirDst')]",
-        "BaseUrl": "[parameter('BaseUrl')]"
+        "Verb": "Sync",
+        "Arguments": {
+          "Source": {
+            "Package": "[resolvepath(variable('SXACommerce.Package.Path'))]"
+          },
+          "Dest": "Auto",
+          "EnableRule": "DoNotDeleteRule",
+          "SetParam": [
+            {
+              "Name": "Application Path",
+              "Value": "[parameter('SiteName')]"
+            },
+            {
+              "Name": "Master Admin Connection String",
+              "Value": "[variable('Sql.Master.ConnectionString')]"
+            }
+          ]
+        }
       }
     }
   }
 }
-  
