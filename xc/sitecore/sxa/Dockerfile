@@ -12,14 +12,12 @@ SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';
 
 COPY files/ /Files/
 
-COPY scripts/install-package.json /Scripts/
-COPY scripts/Invoke-XdtTransform.ps1 /Scripts/
 COPY scripts/Clear-Package.ps1 /Scripts/
 
 # Prepare WebDeploy (WDP) package: Remove DacFx and SQL dependencies
 RUN & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:PSE_PACKAGE"; `
-& "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:SXA_PACKAGE"; `
-& "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:SCXA_PACKAGE"; 
+    & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:SXA_PACKAGE"; `
+    & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:SCXA_PACKAGE"; 
 
 # Stage 1: perform actual build
 FROM ${BASE_IMAGE}
@@ -33,11 +31,12 @@ ARG SITE_NAME="sitecore"
 ARG WEB_TRANSFORM_TOOL
 
 COPY --from=builder /Files/${WEB_TRANSFORM_TOOL} /Files/
-COPY --from=builder /Scripts/Invoke-XdtTransform.ps1 /Scripts/
-COPY --from=builder /Scripts/install-package.json /Scripts/
 COPY --from=builder /Files/${PSE_PACKAGE} /Files/
 COPY --from=builder /Files/${SXA_PACKAGE} /Files/
 COPY --from=builder /Files/${SCXA_PACKAGE} /Files/
+
+COPY scripts/install-package.json /Scripts/
+COPY scripts/Invoke-XdtTransform.ps1 /Scripts/
 
 # Install PSE Module
 RUN Install-SitecoreConfiguration -Path "/Scripts/install-package.json" `
