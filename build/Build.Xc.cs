@@ -294,7 +294,8 @@ partial class Build : NukeBuild
                     $"BASE_IMAGE={baseImage}",
                     $"PSE_PACKAGE={PSE_PACKAGE}",
                     $"SXA_PACKAGE={SXA_PACKAGE}",
-                    $"SCXA_PACKAGE={SCXA_PACKAGE}"
+                    $"SCXA_PACKAGE={SCXA_PACKAGE}",
+                    $"WEB_TRANSFORM_TOOL={WEB_TRANSFORM_TOOL}"
                 })
             );
         });
