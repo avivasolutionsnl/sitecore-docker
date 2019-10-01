@@ -11,13 +11,11 @@ SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';
 
 COPY files/ /Files/
 
-COPY xp/sitecore/sxa/install-sxa.json /Files
+COPY scripts/Clear-Package.ps1 /Scripts/
 
-COPY scripts/WebDeploy-Utilities.ps1 /Scripts/
-# Remove DacFx and SQL dependencies from the WebDeploy (WDP) package which is not needed in a non-mssql container
-RUN . /Scripts/WebDeploy-Utilities.ps1; `
-    RemoveDbDacFxDependencies -WdpFullpath "/Files/$Env:PSE_PACKAGE"; `
-    RemoveDbDacFxDependencies -WdpFullpath "/Files/$Env:SXA_PACKAGE";
+# Prepare WebDeploy (WDP) package: Remove DacFx and SQL dependencies
+RUN & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:PSE_PACKAGE"; `
+    & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:SXA_PACKAGE";
 
 # Stage 1: perform actual build
 FROM ${BASE_IMAGE}
@@ -27,16 +25,28 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 ARG PSE_PACKAGE
 ARG SXA_PACKAGE
 ARG SITE_NAME="sitecore"
+ARG WEB_TRANSFORM_TOOL
 
-COPY --from=builder /Files/install-sxa.json /Files/install-sxa.json
+COPY --from=builder /Files/${WEB_TRANSFORM_TOOL} /Files/
 COPY --from=builder /Files/${PSE_PACKAGE} /Files/
 COPY --from=builder /Files/${SXA_PACKAGE} /Files/
 
-# Install SXA Modules
-RUN $sifConfigFile = Join-Path /files/ 'install-sxa.json'; `
-    Install-SitecoreConfiguration -Path $sifConfigFile `
-    -SiteName $Env:SITE_NAME `
-    -PowershellExtensionsWdpFullPath "/Files/$Env:PSE_PACKAGE"  `
-    -SXAFrameworkWdpFullPath "/Files/$Env:SXA_PACKAGE"
+COPY scripts/install-package.json /Scripts/
+COPY scripts/Invoke-XdtTransform.ps1 /Scripts/
+
+# Install PSE Module
+RUN Install-SitecoreConfiguration -Path "/Scripts/install-package.json" `
+    -Package "/Files/$Env:PSE_PACKAGE" `
+    -SiteName $env:SITE_NAME
+
+# Install SXA Module
+RUN Install-SitecoreConfiguration -Path "/Scripts/install-package.json" `
+    -Package "/Files/$Env:SXA_PACKAGE" `
+    -SiteName $env:SITE_NAME; `
+    $env:SITE_PATH = 'c:/inetpub/wwwroot/{0}' -f $env:SITE_NAME; `
+    $env:XDTDLL_PATH = Join-Path /files/ $env:WEB_TRANSFORM_TOOL; `
+    $env:WEBCONFIG_PATH = Join-Path $env:SITE_PATH '\\Web.config'; `
+    Write-Host $env:XDTDLL_PATH; `
+    & "/Scripts/Invoke-XdtTransform.ps1" -Path $env:WEBCONFIG_PATH -XdtPath (Join-Path $env:SITE_PATH '\\App_Data\\SxaXdt\\Web.config.xdt') -XdtDllPath $env:XDTDLL_PATH;
 
 ENTRYPOINT ["powershell", "C:/Boot.ps1"]

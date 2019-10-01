@@ -217,7 +217,8 @@ partial class Build : NukeBuild
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}",
                     $"PSE_PACKAGE={PSE_PACKAGE}",
-                    $"SXA_PACKAGE={SXA_PACKAGE}"
+                    $"SXA_PACKAGE={SXA_PACKAGE}",
+                    $"WEB_TRANSFORM_TOOL={WEB_TRANSFORM_TOOL}"
                 })
             );
         });
