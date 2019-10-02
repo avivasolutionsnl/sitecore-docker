@@ -1,5 +1,7 @@
 [CmdletBinding()]
+# Remove DacFx and SQL elements from WebDeploy (WDP) package so this can be installed without DacPac installation
 param(
+    # Path of the WDP package
     [Parameter(Mandatory = $true)]
     [ValidateScript( { Test-Path $_ -PathType "Leaf" })] 
     [string]$Path
@@ -25,7 +27,7 @@ function Remove-Elements($XmlPath, $XPath)
     $xml.Save($XmlPath)
 }
 
-# remove sql parameter elements from paramters
+# remove sql parameter elements from parameters
 Remove-Elements -XmlPath (Join-Path $tempPath "parameters.xml") -XPath ".//parameter[contains(@tags, 'SQLConnectionString')]"
 
 # remove dacfx elements from archive
