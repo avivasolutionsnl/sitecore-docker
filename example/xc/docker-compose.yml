@@ -89,7 +89,7 @@ services:
     - solr
 
  redis:
-  image: "${IMAGE_PREFIX}redis:${TAG}"
+  image: "sitecore-base-redis:${TAG}"
   isolation: process
   networks:
     - exampleNetwork

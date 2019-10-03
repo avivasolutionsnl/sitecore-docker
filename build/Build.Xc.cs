@@ -404,17 +404,7 @@ partial class Build : NukeBuild
         });
 
     Target Xc => _ => _
-        .DependsOn(XcCommerce, XcSitecore, XcMssql, XcSolr, XcXconnect, XcIdentity, XcRedis);
-
-    Target XcRedis => _ => _
-        .Executes(() =>
-        {
-            DockerBuild(x => x
-                .SetPath(".")
-                .SetFile("base/redis/Dockerfile")
-                .SetTag(XcImageName("redis"))
-            );
-        });
+        .DependsOn(XcCommerce, XcSitecore, XcMssql, XcSolr, XcXconnect, XcIdentity, BaseRedis);
 
     Target XcSxa => _ => _
         .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);
