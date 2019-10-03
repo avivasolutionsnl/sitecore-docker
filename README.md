@@ -60,9 +60,7 @@ The build results in the following Docker images:
 - XC
     - `sitecore-xc-commerce`: ASP.NET
     - `sitecore-xc-sitecore`: IIS + ASP.NET + Sitecore
-    - `sitecore-xc-sitecore-intermediate`: *Only used during build*
     - `sitecore-xc-mssql`: MS SQL + Sitecore databases
-    - `sitecore-xc-mssql-intermediate`: *Only used during build*
     - `sitecore-xc-solr`: Apache Solr 
     - `sitecore-xc-xconnect`: IIS + ASP.NET + XConnect
 - XC with SXA installed
