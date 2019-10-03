@@ -3,7 +3,7 @@ version: '2.4'
 services:
 
  identity:
-  image: "${IMAGE_PREFIX}identity:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}identity:${TAG}"
   command: -commerceHostname ${COMMERCE_HOST_NAME} -sitecoreHostname ${SITECORE_HOST_NAME} -identityHostname ${IDENTITY_HOST_NAME}
   isolation: process
   networks:
@@ -17,7 +17,7 @@ services:
     - mssql
 
  commerce:
-  image: "${IMAGE_PREFIX}commerce:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}commerce:${TAG}"
   isolation: process
   command: -commerceHostname ${COMMERCE_HOST_NAME} -sitecoreHostname ${SITECORE_HOST_NAME} -identityHostname ${IDENTITY_HOST_NAME}
   networks:
@@ -40,7 +40,7 @@ services:
     - redis
 
  mssql:
-  image: "${IMAGE_PREFIX}mssql:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}mssql:${TAG}"
   isolation: process
   networks:
     - exampleNetwork 
@@ -51,7 +51,7 @@ services:
     - .\data\mssql:C:\Data
   
  sitecore:
-  image: "${IMAGE_PREFIX}sitecore:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}sitecore:${TAG}"
   command: -commerceHostname ${COMMERCE_HOST_NAME} -identityHostname ${IDENTITY_HOST_NAME}
   isolation: process
   networks:
@@ -69,7 +69,7 @@ services:
     - identity
   
  solr:
-  image: "${IMAGE_PREFIX}solr:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}solr:${TAG}"
   isolation: process
   networks:
     - exampleNetwork 
@@ -77,7 +77,7 @@ services:
     - .\data\solr:C:\Data
   
  xconnect:
-  image: "${IMAGE_PREFIX}xconnect:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}xconnect:${TAG}"
   isolation: process
   networks:
     - exampleNetwork 
@@ -89,7 +89,7 @@ services:
     - solr
 
  redis:
-  image: "${IMAGE_PREFIX}redis:${TAG}"
+  image: "${REPOSITORY}sitecore-base-redis:${TAG}"
   isolation: process
   networks:
     - exampleNetwork

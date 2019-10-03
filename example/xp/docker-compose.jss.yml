@@ -3,7 +3,7 @@ version: '2.4'
 
 services:
   mssql:
-    image: "${IMAGE_PREFIX}mssql-jss:${TAG}"
+    image: "${REPOSITORY}${IMAGE_PREFIX}mssql-jss:${TAG}"
 
   sitecore:
-    image: "${IMAGE_PREFIX}sitecore-jss:${TAG}"
+    image: "${REPOSITORY}${IMAGE_PREFIX}sitecore-jss:${TAG}"

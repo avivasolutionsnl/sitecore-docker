@@ -22,7 +22,8 @@ partial class Build : NukeBuild
     {
         "openjdk",
         "sitecore",
-        "solr-builder"
+        "solr-builder",
+        "redis"
     };
 
     private string BaseFullImageName(string name) => string.IsNullOrEmpty(BuildVersion) ? 
@@ -66,6 +67,16 @@ partial class Build : NukeBuild
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}"
                 })
+            );
+        });
+
+    Target BaseRedis => _ => _
+        .Executes(() =>
+        {
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("base/redis/Dockerfile")
+                .SetTag(BaseImageName("redis"))
             );
         });
 

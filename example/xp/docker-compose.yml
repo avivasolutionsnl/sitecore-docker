@@ -3,7 +3,7 @@ version: '2.4'
 services:
 
  identity:
-  image: "${IMAGE_PREFIX}identity:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}identity:${TAG}"
   command: -sitecoreHostname ${SITECORE_HOST_NAME} -identityHostname ${IDENTITY_HOST_NAME}
   networks:
     - exampleNetwork   
@@ -14,7 +14,7 @@ services:
     - mssql
 
  mssql:
-  image: "${IMAGE_PREFIX}mssql:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}mssql:${TAG}"
   networks:
     - exampleNetwork 
   environment:
@@ -24,7 +24,7 @@ services:
     - .\data\mssql:C:\Data
 
  sitecore:
-  image: "${IMAGE_PREFIX}sitecore:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}sitecore:${TAG}"
   networks:
     - exampleNetwork 
   volumes:
@@ -38,14 +38,14 @@ services:
     - identity
 
  solr:
-  image: "${IMAGE_PREFIX}solr:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}solr:${TAG}"
   networks:
     - exampleNetwork 
   volumes:
     - .\data\solr:C:\Data
 
  xconnect:
-  image: "${IMAGE_PREFIX}xconnect:${TAG}"
+  image: "${REPOSITORY}${IMAGE_PREFIX}xconnect:${TAG}"
   networks:
     - exampleNetwork 
   volumes:
