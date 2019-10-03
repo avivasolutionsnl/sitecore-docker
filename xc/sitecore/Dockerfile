@@ -16,20 +16,15 @@ SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';
 COPY files/ /Files/
 
 RUN Expand-Archive -Path "/Files/$Env:COMMERCE_SIF_PACKAGE" -DestinationPath /Files/CommerceSIF -Force
-COPY xc/sitecore/Install.Commerce.Modules.json /Files/CommerceSIF
 
-COPY scripts/WebDeploy-Utilities.ps1 /Scripts/
-# Remove DacFx and SQL dependencies from the WebDeploy (WDP) package which is not needed in a non-mssql container
-RUN . /Scripts/WebDeploy-Utilities.ps1; `
-    RemoveDbDacFxDependencies -WdpFullpath "/Files/$Env:COMMERCE_CONNECT_ENGINE_PACKAGE"
-RUN . /Scripts/WebDeploy-Utilities.ps1; `
-    RemoveDbDacFxDependencies -WdpFullpath "/Files/$Env:COMMERCE_CONNECT_PACKAGE"
-RUN . /Scripts/WebDeploy-Utilities.ps1; `
-    RemoveDbDacFxDependencies -WdpFullpath "/Files/$Env:COMMERCE_MA_PACKAGE"
-RUN . /Scripts/WebDeploy-Utilities.ps1; `
-    RemoveDbDacFxDependencies -WdpFullpath "/Files/$Env:COMMERCE_XPROFILES_PACKAGE"
-RUN . /Scripts/WebDeploy-Utilities.ps1; `
-    RemoveDbDacFxDependencies -WdpFullpath "/Files/$Env:COMMERCE_XANALYTICS_PACKAGE"
+COPY scripts/Clear-Package.ps1 /Scripts/
+
+# Prepare WebDeploy (WDP) package: Remove DacFx and SQL dependencies
+RUN & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:COMMERCE_CONNECT_ENGINE_PACKAGE"; `
+    & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:COMMERCE_CONNECT_PACKAGE"; `
+    & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:COMMERCE_MA_PACKAGE";  `
+    & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:COMMERCE_XPROFILES_PACKAGE";  `
+    & "/Scripts/Clear-Package.ps1" -Path "/Files/$Env:COMMERCE_XANALYTICS_PACKAGE";
 
 # Stage 1: perform actual build
 FROM ${BASE_IMAGE}
@@ -59,18 +54,24 @@ COPY scripts/Import-Certificate.ps1 /Scripts/
 RUN /Scripts/Import-Certificate.ps1 -certificateFile /Files/$Env:COMMERCE_CERT_PATH -secret 'secret' -storeName 'My' -storeLocation 'LocalMachine';
 
 # Install Commerce Modules
+COPY scripts/install-package.json /Scripts/
+RUN Install-SitecoreConfiguration -Path "/Scripts/install-package.json" ` -Package "/Files/$Env:COMMERCE_CONNECT_ENGINE_PACKAGE" ` -SiteName $env:SITE_NAME; `
+    Install-SitecoreConfiguration -Path "/Scripts/install-package.json" ` -Package "/Files/$Env:COMMERCE_CONNECT_PACKAGE" ` -SiteName $env:SITE_NAME; `
+    Install-SitecoreConfiguration -Path "/Scripts/install-package.json" ` -Package "/Files/$Env:COMMERCE_MA_PACKAGE" ` -SiteName $env:SITE_NAME; `
+    Install-SitecoreConfiguration -Path "/Scripts/install-package.json" ` -Package "/Files/$Env:COMMERCE_XPROFILES_PACKAGE" ` -SiteName $env:SITE_NAME; `
+    Install-SitecoreConfiguration -Path "/Scripts/install-package.json" ` -Package "/Files/$Env:COMMERCE_XANALYTICS_PACKAGE" ` -SiteName $env:SITE_NAME;
+
+# CEConnect: Post, EnableDataProvider, EnableIndexing
 RUN [Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/CommerceSIF/Modules'); `
-    $sifConfigFile = Join-Path /files/ 'CommerceSIF/Install.Commerce.Modules.json'; `
-    cd '/Files/CommerceSIF'; `
-    Install-SitecoreConfiguration -Path $sifConfigFile `
-    -InstallDir 'c:\\inetpub\\wwwroot\\sitecore' `
-    -SiteName $Env:SITE_NAME `
-    -MergeToolFullPath '/Files/Microsoft.Web.XmlTransform.dll' `
-    -CEConnectWdpFullPath "/Files/$Env:COMMERCE_CONNECT_ENGINE_PACKAGE"  `
-    -CommerceConnectWdpFullPath "/Files/$Env:COMMERCE_CONNECT_PACKAGE" `
-    -CommerceMAWdpFullPath "/Files/$Env:COMMERCE_MA_PACKAGE"  `
-    -CommercexProfilesWdpFullPath "/Files/$Env:COMMERCE_XPROFILES_PACKAGE" `
-    -CommercexAnalyticsWdpFullPath "/Files/$Env:COMMERCE_XANALYTICS_PACKAGE"
+    $env:SITE_PATH = 'c:/inetpub/wwwroot/{0}' -f $env:SITE_NAME; `
+    Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/CEConnect/CEConnect.Post.json' `
+    -MergeTool (Join-Path /files/ $env:WEB_TRANSFORM_TOOL) `
+    -InputFile (Join-Path $env:SITE_PATH '\\MergeFiles\\Sitecore.Commerce.Engine.Connectors.Merge.Config') `
+    -WebConfig (Join-Path $env:SITE_PATH '\\Web.Config'); `
+    Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/CEConnect/CEConnect.EnableDataProvider.json' `
+    -ConfigDir (Join-Path $env:SITE_PATH '\\App_Config\\Include\\Y.Commerce.Engine'); `
+    Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/CEConnect/CEConnect.EnableIndexing.json' `
+    -ConfigDir (Join-Path $env:SITE_PATH '\\App_Config\\Include\\Y.Commerce.Engine'); 
 
 # Modify the commerce engine connection
 COPY xc/sitecore/InstallCommercePackages.ps1 /Scripts/

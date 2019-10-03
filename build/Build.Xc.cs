@@ -143,81 +143,6 @@ partial class Build : NukeBuild
                 })
             );
         });
-
-    Target XcMssqlIntermediate => _ => _
-        .DependsOn(XpMssql)
-        .Executes(() =>
-        {
-            var baseImage = XpImageName("mssql");
-
-            DockerBuild(x => x
-                .SetPath(".")
-                .SetFile("xc/mssql/Dockerfile")
-                .SetTag(XcImageName("mssql-intermediate"))
-                .SetMemory(4000000000) // 4GB, SQL needs some more memory
-                .SetBuildArg(new string[] {
-                    $"BASE_IMAGE={baseImage}",
-                    $"COMMERCE_DB_PREFIX={COMMERCE_DB_PREFIX}"
-                })
-            );
-        });
-
-    Target XcSitecoreIntermediate => _ => _
-        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_PACKAGE))
-        .Requires(() => File.Exists(Files / COMMERCE_CONNECT_ENGINE_PACKAGE))
-        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
-        .Requires(() => File.Exists(Files / COMMERCE_MA_PACKAGE))
-        .Requires(() => File.Exists(Files / COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE))
-        .Requires(() => File.Exists(Files / COMMERCE_XPROFILES_PACKAGE))
-        .Requires(() => File.Exists(Files / COMMERCE_XANALYTICS_PACKAGE))
-        .DependsOn(XpSitecore)
-        .Executes(() =>
-        {
-            var baseImage = XpImageName("sitecore");
-
-            DockerBuild(x => x
-                .SetPath(".")
-                .SetFile("xc/sitecore/Dockerfile")
-                .SetTag(XcImageName("sitecore-intermediate"))
-                .SetBuildArg(new string[] {
-                    $"BASE_IMAGE={baseImage}",
-                    $"COMMERCE_CERT_PATH={COMMERCE_CERT_PATH}",
-                    $"COMMERCE_CONNECT_PACKAGE={COMMERCE_CONNECT_PACKAGE}",
-                    $"WEB_TRANSFORM_TOOL={WEB_TRANSFORM_TOOL}",
-                    $"COMMERCE_CONNECT_ENGINE_PACKAGE={COMMERCE_CONNECT_ENGINE_PACKAGE}",
-                    $"COMMERCE_SIF_PACKAGE={COMMERCE_SIF_PACKAGE}",
-                    $"COMMERCE_MA_PACKAGE={COMMERCE_MA_PACKAGE}",
-                    $"COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE={COMMERCE_MA_FOR_AUTOMATION_ENGINE_PACKAGE}",
-                    $"COMMERCE_XPROFILES_PACKAGE={COMMERCE_XPROFILES_PACKAGE}",
-                    $"COMMERCE_XANALYTICS_PACKAGE={COMMERCE_XANALYTICS_PACKAGE}",
-                    $"ROOT_CERT_PATH={ROOT_CERT_PATH}"
-                })
-            );
-        });
-
-    Target XcSitecoreMssql => _ => _
-        .Requires(() => File.Exists(XcLicenseFile))
-        .DependsOn(XcCommerce, XcMssqlIntermediate, XcSitecoreIntermediate, XcSolr, XcXconnect)
-        .Executes(() => {
-            System.IO.Directory.SetCurrentDirectory("xc");
-
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
-
-            InstallSitecorePackage(
-                @"C:\Scripts\InstallCommercePackages.ps1", 
-                XcImageName("sitecore"), 
-                XcImageName("mssql"),
-                "-f docker-compose.yml"
-            );
-
-            // To save diskspace, remove the no longer needed intermediate images
-            var mssqlInterImage = XcImageName("mssql-intermediate");
-            var sitecoreInterImage = XcImageName("sitecore-intermediate");
-            Docker($"rmi -f {mssqlInterImage} {sitecoreInterImage}");
-
-            System.IO.Directory.SetCurrentDirectory("..");
-        });
     
     Target XcSolr => _ => _
         .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
@@ -277,29 +202,48 @@ partial class Build : NukeBuild
                 })
             );
         });
-
-    Target XcSitecoreMssqlSxa => _ => _
-        .Requires(() => File.Exists(XcLicenseFile))
-        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
-        .DependsOn(XcSitecoreMssql, XcSolrSxa)
+    
+    Target XcSitecoreSxa => _ => _
+        .Requires(() => File.Exists(Files / PSE_PACKAGE))
+        .Requires(() => File.Exists(Files / SXA_PACKAGE))
+        .Requires(() => File.Exists(Files / SCXA_PACKAGE))
+        .DependsOn(XcSitecore)
         .Executes(() => {
-            System.IO.Directory.SetCurrentDirectory("xc");
+            var baseImage = XcImageName("sitecore");
 
-            // Set env variables for docker-compose
-            Environment.SetEnvironmentVariable("PSE_PACKAGE", $"{PSE_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("SXA_PACKAGE", $"{SXA_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("SCXA_PACKAGE", $"{SCXA_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
-
-            InstallSitecorePackage(
-                @"C:\sxa\InstallSXA.ps1",
-                XcImageName("sitecore-sxa"), 
-                XcImageName("mssql-sxa"),
-                "-f docker-compose.yml -f docker-compose.sxa.yml"
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xc/sitecore/sxa/Dockerfile")
+                .SetTag(XcImageName("sitecore-sxa"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"PSE_PACKAGE={PSE_PACKAGE}",
+                    $"SXA_PACKAGE={SXA_PACKAGE}",
+                    $"SCXA_PACKAGE={SCXA_PACKAGE}",
+                    $"WEB_TRANSFORM_TOOL={WEB_TRANSFORM_TOOL}"
+                })
             );
+        });
+    
+    Target XcMssqlSxa => _ => _
+        .Requires(() => File.Exists(Files / PSE_PACKAGE))
+        .Requires(() => File.Exists(Files / SXA_PACKAGE))
+        .Requires(() => File.Exists(Files / SCXA_PACKAGE))
+        .DependsOn(XcMssql)
+        .Executes(() => {
+            var baseImage = XcImageName("mssql");
 
-            System.IO.Directory.SetCurrentDirectory("..");
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xc/mssql/sxa/Dockerfile")
+                .SetTag(XcImageName("mssql-sxa"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"PSE_PACKAGE={PSE_PACKAGE}",
+                    $"SXA_PACKAGE={SXA_PACKAGE}",
+                    $"SCXA_PACKAGE={SCXA_PACKAGE}"
+                })
+            );
         });
 
     Target XcSolrSxa => _ => _
@@ -407,7 +351,7 @@ partial class Build : NukeBuild
         .DependsOn(XcCommerce, XcSitecore, XcMssql, XcSolr, XcXconnect, XcIdentity, BaseRedis);
 
     Target XcSxa => _ => _
-        .DependsOn(Xc, XcSitecoreMssqlSxa, XcSolrSxa);
+        .DependsOn(Xc, XcSitecoreSxa, XcMssqlSxa, XcSolrSxa);
 
     Target XcJss => _ => _
         .DependsOn(Xc, XcSitecoreMssqlJss);        
