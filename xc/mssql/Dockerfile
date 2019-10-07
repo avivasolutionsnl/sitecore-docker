@@ -23,6 +23,7 @@ COPY files/$COMMERCE_MA_PACKAGE ${INSTALL_PATH}/
 COPY files/$COMMERCE_XPROFILES_PACKAGE ${INSTALL_PATH}/
 COPY files/$COMMERCE_XANALYTICS_PACKAGE ${INSTALL_PATH}/
 COPY xc/mssql/*.ps1 ${INSTALL_PATH}
+COPY xc/mssql/RebuildDescendants.sql ${INSTALL_PATH}
 COPY files/$COMMERCE_SIF_PACKAGE ${INSTALL_PATH}
 COPY scripts/Install-SIF.ps1 ${INSTALL_PATH}
 
@@ -48,5 +49,8 @@ RUN & (Join-Path $env:INSTALL_PATH "Attach-Databases.ps1"); `
     # Add Commerce Users and Roles
     Install-SitecoreConfiguration -Path $usersAndRolesConfig `
     -ConnectionString ("'Data Source=.;Initial Catalog={0}_Core;Integrated Security=true;'" -f $Env:SQL_DB_PREFIX); `
+    # Rebuild Descendants task
+    $env:MasterDatase = '{0}_Master' -f $Env:SQL_DB_PREFIX; `
+    Invoke-Sqlcmd -Database $Env:MasterDatase -InputFile (Join-Path $env:INSTALL_PATH "RebuildDescendants.sql"); `
     & (Join-Path $env:INSTALL_PATH "Detach-Databases.ps1"); `    
     Get-ChildItem -Path $env:INSTALL_PATH -Exclude "*.mdf", "*.ldf" | Remove-Item -Force -Recurse;
