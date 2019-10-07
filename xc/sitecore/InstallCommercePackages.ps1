@@ -92,49 +92,6 @@ Function InitializeCommerceServices {
     Write-Host "Shops initialization complete..." -ForegroundColor Green 
 }
 
-[Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath + ';/Files/CommerceSIF/Modules');
-
-Copy-Item -Path /Files/CommerceSIF/SiteUtilityPages -Destination c:\\inetpub\\wwwroot\\sitecore\\SiteUtilityPages -Force -Recurse
-
-# Enlarge timeout to 7200 seconds
-((Get-Content -path C:/Files/CommerceSIF/Modules/SitecoreUtilityTasks/SitecoreUtilityTasks.psm1 -Raw) -replace '720','7200') | Set-Content -Path C:/Files/CommerceSIF/Modules/SitecoreUtilityTasks/SitecoreUtilityTasks.psm1
-
-# Wait for all the containers to be initialized. For some reason if we don't do this on 9.1.0, installing the packages
-# will result in timeout exceptions in the item saved event handler. We need to investigate this further. 
-Sleep -Seconds 300
-
-Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/Connect/Connect.json' `
-    -ModuleFullPath '/Files/SitecoreCommerceConnectCore/package.zip' `
-    -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
-    -BaseUrl "$sitecoreUrl/SiteUtilityPages"
-
-Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/Connect/Connect_xProfiles.json' `
-    -ModuleFullPath '/Files/CommerceXProfiles/package.zip' `
-    -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
-    -BaseUrl "$sitecoreUrl/SiteUtilityPages"
-
-Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/Connect/Connect_xAnalytics.json' `
-    -ModuleFullPath '/Files/CommerceXAnalytics/package.zip' `
-    -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
-    -BaseUrl "$sitecoreUrl/SiteUtilityPages"
-
-Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/Connect/Connect_MarketingAutomation.json' `
-    -ModuleFullPath '/Files/CommerceMACore/package.zip' `
-    -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
-    -BaseUrl "$sitecoreUrl/SiteUtilityPages" `
-    -AutomationEngineModule 'none' `
-    -XConnectSitePath 'none' `
-    -SiteName 'none' `
-    -Skip 'InstallAutomationEngineModule', 'StopServices', 'StartServices' # Automation Engine is installed in XConnect
-
-Install-SitecoreConfiguration -Path '/Files/CommerceSIF/Configuration/Commerce/CEConnect/CEConnect.json' `
-    -ModuleFullPath /Files/Sitecore.Commerce.Engine.Connect.zip `
-    -ModulesDirDst c:\\inetpub\wwwroot\\sitecore\\App_Data\\packages `
-    -BaseUrl "$sitecoreUrl/SiteUtilityPages" `
-    -MergeTool '/Files/Microsoft.Web.XmlTransform.dll' `
-    -InputFile c:\\inetpub\\wwwroot\\sitecore\\MergeFiles\\Sitecore.Commerce.Engine.Connectors.Merge.Config `
-    -WebConfig c:\\inetpub\\wwwroot\\sitecore\\web.config
-
 # Modify the commerce engine connection
 $engineConnectIncludeDir = 'c:\\inetpub\\wwwroot\\sitecore\\App_Config\\Include\\Y.Commerce.Engine'; `
 $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2; `
@@ -149,13 +106,4 @@ $node.defaultEnvironment = $defaultEnvironment; `
 $node.defaultShopName = $defaultShopName; `
 $xml.Save($pathToConfig);
 
-# Initialize the commerce engine
-$bearerToken = GetIdServerToken -userName $sitecoreUserName -password $sitecorePassword -urlIdentityServerGetToken "${identityServerUrl}connect/token"
 
-BootStrapCommerceServices -urlCommerceShopsServicesBootstrap "${commerceOpsServiceUrl}Bootstrap()" -bearerToken $bearerToken
-InitializeCommerceServices -urlCommerceShopsServicesInitializeEnvironment "${commerceOpsServiceUrl}InitializeEnvironment()" -urlCheckCommandStatus "${commerceOpsServiceUrl}CheckCommandStatus(taskId=taskIdValue)" -environment $defaultEnvironment -bearerToken $bearerToken
-
-$commerceConfigFolder = 'C:\inetpub\wwwroot\sitecore\App_Config\Include\Y.Commerce.Engine'
-Rename-Item $commerceConfigFolder\Sitecore.Commerce.Engine.DataProvider.config.disabled $commerceConfigFolder\Sitecore.Commerce.Engine.DataProvider.config
-Rename-Item $commerceConfigFolder\Sitecore.Commerce.Engine.Connectors.Index.Common.config.disabled $commerceConfigFolder\Sitecore.Commerce.Engine.Connectors.Index.Common.config
-Rename-Item $commerceConfigFolder\Sitecore.Commerce.Engine.Connectors.Index.Solr.config.disabled $commerceConfigFolder\Sitecore.Commerce.Engine.Connectors.Index.Solr.config

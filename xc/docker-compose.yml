@@ -13,7 +13,7 @@ services:
     - mssql
 
  mssql:
-  image: "${IMAGE_PREFIX}mssql-intermediate:${TAG}"
+  image: "${IMAGE_PREFIX}mssql:${TAG}"
   isolation: process
   networks:
     - exampleNetwork 
@@ -22,7 +22,7 @@ services:
     sa_password: ${SQL_SA_PASSWORD}
 
  sitecore:
-  image: "${IMAGE_PREFIX}sitecore-intermediate:${TAG}"
+  image: "${IMAGE_PREFIX}sitecore:${TAG}"
   isolation: process
   networks:
     - exampleNetwork 

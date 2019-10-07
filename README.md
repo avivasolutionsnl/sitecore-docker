@@ -1,6 +1,6 @@
 [![Build Status](https://dev.azure.com/avivasolutions-public/sitecore-docker/_apis/build/status/avivasolutionsnl.sitecore-docker?branchName=master)](https://dev.azure.com/avivasolutions-public/sitecore-docker/_build/latest?definitionId=1&branchName=master)
 
-Run Sitecore XP 9.1.1 and XC 9.1.0 using Docker for Windows.
+Run Sitecore XP 9.2.0 and XC 9.2.0 using Docker for Windows.
 
 # Disclaimer
 This repository contains experimental code that we use in development setups. We do not consider the current code in this repository ready for production.
@@ -43,6 +43,7 @@ The build results in the following Docker images:
     - `sitecore-base-sitecore`: IIS + ASP.NET
     - `sitecore-base-openjdk`: Windows Server Core + OpenJDK
     - `sitecore-base-solr-builder`: sitecore-base-openjdk + Solr
+    - `sitecore-base-redis`: Windows Server Core + OpenJDK
 
 - XP0
     - `sitecore-xp-sitecore`: IIS + ASP.NET + Sitecore
@@ -60,9 +61,7 @@ The build results in the following Docker images:
 - XC
     - `sitecore-xc-commerce`: ASP.NET
     - `sitecore-xc-sitecore`: IIS + ASP.NET + Sitecore
-    - `sitecore-xc-sitecore-intermediate`: *Only used during build*
     - `sitecore-xc-mssql`: MS SQL + Sitecore databases
-    - `sitecore-xc-mssql-intermediate`: *Only used during build*
     - `sitecore-xc-solr`: Apache Solr 
     - `sitecore-xc-xconnect`: IIS + ASP.NET + XConnect
 - XC with SXA installed
@@ -134,12 +133,13 @@ PS> docker-compose -f docker-compose.yml -f docker-compose.jss.yml up
 
 Run-time parameters can be modified using the `.env` file:
 
-| Field                     | Description                                      |
-| ------------------------- | ------------------------------------------------ |
-| SQL_SA_PASSWORD           | The password to use for the SQL sa user          |
-| SITECORE_SITE_NAME        | Host name of the Sitecore site                   |
-| IMAGE_PREFIX              | The Docker image prefix to use                   |
-| TAG                       | The version to tag the Docker images with        |
+| Field                     | Description                                               |
+| ------------------------- | --------------------------------------------------------- |
+| SQL_SA_PASSWORD           | The password to use for the SQL sa user                   |
+| SITECORE_SITE_NAME        | Host name of the Sitecore site                            |
+| REPOSITORY                | The Docker repository to use (must include ending slash ) |
+| IMAGE_PREFIX              | The Docker image prefix to use                            |
+| TAG                       | The version to tag the Docker images with                 |
 
 NB. these run-time parameters should match the used build parameters.
 

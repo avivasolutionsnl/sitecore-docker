@@ -13,7 +13,7 @@ using System.Collections.Generic;
 partial class Build : NukeBuild
 {
     [Parameter("Docker image sitecore version")]
-    public readonly string BaseSitecoreVersion = "9.1.1";
+    public readonly string BaseSitecoreVersion = "9.2.0";
     // Docker image naming
     [Parameter("Docker image prefix for Sitecore base")]
     readonly string BaseImagePrefix = "sitecore-base-";
@@ -22,7 +22,8 @@ partial class Build : NukeBuild
     {
         "openjdk",
         "sitecore",
-        "solr-builder"
+        "solr-builder",
+        "redis"
     };
 
     private string BaseFullImageName(string name) => string.IsNullOrEmpty(BuildVersion) ? 
@@ -66,6 +67,16 @@ partial class Build : NukeBuild
                 .SetBuildArg(new string[] {
                     $"BASE_IMAGE={baseImage}"
                 })
+            );
+        });
+
+    Target BaseRedis => _ => _
+        .Executes(() =>
+        {
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("base/redis/Dockerfile")
+                .SetTag(BaseImageName("redis"))
             );
         });
 

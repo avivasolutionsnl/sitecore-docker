@@ -53,8 +53,8 @@ RUN Install-SitecoreConfiguration -Path $Env:SIF_CONFIG `
     -SitecoreIdentityCert "Identity"`
     -LicenseFile "c:/license/license.xml" `
     -SiteName $Env:SITE_NAME `
-    -SqlCoreUser $Env:SQL_USER `
-    -SqlCorePassword $Env:SQL_SA_PASSWORD `
+    -SqlSecurityUser $Env:SQL_USER `
+    -SqlSecurityPassword $Env:SQL_SA_PASSWORD `
     -SqlServer $Env:SQL_SERVER `
     -PasswordRecoveryUrl http://$Env:SITE_NAME `
     -AllowedCorsOrigins http://$Env:SITECORE_SITE_NAME `

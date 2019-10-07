@@ -3,16 +3,16 @@ version: '2.4'
 
 services:
   commerce:
-    image: "${IMAGE_PREFIX}commerce:${TAG}"
+    image: "${REPOSITORY}${IMAGE_PREFIX}commerce:${TAG}"
 
   mssql:
-    image: "${IMAGE_PREFIX}mssql-sxa:${TAG}"
+    image: "${REPOSITORY}${IMAGE_PREFIX}mssql-sxa:${TAG}"
 
   sitecore:
-    image: "${IMAGE_PREFIX}sitecore-sxa:${TAG}"
+    image: "${REPOSITORY}${IMAGE_PREFIX}sitecore-sxa:${TAG}"
 
   solr:
-    image: "${IMAGE_PREFIX}solr-sxa:${TAG}"
+    image: "${REPOSITORY}${IMAGE_PREFIX}solr-sxa:${TAG}"
 
   xconnect:
-    image: "${IMAGE_PREFIX}xconnect:${TAG}"
+    image: "${REPOSITORY}${IMAGE_PREFIX}xconnect:${TAG}"
