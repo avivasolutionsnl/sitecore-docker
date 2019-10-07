@@ -5,7 +5,6 @@ services:
  identity:
   image: "${REPOSITORY}${IMAGE_PREFIX}identity:${TAG}"
   command: -commerceHostname ${COMMERCE_HOST_NAME} -sitecoreHostname ${SITECORE_HOST_NAME} -identityHostname ${IDENTITY_HOST_NAME}
-  isolation: process
   networks:
     exampleNetwork:
       aliases:
@@ -18,7 +17,6 @@ services:
 
  commerce:
   image: "${REPOSITORY}${IMAGE_PREFIX}commerce:${TAG}"
-  isolation: process
   command: -commerceHostname ${COMMERCE_HOST_NAME} -sitecoreHostname ${SITECORE_HOST_NAME} -identityHostname ${IDENTITY_HOST_NAME}
   networks:
     exampleNetwork:
@@ -41,7 +39,6 @@ services:
 
  mssql:
   image: "${REPOSITORY}${IMAGE_PREFIX}mssql:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   environment:
@@ -53,7 +50,6 @@ services:
  sitecore:
   image: "${REPOSITORY}${IMAGE_PREFIX}sitecore:${TAG}"
   command: -commerceHostname ${COMMERCE_HOST_NAME} -identityHostname ${IDENTITY_HOST_NAME}
-  isolation: process
   networks:
     exampleNetwork:
       aliases:
@@ -70,7 +66,6 @@ services:
   
  solr:
   image: "${REPOSITORY}${IMAGE_PREFIX}solr:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   volumes:
@@ -78,7 +73,6 @@ services:
   
  xconnect:
   image: "${REPOSITORY}${IMAGE_PREFIX}xconnect:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork 
   volumes:
@@ -90,7 +84,6 @@ services:
 
  redis:
   image: "${REPOSITORY}sitecore-base-redis:${TAG}"
-  isolation: process
   networks:
     - exampleNetwork
 
