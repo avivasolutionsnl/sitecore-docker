@@ -143,6 +143,12 @@ NB. these run-time parameters should match the used build parameters.
 To set the Docker container service names as DNS names on your host edit your `hosts` file. 
 A convenient tool to automatically do this is [whales-names](https://github.com/gregolsky/whales-names).
 
+## Post-run steps
+Because we don't want online installations (i.e. a running instance for creating a Docker image) some steps are required after the services are started:
+* Populate SOLR schemas
+* Rebuild the search indexes
+* Initialize the Commerce Engine: Bootstrap, Initialize Environment, etc. (for XC)
+
 # Known issues
 Docker for Windows can be unstable at times, some troubleshooting tips are listed below.
 
@@ -221,7 +227,6 @@ ERROR: [doc=sitecore://master/{731cb645-faa3-4440-9511-a27556a63ad9}?lang=fr-fr&
 ```
 
 Populating the Solr managed schemas will solve this, e.g. do this via the Sitecore Control Panel.
-An automated solution is planned in [this](https://github.com/avivasolutionsnl/sitecore-docker/issues/38) issue.
 
 ## Solr container not starting because of /data/solr folder rights and no error logs in /logs/xconnect and /logs/sitecore
 When starting the Solr docker container the following error can show up:
