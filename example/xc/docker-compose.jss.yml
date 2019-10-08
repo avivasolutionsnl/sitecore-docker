@@ -2,9 +2,6 @@
 version: '2.4'
 
 services:
-  commerce:
-    image: "${REPOSITORY}${IMAGE_PREFIX}commerce:${TAG}"
-
   mssql:
     image: "${REPOSITORY}${IMAGE_PREFIX}mssql-jss:${TAG}"
 
