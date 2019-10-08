@@ -49,7 +49,7 @@ partial class Build : NukeBuild
     readonly string SXA_PACKAGE = "Sitecore Experience Accelerator 1.9.0 rev. 190528 for 9.2.scwdp.zip";
         
     [Parameter("JSS package")]
-    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.2 XP 12.0.0 rev. 190522.zip";
+    readonly string JSS_PACKAGE = "Sitecore JavaScript Services Server for Sitecore 9.2 XP 12.0.0 rev. 190522.scwdp.zip";
 
     // Build configuration parameters
     [Parameter("SQL password")]
@@ -257,29 +257,41 @@ partial class Build : NukeBuild
                     $"SITECORE_CORE_PREFIX={SITECORE_SOLR_CORE_PREFIX}"
                 })
             );
-        });
-
-    Target XpSitecoreMssqlJss => _ => _
+        });   
+    
+    Target XpSitecoreJss => _ => _
         .Requires(() => File.Exists(Files / JSS_PACKAGE))
-        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
-        .DependsOn(Xp)
+        .DependsOn(XpSitecore)
         .Executes(() => {
-            System.IO.Directory.SetCurrentDirectory("xp");
+            var baseImage = XpImageName("sitecore");
 
-            // Set env variables for docker-compose
-            Environment.SetEnvironmentVariable("JSS_PACKAGE", $"{JSS_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XpImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XpSitecoreVersion}", EnvironmentVariableTarget.Process);
-
-            InstallSitecorePackage(
-                @"C:\jss\InstallJSS.ps1",
-                XpImageName("sitecore-jss"),
-                XpImageName("mssql-jss"),
-                "-f docker-compose.yml -f docker-compose.jss.yml"
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xp/sitecore/jss/Dockerfile")
+                .SetTag(XpImageName("sitecore-jss"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"JSS_PACKAGE={JSS_PACKAGE}"
+                })
             );
+        });
+    
+    Target XpMssqlJss => _ => _
+        .Requires(() => File.Exists(Files / JSS_PACKAGE))
+        .DependsOn(XpMssql)
+        .Executes(() => {
+            var baseImage = XpImageName("mssql");
 
-            System.IO.Directory.SetCurrentDirectory("..");
-        });        
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xp/mssql/jss/Dockerfile")
+                .SetTag(XpImageName("mssql-jss"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"JSS_PACKAGE={JSS_PACKAGE}"
+                })
+            );
+        });   
 
     Target Xp => _ => _
         .DependsOn(XpMssql, XpSitecore, XpSolr, XpXconnect, XpIdentity);
@@ -288,7 +300,7 @@ partial class Build : NukeBuild
         .DependsOn(Xp, XpSitecoreSxa, XpMssqlSxa, XpSolrSxa);
 
     Target XpJss => _ => _
-        .DependsOn(XpSitecoreMssqlJss);
+        .DependsOn(Xp, XpSitecoreJss, XpMssqlJss);
 
     Target PushXp => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))

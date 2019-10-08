@@ -261,26 +261,39 @@ partial class Build : NukeBuild
                 })
             );
         });
-
-   Target XcSitecoreMssqlJss => _ => _
-        .Requires(() => File.Exists(Files / COMMERCE_SIF_PACKAGE))
-        .DependsOn(Xc)
+    
+    Target XcSitecoreJss => _ => _
+        .Requires(() => File.Exists(Files / JSS_PACKAGE))
+        .DependsOn(XcSitecore)
         .Executes(() => {
-            System.IO.Directory.SetCurrentDirectory("xc");
+            var baseImage = XcImageName("sitecore");
 
-            // Set env variables for docker-compose
-            Environment.SetEnvironmentVariable("JSS_PACKAGE", $"{JSS_PACKAGE}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("IMAGE_PREFIX", $"{XcImagePrefix}", EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("TAG", $"{XcSitecoreVersion}", EnvironmentVariableTarget.Process);
-
-            InstallSitecorePackage(
-                @"C:\jss\InstallJSS.ps1",
-                XcImageName("sitecore-jss"), 
-                XcImageName("mssql-jss"),
-                "-f docker-compose.yml -f docker-compose.jss.yml"
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xc/sitecore/jss/Dockerfile")
+                .SetTag(XcImageName("sitecore-jss"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"JSS_PACKAGE={JSS_PACKAGE}"
+                })
             );
+        });
+    
+    Target XcMssqlJss => _ => _
+        .Requires(() => File.Exists(Files / JSS_PACKAGE))
+        .DependsOn(XcMssql)
+        .Executes(() => {
+            var baseImage = XcImageName("mssql");
 
-            System.IO.Directory.SetCurrentDirectory("..");
+            DockerBuild(x => x
+                .SetPath(".")
+                .SetFile("xc/mssql/jss/Dockerfile")
+                .SetTag(XcImageName("mssql-jss"))
+                .SetBuildArg(new string[] {
+                    $"BASE_IMAGE={baseImage}",
+                    $"JSS_PACKAGE={JSS_PACKAGE}"
+                })
+            );
         });
 
     Target XcSitecore => _ => _
@@ -354,7 +367,7 @@ partial class Build : NukeBuild
         .DependsOn(Xc, XcSitecoreSxa, XcMssqlSxa, XcSolrSxa);
 
     Target XcJss => _ => _
-        .DependsOn(Xc, XcSitecoreMssqlJss);        
+        .DependsOn(Xc, XcSitecoreJss, XcMssqlJss);        
 
     Target PushXc => _ => _
         .Requires(() => !string.IsNullOrEmpty(RepoImagePrefix))
