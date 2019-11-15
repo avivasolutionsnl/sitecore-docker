@@ -1,3 +1,7 @@
+> THIS REPO IS NO LONGER MAINTAINED.
+> 
+> Sitecore XC Docker is now available here: https://github.com/Sitecore/docker-images.
+
 [![Build Status](https://dev.azure.com/avivasolutions-public/sitecore-docker/_apis/build/status/avivasolutionsnl.sitecore-docker?branchName=master)](https://dev.azure.com/avivasolutions-public/sitecore-docker/_build/latest?definitionId=1&branchName=master)
 
 Run Sitecore XP 9.2.0 and XC 9.2.0 using Docker for Windows.
